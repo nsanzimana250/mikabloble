@@ -38,7 +38,7 @@ const Navbar = () => {
       <div className="section-container flex items-center justify-between h-16 md:h-20">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <img src={logo} alt="MIKA GLOBLE BUSINESS LTD" className="h-10 md:h-14 w-auto" />
+          <img src={logo} alt="MIKA GLOBLE BUSINESS LTD" className="h-10 md:h-14 w-auto max-w-[180px] md:max-w-[240px]" />
         </Link>
 
         {/* Desktop Nav */}
