@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { Car, Facebook, Instagram, Linkedin, Twitter, ArrowUp, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Twitter, ArrowUp, Mail, Phone, MapPin } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import logo from "@/assets/logo.png";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -22,9 +23,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Company Info */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Car className="h-6 w-6 text-secondary" />
-              <span className="font-display font-bold text-lg">MIKA GLOBLE</span>
+            <div className="mb-4">
+              <img src={logo} alt="MIKA GLOBLE BUSINESS LTD" className="h-14 w-auto brightness-0 invert" />
             </div>
             <p className="text-primary-foreground/70 text-sm leading-relaxed mb-4">
               Your trusted partner for quality car spare parts. From small clips to major engine components, we deliver excellence worldwide.
@@ -62,7 +62,7 @@ const Footer = () => {
             <div className="flex flex-col gap-3">
               <div className="flex items-start gap-3 text-sm text-primary-foreground/70">
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-secondary" />
-                <span>123 Industrial Area, Business District, London, UK</span>
+                <span>KN 4 Ave, Kigali City, Rwanda</span>
               </div>
               <div className="flex items-center gap-3 text-sm text-primary-foreground/70">
                 <Phone className="h-4 w-4 shrink-0 text-secondary" />
@@ -99,9 +99,10 @@ const Footer = () => {
       {/* Bottom bar */}
       <div className="border-t border-primary-foreground/10">
         <div className="section-container py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="text-primary-foreground/50 text-xs">
-            © 2026 MIKA GLOBLE BUSINESS LTD. All rights reserved.
-          </p>
+          <div className="text-primary-foreground/50 text-xs text-center sm:text-left">
+            <p>© 2026 MIKA GLOBLE BUSINESS LTD. All rights reserved.</p>
+            <p className="mt-1">Developed by <a href="https://esdras-kappa.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-secondary hover:underline">dev esdras</a></p>
+          </div>
           <button onClick={scrollToTop} className="p-2 rounded-full bg-secondary text-secondary-foreground hover:brightness-110 transition-all">
             <ArrowUp className="h-4 w-4" />
           </button>

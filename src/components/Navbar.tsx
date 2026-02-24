@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Search, User, ShoppingCart, Menu, X, Car } from "lucide-react";
+import { Search, User, ShoppingCart, Menu, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
+import logo from "@/assets/logo.png";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -37,11 +38,7 @@ const Navbar = () => {
       <div className="section-container flex items-center justify-between h-16 md:h-20">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 shrink-0">
-          <Car className={`h-7 w-7 ${scrolled ? "text-secondary" : "text-secondary"}`} />
-          <span className={`font-display font-bold text-sm md:text-lg leading-tight ${scrolled ? "text-primary" : "text-primary-foreground"}`}>
-            MIKA GLOBLE<br className="md:hidden" />
-            <span className="hidden md:inline"> </span>BUSINESS LTD
-          </span>
+          <img src={logo} alt="MIKA GLOBLE BUSINESS LTD" className="h-10 md:h-14 w-auto" />
         </Link>
 
         {/* Desktop Nav */}
@@ -70,9 +67,9 @@ const Navbar = () => {
           <button className={`p-2 rounded-lg transition-colors ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}>
             <Search className="h-5 w-5" />
           </button>
-          <button className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}>
+          <Link to="/profile" className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}>
             <User className="h-5 w-5" />
-          </button>
+          </Link>
           <Link
             to="/cart"
             className={`p-2 rounded-lg transition-colors relative ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}

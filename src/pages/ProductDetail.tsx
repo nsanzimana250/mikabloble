@@ -4,7 +4,7 @@ import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
 import { products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
-import { Star, ChevronRight, Minus, Plus, Heart, ShoppingCart, Truck, ShieldCheck, RotateCcw } from "lucide-react";
+import { Star, ChevronRight, Minus, Plus, Heart, ShoppingCart, Truck, ShieldCheck, RotateCcw, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 const ProductDetail = () => {
@@ -114,6 +114,17 @@ const ProductDetail = () => {
               <button className="p-3 border border-border rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-destructive">
                 <Heart className="h-5 w-5" />
               </button>
+
+              <a
+                href={`https://wa.me/250788123456?text=${encodeURIComponent(`Hi! I'd like to order: ${product.name} (Qty: ${quantity}) - $${(product.price * quantity).toFixed(2)}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 border border-green-500 rounded-lg bg-green-50 hover:bg-green-100 transition-colors text-green-600 flex items-center gap-2"
+                title="Order on WhatsApp"
+              >
+                <MessageCircle className="h-5 w-5" />
+                <span className="text-sm font-medium hidden sm:inline">WhatsApp</span>
+              </a>
             </div>
 
             {/* Trust badges */}
