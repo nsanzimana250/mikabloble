@@ -91,9 +91,9 @@ const Cart = () => {
             {subtotal < 100 && (
               <p className="text-xs text-secondary mt-3">Add ${(100 - subtotal).toFixed(2)} more for free shipping!</p>
             )}
-            <button className="btn-primary w-full mt-6 text-center">
+            <Link to="/checkout" className="btn-primary w-full mt-6 text-center block">
               Proceed to Checkout
-            </button>
+            </Link>
             <Link to="/products" className="block text-center text-sm text-muted-foreground hover:text-secondary mt-3 transition-colors">
               Continue Shopping
             </Link>
