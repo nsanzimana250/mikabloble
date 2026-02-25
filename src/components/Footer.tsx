@@ -102,6 +102,7 @@ const Footer = () => {
           <div className="text-primary-foreground/50 text-xs text-center sm:text-left">
             <p>© 2026 MIKA GLOBLE BUSINESS LTD. All rights reserved.</p>
             <p className="mt-1">Developed by <a href="https://esdras-kappa.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-secondary hover:underline">dev esdras</a></p>
+            <Link to="/admin/login" className="text-primary-foreground/30 hover:text-primary-foreground/60 transition-colors mt-1 inline-block">Admin</Link>
           </div>
           <button onClick={scrollToTop} className="p-2 rounded-full bg-secondary text-secondary-foreground hover:brightness-110 transition-all">
             <ArrowUp className="h-4 w-4" />
