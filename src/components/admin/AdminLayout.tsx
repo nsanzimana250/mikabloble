@@ -23,12 +23,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const currentPage = navItems.find((i) => i.path === location.pathname)?.name || "Dashboard";
 
   return (
-    <div className="min-h-screen flex bg-background">
-      {/* Overlay */}
+    <div className="min-h-screen flex w-full bg-background">
+      {/* Mobile Overlay */}
       {sidebarOpen && <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
       {/* Sidebar */}
-      <aside className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-sidebar-background text-sidebar-foreground flex flex-col transition-transform lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <aside className={`fixed lg:relative lg:translate-x-0 top-0 left-0 z-50 h-screen lg:h-auto lg:min-h-screen w-64 shrink-0 bg-sidebar-background text-sidebar-foreground flex flex-col transition-transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="p-5 border-b border-sidebar-border">
           <Link to="/admin" className="block">
             <img src={logo} alt="MIKA GLOBLE" className="h-10 brightness-0 invert" />
@@ -63,7 +63,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-6 h-16 flex items-center gap-4">
+        <header className="sticky top-0 z-30 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-6 h-16 flex items-center gap-4 shrink-0">
           <button className="lg:hidden p-2 rounded-lg hover:bg-muted" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </button>
@@ -72,7 +72,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">A</div>
           </div>
         </header>
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto">
+        <main className="flex-1 p-4 md:p-6">
           {children}
         </main>
       </div>
