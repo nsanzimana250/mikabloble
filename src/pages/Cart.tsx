@@ -7,8 +7,8 @@ import { motion } from "framer-motion";
 const Cart = () => {
   const { items, updateQuantity, removeFromCart, subtotal, totalItems } = useCart();
 
-  const shipping = subtotal > 100 ? 0 : 9.99;
-  const tax = subtotal * 0.08;
+  const shipping = 0; // Free delivery
+  const tax = subtotal * 0.18;
   const total = subtotal + shipping + tax;
 
   if (items.length === 0) {
@@ -30,7 +30,6 @@ const Cart = () => {
         <h1 className="section-title mb-8">Shopping Cart ({totalItems} items)</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
               <motion.div
@@ -57,7 +56,7 @@ const Cart = () => {
                         <Plus className="h-3 w-3" />
                       </button>
                     </div>
-                    <span className="font-bold text-card-foreground">${(item.product.price * item.quantity).toFixed(2)}</span>
+                    <span className="font-bold text-card-foreground">RWF {(item.product.price * item.quantity).toLocaleString()}</span>
                   </div>
                 </div>
                 <button onClick={() => removeFromCart(item.product.id)} className="text-muted-foreground hover:text-destructive transition-colors self-start p-1">
@@ -67,30 +66,26 @@ const Cart = () => {
             ))}
           </div>
 
-          {/* Order Summary */}
           <div className="bg-card rounded-xl p-6 shadow-[var(--card-shadow)] h-fit sticky top-24">
             <h2 className="font-display font-semibold text-lg text-card-foreground mb-4">Order Summary</h2>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="text-card-foreground font-medium">${subtotal.toFixed(2)}</span>
+                <span className="text-card-foreground font-medium">RWF {subtotal.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Shipping</span>
-                <span className="text-card-foreground font-medium">{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
+                <span className="text-green-600 font-medium">Free</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Tax (est.)</span>
-                <span className="text-card-foreground font-medium">${tax.toFixed(2)}</span>
+                <span className="text-muted-foreground">Tax (18%)</span>
+                <span className="text-card-foreground font-medium">RWF {tax.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
               </div>
               <div className="border-t border-border pt-3 flex justify-between">
                 <span className="font-semibold text-card-foreground">Total</span>
-                <span className="font-bold text-lg text-card-foreground">${total.toFixed(2)}</span>
+                <span className="font-bold text-lg text-card-foreground">RWF {total.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
               </div>
             </div>
-            {subtotal < 100 && (
-              <p className="text-xs text-secondary mt-3">Add ${(100 - subtotal).toFixed(2)} more for free shipping!</p>
-            )}
             <Link to="/checkout" className="btn-primary w-full mt-6 text-center block">
               Proceed to Checkout
             </Link>

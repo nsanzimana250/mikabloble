@@ -4,7 +4,7 @@ import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
 import { products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
-import { Star, ChevronRight, Minus, Plus, Heart, ShoppingCart, Truck, ShieldCheck, RotateCcw, MessageCircle } from "lucide-react";
+import { ChevronRight, Minus, Plus, Heart, ShoppingCart, Truck, ShieldCheck, RotateCcw, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 const ProductDetail = () => {
@@ -12,7 +12,7 @@ const ProductDetail = () => {
   const product = products.find((p) => p.id === id);
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState<"specs" | "compatibility" | "reviews">("specs");
+  const [activeTab, setActiveTab] = useState<"specs" | "compatibility">("specs");
 
   if (!product) {
     return (
@@ -29,56 +29,51 @@ const ProductDetail = () => {
 
   return (
     <Layout>
-      <div className="section-container py-8">
+      <div className="section-container py-8 overflow-x-hidden">
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6 flex-wrap">
           <Link to="/" className="hover:text-secondary transition-colors">Home</Link>
-          <ChevronRight className="h-3 w-3" />
+          <ChevronRight className="h-3 w-3 shrink-0" />
           <Link to="/products" className="hover:text-secondary transition-colors">Products</Link>
-          <ChevronRight className="h-3 w-3" />
-          <span className="text-foreground font-medium">{product.name}</span>
+          <ChevronRight className="h-3 w-3 shrink-0" />
+          <span className="text-foreground font-medium truncate">{product.name}</span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10">
           {/* Image */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-card rounded-2xl overflow-hidden shadow-[var(--card-shadow)]"
+            className="bg-card rounded-2xl overflow-hidden shadow-[var(--card-shadow)] w-full"
           >
             <img src={product.image} alt={product.name} className="w-full aspect-square object-cover" />
           </motion.div>
 
           {/* Info */}
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="min-w-0">
             <span className="text-xs font-semibold text-secondary uppercase tracking-wider">{product.brand}</span>
-            <h1 className="font-display font-bold text-3xl text-foreground mt-2">{product.name}</h1>
+            <h1 className="font-display font-bold text-2xl md:text-3xl text-foreground mt-2 break-words">{product.name}</h1>
 
-            <div className="flex items-center gap-3 mt-3">
-              <div className="flex items-center gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className={`h-4 w-4 ${i < Math.floor(product.rating) ? "fill-secondary text-secondary" : "text-muted-foreground/30"}`} />
-                ))}
-              </div>
-              <span className="text-sm text-muted-foreground">{product.rating} ({product.reviewCount} reviews)</span>
-            </div>
-
-            <div className="flex items-baseline gap-3 mt-5">
-              <span className="text-3xl font-bold text-foreground">${product.price.toFixed(2)}</span>
+            <div className="flex items-baseline gap-3 mt-5 flex-wrap">
+              <span className="text-2xl md:text-3xl font-bold text-foreground">RWF {product.price.toLocaleString()}</span>
               {product.originalPrice && (
-                <span className="text-lg text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</span>
+                <span className="text-base md:text-lg text-muted-foreground line-through">RWF {product.originalPrice.toLocaleString()}</span>
               )}
               {product.originalPrice && (
                 <span className="bg-secondary/10 text-secondary text-sm font-semibold px-2 py-0.5 rounded">
-                  Save ${(product.originalPrice - product.price).toFixed(2)}
+                  Save RWF {(product.originalPrice - product.price).toLocaleString()}
                 </span>
               )}
             </div>
 
-            <p className="text-muted-foreground mt-4 leading-relaxed">{product.description}</p>
+            <p className="text-muted-foreground mt-4 leading-relaxed text-sm md:text-base">{product.description}</p>
 
-            {/* Stock status */}
-            <div className="mt-4">
+            {/* Free Delivery + Stock */}
+            <div className="mt-4 space-y-2">
+              <div className="flex items-center gap-2 text-green-600">
+                <Truck className="h-4 w-4 shrink-0" />
+                <span className="text-sm font-semibold">🚚 FREE DELIVERY — Nationwide</span>
+              </div>
               {product.inStock ? (
                 product.lowStock ? (
                   <span className="text-sm font-medium text-secondary">⚠ Low Stock - Order Soon</span>
@@ -91,12 +86,12 @@ const ProductDetail = () => {
             </div>
 
             {/* Quantity & Actions */}
-            <div className="mt-6 flex flex-wrap items-center gap-4">
+            <div className="mt-6 flex flex-wrap items-center gap-3">
               <div className="flex items-center border border-border rounded-lg overflow-hidden">
                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-3 hover:bg-muted transition-colors">
                   <Minus className="h-4 w-4" />
                 </button>
-                <span className="px-5 font-semibold text-foreground">{quantity}</span>
+                <span className="px-4 font-semibold text-foreground">{quantity}</span>
                 <button onClick={() => setQuantity(quantity + 1)} className="p-3 hover:bg-muted transition-colors">
                   <Plus className="h-4 w-4" />
                 </button>
@@ -105,7 +100,7 @@ const ProductDetail = () => {
               <button
                 onClick={() => addToCart(product, quantity)}
                 disabled={!product.inStock}
-                className="btn-primary flex items-center gap-2 disabled:opacity-50"
+                className="btn-primary flex items-center gap-2 disabled:opacity-50 text-sm md:text-base"
               >
                 <ShoppingCart className="h-4 w-4" />
                 Add to Cart
@@ -116,7 +111,7 @@ const ProductDetail = () => {
               </button>
 
               <a
-                href={`https://wa.me/250788123456?text=${encodeURIComponent(`Hi! I'd like to order: ${product.name} (Qty: ${quantity}) - $${(product.price * quantity).toFixed(2)}`)}`}
+                href={`https://wa.me/250788123456?text=${encodeURIComponent(`Hi! I'd like to order: ${product.name} (Qty: ${quantity}) - RWF ${(product.price * quantity).toLocaleString()}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-3 border border-green-500 rounded-lg bg-green-50 hover:bg-green-100 transition-colors text-green-600 flex items-center gap-2"
@@ -128,15 +123,15 @@ const ProductDetail = () => {
             </div>
 
             {/* Trust badges */}
-            <div className="grid grid-cols-3 gap-3 mt-8">
+            <div className="grid grid-cols-3 gap-2 md:gap-3 mt-8">
               {[
-                { icon: Truck, text: "Free Shipping" },
+                { icon: Truck, text: "Free Delivery" },
                 { icon: ShieldCheck, text: "Genuine Parts" },
                 { icon: RotateCcw, text: "30-Day Returns" },
               ].map(({ icon: Icon, text }) => (
-                <div key={text} className="flex flex-col items-center gap-1 p-3 bg-muted rounded-lg">
-                  <Icon className="h-5 w-5 text-primary" />
-                  <span className="text-xs font-medium text-foreground text-center">{text}</span>
+                <div key={text} className="flex flex-col items-center gap-1 p-2 md:p-3 bg-muted rounded-lg">
+                  <Icon className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+                  <span className="text-[10px] md:text-xs font-medium text-foreground text-center">{text}</span>
                 </div>
               ))}
             </div>
@@ -146,7 +141,7 @@ const ProductDetail = () => {
         {/* Tabs */}
         <div className="mt-12">
           <div className="flex gap-1 border-b border-border">
-            {(["specs", "compatibility", "reviews"] as const).map((tab) => (
+            {(["specs", "compatibility"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -154,7 +149,7 @@ const ProductDetail = () => {
                   activeTab === tab ? "border-secondary text-secondary" : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {tab === "specs" ? "Specifications" : tab === "compatibility" ? "Compatibility" : "Reviews"}
+                {tab === "specs" ? "Specifications" : "Compatibility"}
               </button>
             ))}
           </div>
@@ -166,8 +161,8 @@ const ProductDetail = () => {
                   <tbody>
                     {Object.entries(product.specs).map(([key, value], i) => (
                       <tr key={key} className={i % 2 === 0 ? "bg-muted/50" : ""}>
-                        <td className="px-5 py-3 text-sm font-medium text-foreground w-1/3">{key}</td>
-                        <td className="px-5 py-3 text-sm text-muted-foreground">{value}</td>
+                        <td className="px-4 md:px-5 py-3 text-sm font-medium text-foreground w-1/3">{key}</td>
+                        <td className="px-4 md:px-5 py-3 text-sm text-muted-foreground">{value}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -182,9 +177,6 @@ const ProductDetail = () => {
                   </div>
                 ))}
               </div>
-            )}
-            {activeTab === "reviews" && (
-              <p className="text-muted-foreground">No reviews yet. Be the first to review this product!</p>
             )}
           </div>
         </div>

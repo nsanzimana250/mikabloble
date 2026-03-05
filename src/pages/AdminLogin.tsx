@@ -28,7 +28,7 @@ const AdminLogin = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
-        <div className="bg-card rounded-2xl shadow-lg border border-border p-8">
+        <div className="bg-card rounded-2xl shadow-[0_8px_40px_-12px_hsl(224_76%_33%/0.25)] border border-border p-8">
           <div className="text-center mb-8">
             <Link to="/">
               <img src={logo} alt="MIKA GLOBLE" className="h-12 mx-auto mb-4" />

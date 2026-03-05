@@ -4,17 +4,17 @@ import { motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 
 const stats = [
-  { title: "Total Revenue", value: "$48,295", change: "+12.5%", up: true, icon: DollarSign, color: "bg-green-500/10 text-green-600" },
+  { title: "Total Revenue", value: "RWF 48,295,000", change: "+12.5%", up: true, icon: DollarSign, color: "bg-green-500/10 text-green-600" },
   { title: "Total Orders", value: "1,284", change: "+8.2%", up: true, icon: ShoppingCart, color: "bg-secondary/10 text-secondary" },
   { title: "Products", value: "356", change: "+3", up: true, icon: Package, color: "bg-primary/10 text-primary" },
   { title: "Visitors", value: "12,847", change: "-2.1%", up: false, icon: Eye, color: "bg-purple-500/10 text-purple-600" },
 ];
 
 const monthlyRevenue = [
-  { month: "Jan", revenue: 4200 }, { month: "Feb", revenue: 3800 }, { month: "Mar", revenue: 5100 },
-  { month: "Apr", revenue: 4700 }, { month: "May", revenue: 5800 }, { month: "Jun", revenue: 6200 },
-  { month: "Jul", revenue: 5900 }, { month: "Aug", revenue: 7100 }, { month: "Sep", revenue: 6800 },
-  { month: "Oct", revenue: 7500 }, { month: "Nov", revenue: 8200 }, { month: "Dec", revenue: 9100 },
+  { month: "Jan", revenue: 4200000 }, { month: "Feb", revenue: 3800000 }, { month: "Mar", revenue: 5100000 },
+  { month: "Apr", revenue: 4700000 }, { month: "May", revenue: 5800000 }, { month: "Jun", revenue: 6200000 },
+  { month: "Jul", revenue: 5900000 }, { month: "Aug", revenue: 7100000 }, { month: "Sep", revenue: 6800000 },
+  { month: "Oct", revenue: 7500000 }, { month: "Nov", revenue: 8200000 }, { month: "Dec", revenue: 9100000 },
 ];
 
 const ordersByDay = [
@@ -31,11 +31,11 @@ const categoryData = [
 ];
 
 const recentOrders = [
-  { id: "MG-7A2F", customer: "Jean Mugabo", amount: "$245.00", status: "Delivered", date: "2026-02-25" },
-  { id: "MG-8B3C", customer: "Alice Uwase", amount: "$189.50", status: "Processing", date: "2026-02-24" },
-  { id: "MG-9D4E", customer: "Patrick Nkusi", amount: "$324.00", status: "Shipped", date: "2026-02-24" },
-  { id: "MG-1F5G", customer: "Grace Muhire", amount: "$78.99", status: "Pending", date: "2026-02-23" },
-  { id: "MG-2H6J", customer: "Eric Habimana", amount: "$512.00", status: "Delivered", date: "2026-02-23" },
+  { id: "MG-7A2F", customer: "Jean Mugabo", amount: "RWF 245,000", status: "Delivered", date: "2026-02-25" },
+  { id: "MG-8B3C", customer: "Alice Uwase", amount: "RWF 189,500", status: "Processing", date: "2026-02-24" },
+  { id: "MG-9D4E", customer: "Patrick Nkusi", amount: "RWF 324,000", status: "Shipped", date: "2026-02-24" },
+  { id: "MG-1F5G", customer: "Grace Muhire", amount: "RWF 78,990", status: "Pending", date: "2026-02-23" },
+  { id: "MG-2H6J", customer: "Eric Habimana", amount: "RWF 512,000", status: "Delivered", date: "2026-02-23" },
 ];
 
 const statusColors: Record<string, string> = {
@@ -48,14 +48,13 @@ const statusColors: Record<string, string> = {
 const Dashboard = () => (
   <AdminLayout>
     <div className="space-y-6">
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {stats.map((s, i) => (
           <motion.div key={s.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="bg-card rounded-xl p-5 border border-border shadow-sm">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{s.title}</p>
-                <p className="text-2xl font-bold mt-1">{s.value}</p>
+                <p className="text-xl md:text-2xl font-bold mt-1">{s.value}</p>
               </div>
               <div className={`p-2.5 rounded-xl ${s.color}`}><s.icon className="h-5 w-5" /></div>
             </div>
@@ -67,7 +66,6 @@ const Dashboard = () => (
         ))}
       </div>
 
-      {/* Charts Row */}
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-card rounded-xl p-5 border border-border shadow-sm">
           <h3 className="font-bold mb-4">Monthly Revenue</h3>
@@ -75,8 +73,8 @@ const Dashboard = () => (
             <BarChart data={monthlyRevenue}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 13%, 87%)" />
               <XAxis dataKey="month" fontSize={12} />
-              <YAxis fontSize={12} />
-              <Tooltip formatter={(v: number) => [`$${v}`, "Revenue"]} />
+              <YAxis fontSize={12} tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`} />
+              <Tooltip formatter={(v: number) => [`RWF ${v.toLocaleString()}`, "Revenue"]} />
               <Bar dataKey="revenue" fill="hsl(224, 76%, 33%)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -101,7 +99,6 @@ const Dashboard = () => (
         </div>
       </div>
 
-      {/* Orders chart + Recent orders */}
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="bg-card rounded-xl p-5 border border-border shadow-sm">
           <h3 className="font-bold mb-4">Orders This Week</h3>
@@ -125,7 +122,7 @@ const Dashboard = () => (
                   <p className="font-medium truncate">{o.customer}</p>
                   <p className="text-xs text-muted-foreground">{o.id} · {o.date}</p>
                 </div>
-                <span className="font-semibold">{o.amount}</span>
+                <span className="font-semibold text-xs md:text-sm">{o.amount}</span>
                 <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColors[o.status]}`}>{o.status}</span>
               </div>
             ))}

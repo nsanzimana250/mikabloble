@@ -16,7 +16,7 @@ const Checkout = () => {
   const [processing, setProcessing] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
 
-  const shipping = subtotal > 100 ? 0 : 9.99;
+  const shipping = 0;
   const tax = subtotal * 0.18;
   const total = subtotal + shipping + tax;
 
@@ -72,7 +72,6 @@ const Checkout = () => {
   return (
     <Layout>
       <div className="section-container py-8 md:py-12">
-        {/* Progress Steps */}
         <div className="flex items-center justify-center gap-2 mb-10">
           {["Shipping", "Payment", "Review"].map((s, i) => (
             <div key={s} className="flex items-center gap-2">
@@ -86,7 +85,6 @@ const Checkout = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Form */}
           <div className="lg:col-span-2">
             <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-card rounded-xl p-6 shadow-sm border border-border">
               {step === 1 && (
@@ -108,7 +106,6 @@ const Checkout = () => {
               {step === 2 && (
                 <>
                   <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><CreditCard className="h-5 w-5 text-secondary" /> Payment Method</h2>
-                  {/* Payment method selector */}
                   <div className="grid sm:grid-cols-3 gap-3 mb-6">
                     {[
                       { id: "card", label: "Credit Card" },
@@ -158,7 +155,7 @@ const Checkout = () => {
                           <p className="font-medium text-sm truncate">{item.product.name}</p>
                           <p className="text-muted-foreground text-xs">Qty: {item.quantity}</p>
                         </div>
-                        <p className="font-semibold text-sm">${(item.product.price * item.quantity).toFixed(2)}</p>
+                        <p className="font-semibold text-sm">RWF {(item.product.price * item.quantity).toLocaleString()}</p>
                       </div>
                     ))}
                   </div>
@@ -172,7 +169,7 @@ const Checkout = () => {
                       {processing ? (
                         <span className="flex items-center gap-2"><span className="h-4 w-4 border-2 border-secondary-foreground/30 border-t-secondary-foreground rounded-full animate-spin" /> Processing…</span>
                       ) : (
-                        <span className="flex items-center gap-2"><Lock className="h-4 w-4" /> Place Order — ${total.toFixed(2)}</span>
+                        <span className="flex items-center gap-2"><Lock className="h-4 w-4" /> Place Order — RWF {total.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                       )}
                     </Button>
                   </div>
@@ -181,7 +178,6 @@ const Checkout = () => {
             </motion.div>
           </div>
 
-          {/* Order Summary Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-card rounded-xl p-6 shadow-sm border border-border sticky top-24">
               <h3 className="font-bold text-lg mb-4">Order Summary</h3>
@@ -189,17 +185,17 @@ const Checkout = () => {
                 {items.map((item) => (
                   <div key={item.product.id} className="flex justify-between">
                     <span className="text-muted-foreground truncate mr-2">{item.product.name} × {item.quantity}</span>
-                    <span className="font-medium">${(item.product.price * item.quantity).toFixed(2)}</span>
+                    <span className="font-medium">RWF {(item.product.price * item.quantity).toLocaleString()}</span>
                   </div>
                 ))}
               </div>
               <div className="border-t border-border mt-4 pt-4 space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Tax (18%)</span><span>${tax.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>RWF {subtotal.toLocaleString()}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span className="text-green-600">Free</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Tax (18%)</span><span>RWF {tax.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span></div>
               </div>
               <div className="border-t border-border mt-4 pt-4 flex justify-between font-bold text-lg">
-                <span>Total</span><span className="text-secondary">${total.toFixed(2)}</span>
+                <span>Total</span><span className="text-secondary">RWF {total.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
               </div>
               <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
                 <Lock className="h-3 w-3" /> Secure checkout · SSL encrypted

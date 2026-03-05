@@ -17,30 +17,23 @@ const Profile = () => {
 
   const orders = [
     {
-      id: "ORD-001", date: "2026-02-20", status: "Delivered", total: 156.99,
+      id: "ORD-001", date: "2026-02-20", status: "Delivered", total: 156990,
       items: [
-        { name: "Brake Pad Set - Ceramic", qty: 2, price: 45.99, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=80&h=80&fit=crop" },
-        { name: "Oil Filter - Premium", qty: 1, price: 12.99, image: "https://images.unsplash.com/photo-1635784063407-577ca6097e01?w=80&h=80&fit=crop" },
+        { name: "Brake Pad Set - Ceramic", qty: 2, price: 45990, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=80&h=80&fit=crop" },
+        { name: "Oil Filter - Premium", qty: 1, price: 12990, image: "https://images.unsplash.com/photo-1635784063407-577ca6097e01?w=80&h=80&fit=crop" },
       ],
     },
     {
-      id: "ORD-002", date: "2026-02-18", status: "Shipped", total: 89.50,
+      id: "ORD-002", date: "2026-02-18", status: "Shipped", total: 89500,
       items: [
-        { name: "Alternator Assembly", qty: 1, price: 89.50, image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=80&h=80&fit=crop" },
+        { name: "Alternator Assembly", qty: 1, price: 89500, image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=80&h=80&fit=crop" },
       ],
     },
     {
-      id: "ORD-003", date: "2026-02-10", status: "Processing", total: 234.00,
+      id: "ORD-003", date: "2026-02-10", status: "Processing", total: 234000,
       items: [
-        { name: "Suspension Kit - Complete", qty: 1, price: 189.00, image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=80&h=80&fit=crop" },
-        { name: "Shock Absorber - Front", qty: 2, price: 22.50, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=80&h=80&fit=crop" },
-      ],
-    },
-    {
-      id: "ORD-004", date: "2026-01-28", status: "Delivered", total: 67.00,
-      items: [
-        { name: "Air Filter - High Performance", qty: 3, price: 15.00, image: "https://images.unsplash.com/photo-1635784063407-577ca6097e01?w=80&h=80&fit=crop" },
-        { name: "Spark Plug Set", qty: 1, price: 22.00, image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=80&h=80&fit=crop" },
+        { name: "Suspension Kit - Complete", qty: 1, price: 189000, image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=80&h=80&fit=crop" },
+        { name: "Shock Absorber - Front", qty: 2, price: 22500, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=80&h=80&fit=crop" },
       ],
     },
   ];
@@ -75,7 +68,6 @@ const Profile = () => {
       <section className="py-12">
         <div className="section-container">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Sidebar */}
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="bg-card rounded-2xl p-6 shadow-[var(--card-shadow)] h-fit">
               <div className="text-center mb-6">
                 <div className="relative inline-block">
@@ -110,9 +102,7 @@ const Profile = () => {
               </nav>
             </motion.div>
 
-            {/* Main Content */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="lg:col-span-2 space-y-8">
-              {/* Profile Info Tab */}
               {activeTab === "profile" && (
                 <div className="bg-card rounded-2xl p-6 shadow-[var(--card-shadow)]">
                   <div className="flex items-center justify-between mb-6">
@@ -151,7 +141,6 @@ const Profile = () => {
                 </div>
               )}
 
-              {/* Orders Tab */}
               {activeTab === "orders" && (
                 <div className="space-y-6">
                   <div className="bg-card rounded-2xl p-6 shadow-[var(--card-shadow)]">
@@ -160,7 +149,6 @@ const Profile = () => {
                       <span className="text-sm text-muted-foreground">{orders.length} orders</span>
                     </div>
 
-                    {/* Order Stats */}
                     <div className="grid grid-cols-3 gap-3 mb-6">
                       {[
                         { label: "Total Orders", value: orders.length, color: "bg-primary/10 text-primary" },
@@ -174,11 +162,9 @@ const Profile = () => {
                       ))}
                     </div>
 
-                    {/* Order List */}
                     <div className="space-y-3">
                       {orders.map((order) => (
                         <div key={order.id} className="border border-border rounded-xl overflow-hidden">
-                          {/* Order Header */}
                           <button
                             onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
                             className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
@@ -196,12 +182,11 @@ const Profile = () => {
                               <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${statusColor(order.status)}`}>
                                 {statusIcon(order.status)} {order.status}
                               </span>
-                              <span className="font-bold text-sm text-foreground">${order.total.toFixed(2)}</span>
+                              <span className="font-bold text-sm text-foreground hidden sm:block">RWF {order.total.toLocaleString()}</span>
                               <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${expandedOrder === order.id ? "rotate-90" : ""}`} />
                             </div>
                           </button>
 
-                          {/* Order Details (expanded) */}
                           {expandedOrder === order.id && (
                             <motion.div
                               initial={{ height: 0, opacity: 0 }}
@@ -209,26 +194,6 @@ const Profile = () => {
                               className="border-t border-border"
                             >
                               <div className="p-4 space-y-3">
-                                {/* Progress tracker */}
-                                <div className="flex items-center justify-between mb-4 px-4">
-                                  {["Placed", "Processing", "Shipped", "Delivered"].map((step, i) => {
-                                    const stepIndex = order.status === "Processing" ? 1 : order.status === "Shipped" ? 2 : order.status === "Delivered" ? 3 : 0;
-                                    const isActive = i <= stepIndex;
-                                    return (
-                                      <div key={step} className="flex flex-col items-center flex-1">
-                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isActive ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground"}`}>
-                                          {i + 1}
-                                        </div>
-                                        <span className={`text-xs mt-1 ${isActive ? "text-foreground font-medium" : "text-muted-foreground"}`}>{step}</span>
-                                        {i < 3 && (
-                                          <div className={`h-0.5 w-full mt-[-18px] mb-4 ${i < stepIndex ? "bg-secondary" : "bg-muted"}`} />
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-
-                                {/* Items */}
                                 {order.items.map((item, idx) => (
                                   <div key={idx} className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
                                     <img src={item.image} alt={item.name} className="w-14 h-14 rounded-lg object-cover" />
@@ -236,11 +201,10 @@ const Profile = () => {
                                       <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
                                       <p className="text-xs text-muted-foreground">Qty: {item.qty}</p>
                                     </div>
-                                    <span className="text-sm font-semibold text-foreground">${(item.price * item.qty).toFixed(2)}</span>
+                                    <span className="text-sm font-semibold text-foreground">RWF {(item.price * item.qty).toLocaleString()}</span>
                                   </div>
                                 ))}
 
-                                {/* Order summary */}
                                 <div className="flex items-center justify-between pt-3 border-t border-border">
                                   <div className="flex gap-2">
                                     <button className="text-xs text-secondary hover:underline flex items-center gap-1">
@@ -252,7 +216,7 @@ const Profile = () => {
                                   </div>
                                   <div className="text-right">
                                     <span className="text-xs text-muted-foreground">Total: </span>
-                                    <span className="font-bold text-foreground">${order.total.toFixed(2)}</span>
+                                    <span className="font-bold text-foreground">RWF {order.total.toLocaleString()}</span>
                                   </div>
                                 </div>
                               </div>
@@ -265,7 +229,6 @@ const Profile = () => {
                 </div>
               )}
 
-              {/* Wishlist Tab */}
               {activeTab === "wishlist" && (
                 <div className="bg-card rounded-2xl p-6 shadow-[var(--card-shadow)]">
                   <h3 className="font-display font-bold text-lg text-foreground mb-4">My Wishlist</h3>
