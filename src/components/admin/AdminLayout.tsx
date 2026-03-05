@@ -27,13 +27,13 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Mobile Overlay */}
       {sidebarOpen && <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />}
 
-      {/* Sidebar */}
-      <aside className={`fixed lg:relative lg:translate-x-0 top-0 left-0 z-50 h-screen lg:h-auto lg:min-h-screen w-64 shrink-0 bg-sidebar-background text-sidebar-foreground flex flex-col transition-transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
-        <div className="p-5 border-b border-sidebar-border">
+      {/* Sidebar - fixed on all screens */}
+      <aside className={`fixed top-0 left-0 z-50 h-screen w-64 shrink-0 bg-primary text-primary-foreground flex flex-col transition-transform lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+        <div className="p-5 border-b border-primary-foreground/10">
           <Link to="/admin" className="block">
             <img src={logo} alt="MIKA GLOBLE" className="h-10 brightness-0 invert" />
           </Link>
-          <p className="text-[10px] uppercase tracking-widest text-sidebar-foreground/50 mt-1">Admin Panel</p>
+          <p className="text-[10px] uppercase tracking-widest text-primary-foreground/50 mt-1">Admin Panel</p>
         </div>
 
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
@@ -44,7 +44,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${active ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md" : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"}`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${active ? "bg-primary-foreground text-primary shadow-md" : "text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"}`}
               >
                 <item.icon className="h-5 w-5" />
                 {item.name}
@@ -54,15 +54,15 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           })}
         </nav>
 
-        <div className="p-3 border-t border-sidebar-border">
-          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-sidebar-foreground/70 hover:bg-destructive/20 hover:text-destructive transition-colors">
+        <div className="p-3 border-t border-primary-foreground/10">
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-primary-foreground/70 hover:bg-destructive/20 hover:text-red-300 transition-colors">
             <LogOut className="h-5 w-5" /> Logout
           </button>
         </div>
       </aside>
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Main - offset by sidebar width on desktop */}
+      <div className="flex-1 flex flex-col min-w-0 lg:ml-64">
         <header className="sticky top-0 z-30 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-6 h-16 flex items-center gap-4 shrink-0">
           <button className="lg:hidden p-2 rounded-lg hover:bg-muted" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />

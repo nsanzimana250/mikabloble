@@ -36,7 +36,7 @@ const AdminProducts = () => {
       setProductList((prev) => prev.map((p) => p.id === editProduct.id ? { ...p, name: form.name, price: parseFloat(form.price), category: form.category, brand: form.brand, description: form.description, image: form.image } : p));
       toast.success("Product updated!");
     } else {
-      const newP: Product = { id: String(Date.now()), name: form.name, price: parseFloat(form.price) || 0, category: form.category, brand: form.brand, description: form.description, image: form.image || "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&h=400&fit=crop", rating: 4.0, reviewCount: 0, inStock: true };
+      const newP: Product = { id: String(Date.now()), name: form.name, price: parseFloat(form.price) || 0, category: form.category, brand: form.brand, description: form.description, image: form.image || "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&h=400&fit=crop", rating: 0, reviewCount: 0, inStock: true };
       setProductList((prev) => [newP, ...prev]);
       toast.success("Product added!");
     }
@@ -51,7 +51,6 @@ const AdminProducts = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -60,7 +59,6 @@ const AdminProducts = () => {
           <Button onClick={openAdd}><Plus className="h-4 w-4 mr-1" /> Add Product</Button>
         </div>
 
-        {/* Stats row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: "Total Products", value: productList.length },
@@ -75,7 +73,6 @@ const AdminProducts = () => {
           ))}
         </div>
 
-        {/* Table */}
         <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -93,7 +90,7 @@ const AdminProducts = () => {
                   <tr key={p.id} className="hover:bg-muted/30 transition-colors">
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <img src={p.image} alt={p.name} className="h-10 w-10 rounded-lg object-cover" />
+                        <img src={p.image} alt={p.name} className="h-10 w-10 rounded-lg object-cover shrink-0" />
                         <div className="min-w-0">
                           <p className="font-medium truncate">{p.name}</p>
                           <p className="text-xs text-muted-foreground md:hidden">{p.category}</p>
@@ -101,7 +98,7 @@ const AdminProducts = () => {
                       </div>
                     </td>
                     <td className="p-4 text-muted-foreground hidden md:table-cell">{p.category}</td>
-                    <td className="p-4 font-semibold">${p.price.toFixed(2)}</td>
+                    <td className="p-4 font-semibold whitespace-nowrap">RWF {p.price.toLocaleString()}</td>
                     <td className="p-4 hidden sm:table-cell">
                       <span className={`text-xs px-2 py-1 rounded-full font-medium ${p.inStock ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
                         {p.inStock ? "In Stock" : "Out"}
@@ -126,7 +123,6 @@ const AdminProducts = () => {
           )}
         </div>
 
-        {/* Modal */}
         <AnimatePresence>
           {showForm && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={() => setShowForm(false)}>
@@ -138,7 +134,7 @@ const AdminProducts = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div><Label>Name</Label><Input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} required /></div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div><Label>Price ($)</Label><Input type="number" step="0.01" value={form.price} onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))} required /></div>
+                    <div><Label>Price (RWF)</Label><Input type="number" step="1" value={form.price} onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))} required /></div>
                     <div><Label>Category</Label><Input value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))} required /></div>
                   </div>
                   <div><Label>Brand</Label><Input value={form.brand} onChange={(e) => setForm((p) => ({ ...p, brand: e.target.value }))} /></div>

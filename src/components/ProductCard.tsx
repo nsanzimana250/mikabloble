@@ -1,4 +1,4 @@
-import { Star, ShoppingCart, Eye } from "lucide-react";
+import { ShoppingCart, Eye, Truck } from "lucide-react";
 import { Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { Link } from "react-router-dom";
@@ -36,7 +36,6 @@ const ProductCard = ({ product }: { product: Product }) => {
             <span className="bg-card text-foreground px-4 py-2 rounded-lg font-semibold text-sm">Out of Stock</span>
           </div>
         )}
-        {/* Quick view */}
         {hovered && product.inStock && (
           <Link
             to={`/products/${product.id}`}
@@ -57,23 +56,18 @@ const ProductCard = ({ product }: { product: Product }) => {
         </Link>
         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{product.description}</p>
 
-        {/* Rating */}
-        <div className="flex items-center gap-1 mt-2">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star
-              key={i}
-              className={`h-3.5 w-3.5 ${i < Math.floor(product.rating) ? "fill-secondary text-secondary" : "text-muted-foreground/30"}`}
-            />
-          ))}
-          <span className="text-xs text-muted-foreground ml-1">({product.reviewCount})</span>
+        {/* Free Delivery Badge */}
+        <div className="flex items-center gap-1 mt-2 text-green-600">
+          <Truck className="h-3.5 w-3.5" />
+          <span className="text-xs font-medium">Free Delivery</span>
         </div>
 
         {/* Price + CTA */}
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-baseline gap-2">
-            <span className="text-lg font-bold text-card-foreground">${product.price.toFixed(2)}</span>
+            <span className="text-lg font-bold text-card-foreground">RWF {product.price.toLocaleString()}</span>
             {product.originalPrice && (
-              <span className="text-sm text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</span>
+              <span className="text-sm text-muted-foreground line-through">RWF {product.originalPrice.toLocaleString()}</span>
             )}
           </div>
           <button

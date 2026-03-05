@@ -13,7 +13,6 @@ const Products = () => {
   const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategory ? [initialCategory] : []);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 300]);
   const [sortBy, setSortBy] = useState("popularity");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
@@ -28,27 +27,23 @@ const Products = () => {
       if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.description.toLowerCase().includes(search.toLowerCase())) return false;
       if (selectedCategories.length && !selectedCategories.includes(p.category)) return false;
       if (selectedBrands.length && !selectedBrands.includes(p.brand)) return false;
-      if (p.price < priceRange[0] || p.price > priceRange[1]) return false;
       return true;
     });
     if (sortBy === "price-asc") result.sort((a, b) => a.price - b.price);
     else if (sortBy === "price-desc") result.sort((a, b) => b.price - a.price);
-    else if (sortBy === "rating") result.sort((a, b) => b.rating - a.rating);
     return result;
-  }, [search, selectedCategories, selectedBrands, priceRange, sortBy]);
+  }, [search, selectedCategories, selectedBrands, sortBy]);
 
   const resetFilters = () => {
     setSearch("");
     setSelectedCategories([]);
     setSelectedBrands([]);
-    setPriceRange([0, 300]);
   };
 
   const activeFilterCount = selectedCategories.length + selectedBrands.length + (search ? 1 : 0);
 
   const FilterSidebar = () => (
     <div className="space-y-6">
-      {/* Search */}
       <div>
         <label className="text-sm font-semibold text-foreground mb-2 block">Search</label>
         <div className="relative">
@@ -63,7 +58,6 @@ const Products = () => {
         </div>
       </div>
 
-      {/* Categories */}
       <div>
         <label className="text-sm font-semibold text-foreground mb-2 block">Categories</label>
         <div className="space-y-2">
@@ -81,22 +75,6 @@ const Products = () => {
         </div>
       </div>
 
-      {/* Price Range */}
-      <div>
-        <label className="text-sm font-semibold text-foreground mb-2 block">
-          Price Range: ${priceRange[0]} - ${priceRange[1]}
-        </label>
-        <input
-          type="range"
-          min={0}
-          max={300}
-          value={priceRange[1]}
-          onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-          className="w-full accent-secondary"
-        />
-      </div>
-
-      {/* Brands */}
       <div>
         <label className="text-sm font-semibold text-foreground mb-2 block">Brands</label>
         <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -123,7 +101,6 @@ const Products = () => {
   return (
     <Layout>
       <div className="section-container py-8">
-        {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
           <Link to="/" className="hover:text-secondary transition-colors">Home</Link>
           <ChevronRight className="h-3 w-3" />
@@ -137,7 +114,6 @@ const Products = () => {
         </div>
 
         <div className="flex gap-8">
-          {/* Desktop Sidebar */}
           <aside className="hidden lg:block w-64 shrink-0">
             <div className="bg-card rounded-xl p-5 shadow-[var(--card-shadow)] sticky top-24">
               <h3 className="font-display font-semibold text-lg mb-4">Filters</h3>
@@ -145,9 +121,7 @@ const Products = () => {
             </div>
           </aside>
 
-          {/* Main */}
           <div className="flex-1 min-w-0">
-            {/* Top bar */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <button
@@ -174,7 +148,6 @@ const Products = () => {
                   <option value="popularity">Popularity</option>
                   <option value="price-asc">Price: Low to High</option>
                   <option value="price-desc">Price: High to Low</option>
-                  <option value="rating">Top Rated</option>
                 </select>
                 <div className="hidden sm:flex bg-card border border-border rounded-lg overflow-hidden">
                   <button
@@ -193,7 +166,6 @@ const Products = () => {
               </div>
             </div>
 
-            {/* Active filters */}
             {activeFilterCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
                 {selectedCategories.map((cat) => (
@@ -211,7 +183,6 @@ const Products = () => {
               </div>
             )}
 
-            {/* Products Grid */}
             {filtered.length > 0 ? (
               <div className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1"}`}>
                 {filtered.map((product, i) => (
@@ -234,7 +205,6 @@ const Products = () => {
           </div>
         </div>
 
-        {/* Mobile filter overlay */}
         {showFilters && (
           <div className="fixed inset-0 z-50 lg:hidden">
             <div className="absolute inset-0 bg-foreground/50" onClick={() => setShowFilters(false)} />

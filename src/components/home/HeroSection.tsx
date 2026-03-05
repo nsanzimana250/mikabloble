@@ -1,12 +1,11 @@
 import { Link } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
   return (
     <section className="relative min-h-[600px] md:min-h-[700px] flex items-center gradient-hero overflow-hidden">
-      {/* Background image with overlay */}
       <div className="absolute inset-0">
         <img src={heroBg} alt="Car spare parts" className="w-full h-full object-cover opacity-30" />
         <div className="absolute inset-0 gradient-hero opacity-80" />
@@ -14,6 +13,17 @@ const HeroSection = () => {
 
       <div className="section-container relative z-10 py-20">
         <div className="max-w-2xl">
+          {/* Free Delivery Alert */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 bg-green-500/20 backdrop-blur-sm border border-green-400/30 text-green-300 px-4 py-2 rounded-full text-sm font-semibold mb-6"
+          >
+            <Truck className="h-4 w-4" />
+            🚚 FREE DELIVERY on all orders — Nationwide!
+          </motion.div>
+
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -33,7 +43,6 @@ const HeroSection = () => {
             From small clips to major engine components — MIKA GLOBLE delivers excellence worldwide.
           </motion.p>
 
-          {/* Search Bar */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -46,27 +55,19 @@ const HeroSection = () => {
               placeholder="Search by part name, number, or vehicle..."
               className="flex-1 bg-transparent text-primary-foreground placeholder:text-primary-foreground/40 px-3 py-2.5 text-sm focus:outline-none"
             />
-            <button className="btn-primary rounded-lg px-5 py-2.5 text-sm">
-              Search
-            </button>
+            <button className="btn-primary rounded-lg px-5 py-2.5 text-sm">Search</button>
           </motion.div>
 
-          {/* CTAs */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.4 }}
             className="mt-8 flex flex-wrap gap-4"
           >
-            <Link to="/products" className="btn-primary text-base">
-              Shop Now
-            </Link>
-            <Link to="/request-quote" className="btn-outline-hero text-base">
-              Request Quote
-            </Link>
+            <Link to="/products" className="btn-primary text-base">Shop Now</Link>
+            <Link to="/request-quote" className="btn-outline-hero text-base">Request Quote</Link>
           </motion.div>
 
-          {/* Stats */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

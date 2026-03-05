@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import { motion } from "framer-motion";
-import { Target, Eye, Award, Users, Package, Globe } from "lucide-react";
+import { Target, Eye, Users, Package, Globe, Award } from "lucide-react";
 
 const stats = [
   { icon: Users, value: "15,000+", label: "Happy Customers" },
@@ -9,17 +9,9 @@ const stats = [
   { icon: Award, value: "12+", label: "Years in Business" },
 ];
 
-const team = [
-  { name: "Michael Adebayo", role: "CEO & Founder", initials: "MA" },
-  { name: "Sarah Johnson", role: "Head of Operations", initials: "SJ" },
-  { name: "David Chen", role: "Supply Chain Director", initials: "DC" },
-  { name: "Amina Okafor", role: "Customer Relations", initials: "AO" },
-];
-
 const About = () => {
   return (
     <Layout>
-      {/* Hero */}
       <section className="gradient-hero py-20">
         <div className="section-container text-center">
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-display font-black text-4xl md:text-5xl text-primary-foreground">
@@ -31,7 +23,6 @@ const About = () => {
         </div>
       </section>
 
-      {/* Story */}
       <section className="py-20">
         <div className="section-container grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
@@ -63,7 +54,6 @@ const About = () => {
         </div>
       </section>
 
-      {/* Mission & Vision */}
       <section className="py-20 bg-card">
         <div className="section-container grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="p-8 rounded-2xl bg-primary/5 border border-primary/10">
@@ -79,34 +69,6 @@ const About = () => {
             <p className="text-muted-foreground leading-relaxed">
               To become the world's most trusted marketplace for automotive spare parts, driving innovation in global supply chain logistics and customer experience.
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Team */}
-      <section className="py-20">
-        <div className="section-container">
-          <div className="text-center mb-12">
-            <h2 className="section-title">Our Leadership Team</h2>
-            <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {team.map((member, i) => (
-              <motion.div
-                key={member.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="text-center"
-              >
-                <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <span className="font-display font-bold text-xl text-primary">{member.initials}</span>
-                </div>
-                <h3 className="font-semibold text-foreground">{member.name}</h3>
-                <p className="text-sm text-muted-foreground mt-1">{member.role}</p>
-              </motion.div>
-            ))}
           </div>
         </div>
       </section>
