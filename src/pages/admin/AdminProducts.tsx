@@ -3,7 +3,8 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { 
   Plus, Search, Edit2, Trash2, X, Package, 
   FolderPlus, Tag, Upload, Image as ImageIcon,
-  PlusCircle, MinusCircle, Camera, AlertCircle, Eye
+  PlusCircle, MinusCircle, Camera, AlertCircle, Eye,
+  ChevronLeft, ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,6 +69,8 @@ const AdminProducts = () => {
     name: string 
   }>({ isOpen: false, type: 'product', id: '', name: '' });
   const [viewProduct, setViewProduct] = useState<ProductWithRelations | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [showImageGallery, setShowImageGallery] = useState(false);
 
   // Product Form State with dynamic fields
   const [productForm, setProductForm] = useState({
@@ -213,7 +216,7 @@ const AdminProducts = () => {
       setImageUrlInput('');
       toast.success('Main image URL added');
     } catch {
-      toast.error('Please enter a valid URL');
+      toast.error('Please enter a valid URL (include http:// or https://)');
     }
   };
 
@@ -238,8 +241,12 @@ const AdminProducts = () => {
       setAdditionalImageUrl('');
       toast.success('Additional image URL added');
     } catch {
-      toast.error('Please enter a valid URL');
+      toast.error('Please enter a valid URL (include http:// or https://)');
     }
+  };
+
+  const removeMainImage = () => {
+    setProductForm(prev => ({ ...prev, image: '' }));
   };
 
   const removeAdditionalImage = (index: number) => {
@@ -389,7 +396,7 @@ const AdminProducts = () => {
         category_id: productForm.categoryId,
         brand_id: productForm.brandId,
         description: productForm.description || null,
-        image: productForm.image || null,
+        image: productForm.image || null, // Make sure image is included
         images: productForm.images || [],
         in_stock: productForm.inStock,
         low_stock: productForm.lowStock,
@@ -397,6 +404,8 @@ const AdminProducts = () => {
         compatibility: productForm.compatibility || [],
         updated_at: new Date().toISOString()
       };
+
+      console.log('Submitting product data:', productData); // Debug log
 
       if (editProduct) {
         // Update existing product
@@ -558,6 +567,35 @@ const AdminProducts = () => {
 
   const openDeleteDialog = (type: 'product' | 'category' | 'brand', id: string, name: string) => {
     setDeleteDialog({ isOpen: true, type, id, name });
+  };
+
+  // Image gallery handlers
+  const openImageGallery = (product: ProductWithRelations, index: number = 0) => {
+    setViewProduct(product);
+    setSelectedImageIndex(index);
+    setShowImageGallery(true);
+  };
+
+  const nextImage = () => {
+    if (!viewProduct) return;
+    const totalImages = [viewProduct.image, ...(viewProduct.images || [])].filter(Boolean).length;
+    setSelectedImageIndex((prev) => (prev + 1) % totalImages);
+  };
+
+  const prevImage = () => {
+    if (!viewProduct) return;
+    const totalImages = [viewProduct.image, ...(viewProduct.images || [])].filter(Boolean).length;
+    setSelectedImageIndex((prev) => (prev - 1 + totalImages) % totalImages);
+  };
+
+  // Get all images for gallery
+  const getAllImages = (product: ProductWithRelations) => {
+    const images = [];
+    if (product.image) images.push(product.image);
+    if (product.images && product.images.length > 0) {
+      images.push(...product.images);
+    }
+    return images;
   };
 
   return (
@@ -727,19 +765,27 @@ const AdminProducts = () => {
                       <tr key={p.id} className="hover:bg-muted/30 transition-colors">
                         <td className="p-4">
                           <div className="flex items-center gap-3">
-                            <img 
-                              src={p.image || '/placeholder-image.jpg'} 
-                              alt={p.name} 
-                              className="h-10 w-10 rounded-lg object-cover shrink-0"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
-                              }}
-                            />
+                            <div 
+                              className="relative cursor-pointer group"
+                              onClick={() => openImageGallery(p, 0)}
+                            >
+                              <img 
+                                src={p.image || '/placeholder-image.jpg'} 
+                                alt={p.name} 
+                                className="h-10 w-10 rounded-lg object-cover shrink-0 border"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                <Eye className="h-4 w-4 text-white" />
+                              </div>
+                            </div>
                             <div className="min-w-0">
                               <p className="font-medium truncate max-w-[200px]">{p.name}</p>
-                              {p.images && p.images.length > 0 && (
+                              {(p.image || (p.images && p.images.length > 0)) && (
                                 <p className="text-xs text-muted-foreground">
-                                  +{p.images.length} more images
+                                  {p.image ? '1 main' : '0 main'} + {(p.images?.length || 0)} additional
                                 </p>
                               )}
                             </div>
@@ -780,7 +826,7 @@ const AdminProducts = () => {
                             <button 
                               onClick={() => setViewProduct(p)} 
                               className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-                              title="View"
+                              title="View Details"
                             >
                               <Eye className="h-4 w-4" />
                             </button>
@@ -967,10 +1013,10 @@ const AdminProducts = () => {
                     
                     {/* Main Image */}
                     <div>
-                      <Label>Main Product Image URL</Label>
+                      <Label>Main Product Image URL *</Label>
                       <div className="mt-2 space-y-3">
                         {productForm.image && (
-                          <div className="relative w-32 h-32 rounded-lg overflow-hidden border">
+                          <div className="relative w-32 h-32 rounded-lg overflow-hidden border group">
                             <img 
                               src={productForm.image} 
                               alt="Main product preview" 
@@ -981,31 +1027,34 @@ const AdminProducts = () => {
                             />
                             <button
                               type="button"
-                              onClick={() => setProductForm(p => ({ ...p, image: '' }))}
-                              className="absolute top-1 right-1 bg-destructive text-white rounded-full p-1"
+                              onClick={removeMainImage}
+                              className="absolute top-1 right-1 bg-destructive text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              title="Remove image"
                             >
                               <X className="h-3 w-3" />
                             </button>
                           </div>
                         )}
                         
-                        <div className="flex gap-2">
-                          <Input
-                            value={imageUrlInput}
-                            onChange={(e) => setImageUrlInput(e.target.value)}
-                            placeholder="https://example.com/image.jpg"
-                            className="flex-1"
-                          />
-                          <Button 
-                            type="button" 
-                            onClick={addImageUrl}
-                            size="sm"
-                          >
-                            Add URL
-                          </Button>
-                        </div>
+                        {!productForm.image && (
+                          <div className="flex gap-2">
+                            <Input
+                              value={imageUrlInput}
+                              onChange={(e) => setImageUrlInput(e.target.value)}
+                              placeholder="https://example.com/image.jpg"
+                              className="flex-1"
+                            />
+                            <Button 
+                              type="button" 
+                              onClick={addImageUrl}
+                              size="sm"
+                            >
+                              Add URL
+                            </Button>
+                          </div>
+                        )}
                         <p className="text-xs text-muted-foreground">
-                          Enter a valid image URL (e.g., from Imgur, Cloudinary, or your CDN)
+                          Enter a valid image URL (must include http:// or https://)
                         </p>
                       </div>
                     </div>
@@ -1029,6 +1078,7 @@ const AdminProducts = () => {
                                 type="button"
                                 onClick={() => removeAdditionalImage(index)}
                                 className="absolute -top-1 -right-1 bg-destructive text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                title="Remove image"
                               >
                                 <X className="h-3 w-3" />
                               </button>
@@ -1041,25 +1091,25 @@ const AdminProducts = () => {
                           )}
                         </div>
                         
-                        <div className="flex gap-2">
-                          <Input
-                            value={additionalImageUrl}
-                            onChange={(e) => setAdditionalImageUrl(e.target.value)}
-                            placeholder="https://example.com/image.jpg"
-                            className="flex-1"
-                            disabled={productForm.images.length >= 3}
-                          />
-                          <Button 
-                            type="button" 
-                            onClick={addAdditionalImageUrl}
-                            size="sm"
-                            disabled={productForm.images.length >= 3}
-                          >
-                            Add URL
-                          </Button>
-                        </div>
+                        {productForm.images.length < 3 && (
+                          <div className="flex gap-2">
+                            <Input
+                              value={additionalImageUrl}
+                              onChange={(e) => setAdditionalImageUrl(e.target.value)}
+                              placeholder="https://example.com/image.jpg"
+                              className="flex-1"
+                            />
+                            <Button 
+                              type="button" 
+                              onClick={addAdditionalImageUrl}
+                              size="sm"
+                            >
+                              Add URL
+                            </Button>
+                          </div>
+                        )}
                         <p className="text-xs text-muted-foreground">
-                          {productForm.images.length}/3 images. Enter valid image URLs.
+                          {productForm.images.length}/3 images. Enter valid image URLs with http:// or https://
                         </p>
                       </div>
                     </div>
@@ -1317,7 +1367,7 @@ const AdminProducts = () => {
 
         {/* Product View Modal */}
         <AnimatePresence>
-          {viewProduct && (
+          {viewProduct && !showImageGallery && (
             <motion.div 
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 
@@ -1344,26 +1394,42 @@ const AdminProducts = () => {
                   <div className="space-y-4">
                     <h3 className="font-semibold text-sm text-muted-foreground border-b pb-2">Images</h3>
                     <div className="space-y-2">
-                      <img 
-                        src={viewProduct.image || '/placeholder-image.jpg'} 
-                        alt={viewProduct.name} 
-                        className="w-full h-64 object-cover rounded-lg border"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
-                        }}
-                      />
+                      <div 
+                        className="relative cursor-pointer group"
+                        onClick={() => openImageGallery(viewProduct, 0)}
+                      >
+                        <img 
+                          src={viewProduct.image || '/placeholder-image.jpg'} 
+                          alt={viewProduct.name} 
+                          className="w-full h-64 object-cover rounded-lg border"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                          <span className="text-white text-sm">Click to view gallery</span>
+                        </div>
+                      </div>
                       {viewProduct.images && viewProduct.images.length > 0 && (
                         <div className="grid grid-cols-3 gap-2">
                           {viewProduct.images.map((img, index) => (
-                            <img 
+                            <div 
                               key={index} 
-                              src={img || '/placeholder-image.jpg'} 
-                              alt={`Additional ${index + 1}`} 
-                              className="w-full h-24 object-cover rounded-lg border"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
-                              }}
-                            />
+                              className="relative cursor-pointer group"
+                              onClick={() => openImageGallery(viewProduct, index + 1)}
+                            >
+                              <img 
+                                src={img || '/placeholder-image.jpg'} 
+                                alt={`Additional ${index + 1}`} 
+                                className="w-full h-24 object-cover rounded-lg border"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
+                                }}
+                              />
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                                <Eye className="h-4 w-4 text-white" />
+                              </div>
+                            </div>
                           ))}
                         </div>
                       )}
@@ -1433,7 +1499,7 @@ const AdminProducts = () => {
                           {Object.entries(viewProduct.specs).map(([key, value]) => (
                             <div key={key} className="flex justify-between gap-4">
                               <span className="text-sm font-medium">{key}:</span>
-                              <span className="text-sm text-muted-foreground">{value}</span>
+                              <span className="text-sm text-muted-foreground">{String(value)}</span>
                             </div>
                           ))}
                         </div>
@@ -1458,6 +1524,95 @@ const AdminProducts = () => {
                     Edit Product
                   </Button>
                 </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Image Gallery Modal */}
+        <AnimatePresence>
+          {showImageGallery && viewProduct && (
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }} 
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90" 
+              onClick={() => setShowImageGallery(false)}
+            >
+              <motion.div 
+                initial={{ scale: 0.95, opacity: 0 }} 
+                animate={{ scale: 1, opacity: 1 }} 
+                exit={{ scale: 0.95, opacity: 0 }} 
+                className="relative w-full max-w-5xl" 
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button 
+                  onClick={() => setShowImageGallery(false)} 
+                  className="absolute -top-12 right-0 text-white/70 hover:text-white p-2"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+                
+                <div className="relative">
+                  {/* Main Image */}
+                  <div className="flex items-center justify-center">
+                    <img 
+                      src={getAllImages(viewProduct)[selectedImageIndex] || '/placeholder-image.jpg'} 
+                      alt={`${viewProduct.name} - Image ${selectedImageIndex + 1}`} 
+                      className="max-h-[80vh] max-w-full object-contain rounded-lg"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
+                      }}
+                    />
+                  </div>
+
+                  {/* Navigation Arrows */}
+                  {getAllImages(viewProduct).length > 1 && (
+                    <>
+                      <button
+                        onClick={prevImage}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                      >
+                        <ChevronLeft className="h-6 w-6" />
+                      </button>
+                      <button
+                        onClick={nextImage}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                      >
+                        <ChevronRight className="h-6 w-6" />
+                      </button>
+                    </>
+                  )}
+
+                  {/* Image Counter */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                    {selectedImageIndex + 1} / {getAllImages(viewProduct).length}
+                  </div>
+                </div>
+
+                {/* Thumbnails */}
+                {getAllImages(viewProduct).length > 1 && (
+                  <div className="flex justify-center gap-2 mt-4">
+                    {getAllImages(viewProduct).map((img, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedImageIndex(index)}
+                        className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                          selectedImageIndex === index ? 'border-primary scale-110' : 'border-transparent opacity-50 hover:opacity-100'
+                        }`}
+                      >
+                        <img 
+                          src={img || '/placeholder-image.jpg'} 
+                          alt={`Thumbnail ${index + 1}`} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
+                          }}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </motion.div>
             </motion.div>
           )}

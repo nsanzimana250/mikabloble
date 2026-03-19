@@ -18,8 +18,8 @@ const ProductCard = ({ product }: { product: Product }) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Image */}
-      <div className="relative overflow-hidden aspect-square bg-muted">
+        {/* Image */}
+      <div className="relative overflow-hidden aspect-[4/3] bg-muted">
         <img
           src={product.image}
           alt={product.name}
@@ -46,29 +46,24 @@ const ProductCard = ({ product }: { product: Product }) => {
         )}
       </div>
 
-      {/* Info */}
-      <div className="p-4">
-        <p className="text-xs text-muted-foreground mb-1">{product.brand} · {product.category}</p>
+        {/* Info */}
+      <div className="p-3">
         <Link to={`/products/${product.id}`}>
-          <h3 className="font-semibold text-card-foreground hover:text-secondary transition-colors line-clamp-1">
+          <h3 className="font-semibold text-sm text-card-foreground hover:text-secondary transition-colors line-clamp-1">
             {product.name}
           </h3>
         </Link>
-        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{product.description}</p>
 
         {/* Free Delivery Badge */}
         <div className="flex items-center gap-1 mt-2 text-green-600">
-          <Truck className="h-3.5 w-3.5" />
+          <Truck className="h-3 w-3" />
           <span className="text-xs font-medium">Free Delivery</span>
         </div>
 
         {/* Price + CTA */}
-        <div className="flex items-center justify-between mt-3">
+        <div className="flex items-center justify-between mt-2">
           <div className="flex items-baseline gap-2">
-            <span className="text-lg font-bold text-card-foreground">RWF {product.price.toLocaleString()}</span>
-            {product.originalPrice && (
-              <span className="text-sm text-muted-foreground line-through">RWF {product.originalPrice.toLocaleString()}</span>
-            )}
+            <span className="text-base font-bold text-card-foreground">RWF {product.price.toLocaleString()}</span>
           </div>
           <button
             onClick={() => addToCart(product)}

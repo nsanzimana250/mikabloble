@@ -21,7 +21,7 @@ const HeroSection = () => {
             className="inline-flex items-center gap-2 bg-green-500/20 backdrop-blur-sm border border-green-400/30 text-green-300 px-4 py-2 rounded-full text-sm font-semibold mb-6"
           >
             <Truck className="h-4 w-4" />
-            🚚 FREE DELIVERY on all orders — Nationwide!
+             FREE DELIVERY on all orders — Nationwide!
           </motion.div>
 
           <motion.h1
