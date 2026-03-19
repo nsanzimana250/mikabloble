@@ -6,7 +6,9 @@ export interface Product {
   originalPrice?: number;
   reviewCount: number;
   category: string;
+  category_id?: string;
   brand: string;
+  brand_id?: string;
   inStock: boolean;
   lowStock?: boolean;
   image: string;

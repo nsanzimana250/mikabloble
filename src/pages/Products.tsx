@@ -1,10 +1,22 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
-import { products, categories, brands } from "@/data/products";
 import { Search, SlidersHorizontal, Grid3X3, List, ChevronRight, X } from "lucide-react";
 import { motion } from "framer-motion";
+import { supabase } from "@/supabase";
+import { Product } from "@/data/products";
+
+interface Category {
+  id: string;
+  name: string;
+  count?: number;
+}
+
+interface Brand {
+  id: string;
+  name: string;
+}
 
 const Products = () => {
   const [searchParams] = useSearchParams();
@@ -16,6 +28,108 @@ const Products = () => {
   const [sortBy, setSortBy] = useState("popularity");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Data states
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch data from database
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch categories with product count
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from('mika_categories')
+          .select('*');
+        
+        if (categoriesError) {
+          console.error('Error fetching categories:', categoriesError);
+          setCategories([]);
+        } else {
+          // Get product count for each category
+          const categoriesWithCount = await Promise.all(
+            (categoriesData || []).map(async (category) => {
+              const { count } = await supabase
+                .from('mika_products')
+                .select('*', { count: 'exact', head: true })
+                .eq('category_id', category.id);
+              
+              return {
+                ...category,
+                count: count || 0
+              };
+            })
+          );
+          
+          setCategories(categoriesWithCount);
+        }
+
+        // Fetch brands
+        const { data: brandsData, error: brandsError } = await supabase
+          .from('mika_brands')
+          .select('*')
+          .order('name');
+        
+        if (brandsError) {
+          console.error('Error fetching brands:', brandsError);
+          setBrands([]);
+        } else {
+          setBrands(brandsData || []);
+        }
+
+        // Fetch products
+        const { data: productsData, error: productsError } = await supabase
+          .from('mika_products')
+          .select(`
+            *,
+            mika_categories!left (id, name),
+            mika_brands!left (id, name)
+          `)
+          .order('created_at', { ascending: false });
+        
+        if (productsError) {
+          console.error('Error fetching products:', productsError);
+          setProducts([]);
+        } else if (productsData) {
+           const transformedProducts = productsData.map(product => ({
+             id: product.id,
+             name: product.name,
+             description: product.description || '',
+             price: parseFloat(product.price),
+             originalPrice: product.original_price ? parseFloat(product.original_price) : undefined,
+             reviewCount: product.review_count || 0,
+             category: product.mika_categories?.name || 'Uncategorized',
+             category_id: product.category_id,
+             brand: product.mika_brands?.name || 'Unbranded',
+             brand_id: product.brand_id,
+             inStock: product.in_stock,
+             lowStock: product.low_stock || false,
+             image: product.image,
+             images: product.images || [],
+             specs: product.specs || {},
+             compatibility: product.compatibility || []
+           }));
+          
+          setProducts(transformedProducts);
+        } else {
+          setProducts([]);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setProducts([]);
+        setCategories([]);
+        setBrands([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const toggleCategory = (cat: string) =>
     setSelectedCategories((prev) => prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]);
@@ -32,7 +146,7 @@ const Products = () => {
     if (sortBy === "price-asc") result.sort((a, b) => a.price - b.price);
     else if (sortBy === "price-desc") result.sort((a, b) => b.price - a.price);
     return result;
-  }, [search, selectedCategories, selectedBrands, sortBy]);
+  }, [search, selectedCategories, selectedBrands, sortBy, products]);
 
   const resetFilters = () => {
     setSearch("");
@@ -62,7 +176,7 @@ const Products = () => {
         <label className="text-sm font-semibold text-foreground mb-2 block">Categories</label>
         <div className="space-y-2">
           {categories.map((cat) => (
-            <label key={cat.name} className="flex items-center gap-2 text-sm text-foreground cursor-pointer hover:text-secondary transition-colors">
+            <label key={cat.id} className="flex items-center gap-2 text-sm text-foreground cursor-pointer hover:text-secondary transition-colors">
               <input
                 type="checkbox"
                 checked={selectedCategories.includes(cat.name)}
@@ -79,14 +193,14 @@ const Products = () => {
         <label className="text-sm font-semibold text-foreground mb-2 block">Brands</label>
         <div className="space-y-2 max-h-40 overflow-y-auto">
           {brands.slice(0, 8).map((brand) => (
-            <label key={brand} className="flex items-center gap-2 text-sm text-foreground cursor-pointer hover:text-secondary transition-colors">
+            <label key={brand.id} className="flex items-center gap-2 text-sm text-foreground cursor-pointer hover:text-secondary transition-colors">
               <input
                 type="checkbox"
-                checked={selectedBrands.includes(brand)}
-                onChange={() => toggleBrand(brand)}
+                checked={selectedBrands.includes(brand.name)}
+                onChange={() => toggleBrand(brand.name)}
                 className="rounded border-border accent-secondary"
               />
-              {brand}
+              {brand.name}
             </label>
           ))}
         </div>
@@ -183,7 +297,11 @@ const Products = () => {
               </div>
             )}
 
-            {filtered.length > 0 ? (
+            {loading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : filtered.length > 0 ? (
               <div className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1"}`}>
                 {filtered.map((product, i) => (
                   <motion.div

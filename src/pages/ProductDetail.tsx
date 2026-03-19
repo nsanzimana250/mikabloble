@@ -1,18 +1,134 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { ChevronRight, Minus, Plus, Heart, ShoppingCart, Truck, ShieldCheck, RotateCcw, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { supabase } from "@/supabase";
+import { Product } from "@/data/products";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const product = products.find((p) => p.id === id);
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<"specs" | "compatibility">("specs");
+  
+  const [product, setProduct] = useState<Product | null>(null);
+  const [related, setRelated] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch product details
+        const { data: productData, error: productError } = await supabase
+          .from('mika_products')
+          .select(`
+            *,
+            mika_categories!left (id, name),
+            mika_brands!left (id, name)
+          `)
+          .eq('id', id)
+          .single();
+        
+        if (productError) {
+          console.error('Error fetching product:', productError);
+          setProduct(null);
+        } else if (productData) {
+          console.log('Product Data from DB:', productData);
+          const transformedProduct: Product = {
+            id: productData.id,
+            name: productData.name,
+            description: productData.description || '',
+            price: parseFloat(productData.price),
+            originalPrice: productData.original_price ? parseFloat(productData.original_price) : undefined,
+            reviewCount: productData.review_count || 0,
+            category: productData.mika_categories?.name || 'Uncategorized',
+            category_id: productData.category_id,
+            brand: productData.mika_brands?.name || 'Unbranded',
+            brand_id: productData.brand_id,
+            inStock: productData.in_stock,
+            lowStock: productData.low_stock || false,
+            image: productData.image,
+            images: productData.images || [],
+            specs: productData.specs || {},
+            compatibility: productData.compatibility || []
+          };
+          console.log('Transformed Product:', transformedProduct);
+          
+          setProduct(transformedProduct);
+
+          // Fetch related products
+          if (productData.category_id) {
+            const { data: relatedData, error: relatedError } = await supabase
+              .from('mika_products')
+              .select(`
+                *,
+                mika_categories!left (id, name),
+                mika_brands!left (id, name)
+              `)
+              .eq('category_id', productData.category_id)
+              .neq('id', id)
+              .limit(4);
+            
+            if (relatedError) {
+              console.error('Error fetching related products:', relatedError);
+              setRelated([]);
+            } else if (relatedData) {
+              const transformedRelated = relatedData.map(p => ({
+                id: p.id,
+                name: p.name,
+                description: p.description || '',
+                price: parseFloat(p.price),
+                originalPrice: p.original_price ? parseFloat(p.original_price) : undefined,
+                reviewCount: p.review_count || 0,
+                category: p.mika_categories?.name || 'Uncategorized',
+                category_id: p.category_id,
+                brand: p.mika_brands?.name || 'Unbranded',
+                brand_id: p.brand_id,
+                inStock: p.in_stock,
+                lowStock: p.low_stock || false,
+                image: p.image || 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&h=400&fit=crop',
+                images: p.images || [],
+                specs: p.specs || {},
+                compatibility: p.compatibility || []
+              }));
+              
+              setRelated(transformedRelated);
+            } else {
+              setRelated([]);
+            }
+          }
+        } else {
+          setProduct(null);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setProduct(null);
+        setRelated([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchData();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="section-container py-20 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!product) {
     return (
@@ -24,8 +140,6 @@ const ProductDetail = () => {
       </Layout>
     );
   }
-
-  const related = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
 
   return (
     <Layout>
@@ -47,6 +161,18 @@ const ProductDetail = () => {
             className="bg-card rounded-2xl overflow-hidden shadow-[var(--card-shadow)] w-full"
           >
             <img src={product.image} alt={product.name} className="w-full aspect-square object-cover" />
+            {product.images && product.images.length > 0 && (
+              <div className="grid grid-cols-3 gap-2 p-2">
+                {product.images.map((img, index) => (
+                  <img 
+                    key={index} 
+                    src={img} 
+                    alt={`Additional ${index + 1}`} 
+                    className="w-full aspect-square object-cover rounded-lg"
+                  />
+                ))}
+              </div>
+            )}
           </motion.div>
 
           {/* Info */}

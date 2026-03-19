@@ -16,7 +16,6 @@ CREATE TABLE MIKA_brands (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
 -- Create products table
 CREATE TABLE MIKA_products (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
