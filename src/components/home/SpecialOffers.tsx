@@ -38,7 +38,7 @@ const SpecialOffers = () => {
                 <p className="text-primary-foreground/70 mb-6">Up to 30% off on premium brake systems. Don't miss out!</p>
 
                 {/* Countdown */}
-                <div className="flex gap-3 mb-6">
+                <div className="flex flex-wrap gap-2 sm:gap-3 mb-6">
                   {[
                     { value: timeLeft.days, label: "Days" },
                     { value: timeLeft.hours, label: "Hours" },

@@ -28,7 +28,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="font-display font-black text-4xl md:text-5xl lg:text-6xl text-primary-foreground leading-tight"
+            className="font-display font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-primary-foreground leading-tight"
           >
             Quality Car Spare Parts for{" "}
             <span className="text-gradient">Every Vehicle</span>

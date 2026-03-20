@@ -24,7 +24,7 @@ const Newsletter = () => {
           Get exclusive deals, new arrivals, and industry news delivered to your inbox.
         </p>
 
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto flex gap-2">
+        <form onSubmit={handleSubmit} className="max-w-md mx-auto flex flex-col sm:flex-row gap-2">
           <input
             type="email"
             placeholder="Enter your email"
