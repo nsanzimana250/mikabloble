@@ -24,7 +24,7 @@ const SpecialOffers = () => {
     <section className="py-20 bg-card">
       <div className="section-container">
         <div className="relative rounded-2xl overflow-hidden">
-          <img src={saleBanner} alt="Special offer" className="w-full h-[400px] md:h-[350px] object-cover" />
+          <img src={saleBanner} alt="Special offer" className="w-full h-[450px] sm:h-[400px] md:h-[350px] object-cover" />
           <div className="absolute inset-0 gradient-hero opacity-85" />
           <div className="absolute inset-0 flex items-center">
             <div className="section-container">
@@ -32,13 +32,13 @@ const SpecialOffers = () => {
                 <span className="inline-block bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1 rounded-full mb-4">
                   LIMITED TIME OFFER
                 </span>
-                <h2 className="font-display font-bold text-3xl md:text-4xl text-primary-foreground mb-3">
+                <h2 className="font-display font-bold text-xl sm:text-3xl md:text-4xl text-primary-foreground mb-3">
                   Special Discount on Brake Parts
                 </h2>
                 <p className="text-primary-foreground/70 mb-6">Up to 30% off on premium brake systems. Don't miss out!</p>
 
                 {/* Countdown */}
-                <div className="flex gap-3 mb-6">
+                <div className="flex flex-wrap gap-2 sm:gap-3 mb-6">
                   {[
                     { value: timeLeft.days, label: "Days" },
                     { value: timeLeft.hours, label: "Hours" },
