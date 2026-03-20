@@ -5,7 +5,7 @@ import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-[600px] md:min-h-[700px] flex items-center gradient-hero overflow-hidden">
+    <section className="relative min-h-[500px] sm:min-h-[600px] md:min-h-[700px] flex items-center gradient-hero overflow-hidden">
       <div className="absolute inset-0">
         <img src={heroBg} alt="Car spare parts" className="w-full h-full object-cover opacity-30" />
         <div className="absolute inset-0 gradient-hero opacity-80" />
