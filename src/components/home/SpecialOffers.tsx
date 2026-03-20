@@ -32,7 +32,7 @@ const SpecialOffers = () => {
                 <span className="inline-block bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1 rounded-full mb-4">
                   LIMITED TIME OFFER
                 </span>
-                <h2 className="font-display font-bold text-3xl md:text-4xl text-primary-foreground mb-3">
+                <h2 className="font-display font-bold text-xl sm:text-3xl md:text-4xl text-primary-foreground mb-3">
                   Special Discount on Brake Parts
                 </h2>
                 <p className="text-primary-foreground/70 mb-6">Up to 30% off on premium brake systems. Don't miss out!</p>
