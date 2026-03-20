@@ -72,7 +72,7 @@ const HeroSection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.6 }}
-            className="mt-12 flex gap-8"
+            className="mt-8 sm:mt-12 flex flex-wrap gap-4 sm:gap-8"
           >
             {[
               { value: "50K+", label: "Parts Available" },
@@ -80,8 +80,8 @@ const HeroSection = () => {
               { value: "120+", label: "Countries" },
             ].map((stat) => (
               <div key={stat.label}>
-                <div className="font-display font-bold text-2xl text-secondary">{stat.value}</div>
-                <div className="text-primary-foreground/60 text-xs mt-0.5">{stat.label}</div>
+                <div className="font-display font-bold text-xl sm:text-2xl text-secondary">{stat.value}</div>
+                <div className="text-primary-foreground/60 text-[10px] sm:text-xs mt-0.5">{stat.label}</div>
               </div>
             ))}
           </motion.div>
