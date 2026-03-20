@@ -17,7 +17,7 @@ const Newsletter = () => {
     <section className="py-20 gradient-hero">
       <div className="section-container text-center">
         <Mail className="h-12 w-12 text-secondary mx-auto mb-4" />
-        <h2 className="font-display font-bold text-3xl text-primary-foreground mb-3">
+        <h2 className="font-display font-bold text-xl sm:text-2xl md:text-3xl text-primary-foreground mb-3">
           Subscribe for Latest Updates & Offers
         </h2>
         <p className="text-primary-foreground/60 max-w-md mx-auto mb-8">
