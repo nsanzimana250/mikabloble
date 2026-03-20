@@ -2,13 +2,17 @@ import { useState, useMemo } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
-import { products, categories, brands } from "@/data/products";
-import { Search, SlidersHorizontal, Grid3X3, List, ChevronRight, X } from "lucide-react";
+import { useProducts, useCategories, useBrands } from "@/hooks/useProducts";
+import { Search, SlidersHorizontal, Grid3X3, List, ChevronRight, X, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 const Products = () => {
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "";
+
+  const { data: products = [], isLoading } = useProducts();
+  const { data: dbCategories = [] } = useCategories();
+  const { data: dbBrands = [] } = useBrands();
 
   const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategory ? [initialCategory] : []);
@@ -32,7 +36,7 @@ const Products = () => {
     if (sortBy === "price-asc") result.sort((a, b) => a.price - b.price);
     else if (sortBy === "price-desc") result.sort((a, b) => b.price - a.price);
     return result;
-  }, [search, selectedCategories, selectedBrands, sortBy]);
+  }, [products, search, selectedCategories, selectedBrands, sortBy]);
 
   const resetFilters = () => {
     setSearch("");
@@ -41,6 +45,9 @@ const Products = () => {
   };
 
   const activeFilterCount = selectedCategories.length + selectedBrands.length + (search ? 1 : 0);
+
+  const categoryNames = dbCategories.map((c: any) => c.name);
+  const brandNames = dbBrands.map((b: any) => b.name);
 
   const FilterSidebar = () => (
     <div className="space-y-6">
@@ -61,15 +68,15 @@ const Products = () => {
       <div>
         <label className="text-sm font-semibold text-foreground mb-2 block">Categories</label>
         <div className="space-y-2">
-          {categories.map((cat) => (
-            <label key={cat.name} className="flex items-center gap-2 text-sm text-foreground cursor-pointer hover:text-secondary transition-colors">
+          {categoryNames.map((name: string) => (
+            <label key={name} className="flex items-center gap-2 text-sm text-foreground cursor-pointer hover:text-secondary transition-colors">
               <input
                 type="checkbox"
-                checked={selectedCategories.includes(cat.name)}
-                onChange={() => toggleCategory(cat.name)}
+                checked={selectedCategories.includes(name)}
+                onChange={() => toggleCategory(name)}
                 className="rounded border-border accent-secondary"
               />
-              {cat.name} <span className="text-muted-foreground ml-auto">({cat.count})</span>
+              {name}
             </label>
           ))}
         </div>
@@ -78,15 +85,15 @@ const Products = () => {
       <div>
         <label className="text-sm font-semibold text-foreground mb-2 block">Brands</label>
         <div className="space-y-2 max-h-40 overflow-y-auto">
-          {brands.slice(0, 8).map((brand) => (
-            <label key={brand} className="flex items-center gap-2 text-sm text-foreground cursor-pointer hover:text-secondary transition-colors">
+          {brandNames.map((name: string) => (
+            <label key={name} className="flex items-center gap-2 text-sm text-foreground cursor-pointer hover:text-secondary transition-colors">
               <input
                 type="checkbox"
-                checked={selectedBrands.includes(brand)}
-                onChange={() => toggleBrand(brand)}
+                checked={selectedBrands.includes(name)}
+                onChange={() => toggleBrand(name)}
                 className="rounded border-border accent-secondary"
               />
-              {brand}
+              {name}
             </label>
           ))}
         </div>
@@ -100,8 +107,8 @@ const Products = () => {
 
   return (
     <Layout>
-      <div className="section-container py-8">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+      <div className="section-container py-6 md:py-8 overflow-x-hidden">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6 flex-wrap">
           <Link to="/" className="hover:text-secondary transition-colors">Home</Link>
           <ChevronRight className="h-3 w-3" />
           <span className="text-foreground font-medium">Products</span>
@@ -113,7 +120,7 @@ const Products = () => {
           )}
         </div>
 
-        <div className="flex gap-8">
+        <div className="flex gap-6 lg:gap-8">
           <aside className="hidden lg:block w-64 shrink-0">
             <div className="bg-card rounded-xl p-5 shadow-[var(--card-shadow)] sticky top-24">
               <h3 className="font-display font-semibold text-lg mb-4">Filters</h3>
@@ -122,7 +129,7 @@ const Products = () => {
           </aside>
 
           <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setShowFilters(true)}
@@ -139,7 +146,7 @@ const Products = () => {
                 <span className="text-sm text-muted-foreground">{filtered.length} products</span>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
@@ -183,8 +190,10 @@ const Products = () => {
               </div>
             )}
 
-            {filtered.length > 0 ? (
-              <div className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1"}`}>
+            {isLoading ? (
+              <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
+            ) : filtered.length > 0 ? (
+              <div className={`grid gap-4 md:gap-6 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3" : "grid-cols-1"}`}>
                 {filtered.map((product, i) => (
                   <motion.div
                     key={product.id}
@@ -208,7 +217,7 @@ const Products = () => {
         {showFilters && (
           <div className="fixed inset-0 z-50 lg:hidden">
             <div className="absolute inset-0 bg-foreground/50" onClick={() => setShowFilters(false)} />
-            <div className="absolute right-0 top-0 bottom-0 w-80 bg-card p-6 overflow-y-auto">
+            <div className="absolute right-0 top-0 bottom-0 w-80 max-w-[85vw] bg-card p-6 overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-display font-semibold text-lg">Filters</h3>
                 <button onClick={() => setShowFilters(false)}><X className="h-5 w-5" /></button>
