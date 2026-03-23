@@ -43,6 +43,18 @@ CREATE INDEX idx_mika_products_price ON MIKA_products(price);
 
 
 -- Create users table with location
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Create update timestamp function
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;      
+-- Create users table with location
 CREATE TABLE MIKA_users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR(255) NOT NULL,
@@ -59,14 +71,12 @@ CREATE TABLE MIKA_users (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create index for faster email lookups
+-- Create indexes for faster lookups
 CREATE INDEX idx_mika_users_email ON MIKA_users(email);
-
--- Create index for location-based queries
 CREATE INDEX idx_mika_users_country ON MIKA_users(country);
 CREATE INDEX idx_mika_users_city ON MIKA_users(city);
 
--- Add trigger for updated_at (if function exists)
+-- Add trigger for updated_at
 CREATE TRIGGER update_mika_users_updated_at
   BEFORE UPDATE ON MIKA_users
   FOR EACH ROW
