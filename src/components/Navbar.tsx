@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Search, User, ShoppingCart, Menu, X } from "lucide-react";
+import { Search, User, ShoppingCart, Menu, X, LogIn, UserPlus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/logo.png";
 
@@ -17,6 +18,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { totalItems } = useCart();
+  const { user } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
@@ -67,9 +69,31 @@ const Navbar = () => {
           <button className={`p-2 rounded-lg transition-colors ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}>
             <Search className="h-5 w-5" />
           </button>
-          <Link to="/profile" className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}>
-            <User className="h-5 w-5" />
-          </Link>
+          
+          {/* Authenticated user */}
+          {user ? (
+            <Link to="/profile" className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}>
+              <User className="h-5 w-5" />
+            </Link>
+          ) : (
+            <>
+              {/* Login */}
+              <Link 
+                to="/login" 
+                className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}
+              >
+                <LogIn className="h-5 w-5" />
+              </Link>
+              {/* Sign Up */}
+              <Link 
+                to="/signup" 
+                className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}
+              >
+                <UserPlus className="h-5 w-5" />
+              </Link>
+            </>
+          )}
+          
           <Link
             to="/cart"
             className={`p-2 rounded-lg transition-colors relative ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}

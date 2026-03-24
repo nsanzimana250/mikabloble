@@ -1,48 +1,111 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { User, Mail, Phone, MapPin, Edit, ShoppingBag, Heart, LogOut, Camera, Package, Eye, ChevronRight, Clock, CheckCircle, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const Profile = () => {
   const [editing, setEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<"profile" | "orders" | "wishlist">("profile");
-  const [profile, setProfile] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+250 788 000 000",
-    address: "KN 4 Ave, Kigali City, Rwanda",
+  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  
+  const { profile, updateProfile, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!profile) {
+      navigate("/login");
+    }
+  }, [profile, navigate]);
+
+  // Initialize profile form with real data when profile loads
+  const [profileForm, setProfileForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    country: "",
+    city: ""
   });
 
-  const orders = [
-    {
-      id: "ORD-001", date: "2026-02-20", status: "Delivered", total: 156990,
-      items: [
-        { name: "Brake Pad Set - Ceramic", qty: 2, price: 45990, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=80&h=80&fit=crop" },
-        { name: "Oil Filter - Premium", qty: 1, price: 12990, image: "https://images.unsplash.com/photo-1635784063407-577ca6097e01?w=80&h=80&fit=crop" },
-      ],
-    },
-    {
-      id: "ORD-002", date: "2026-02-18", status: "Shipped", total: 89500,
-      items: [
-        { name: "Alternator Assembly", qty: 1, price: 89500, image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=80&h=80&fit=crop" },
-      ],
-    },
-    {
-      id: "ORD-003", date: "2026-02-10", status: "Processing", total: 234000,
-      items: [
-        { name: "Suspension Kit - Complete", qty: 1, price: 189000, image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=80&h=80&fit=crop" },
-        { name: "Shock Absorber - Front", qty: 2, price: 22500, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=80&h=80&fit=crop" },
-      ],
-    },
-  ];
+  useEffect(() => {
+    if (profile) {
+      setProfileForm({
+        name: profile.name || "",
+        email: profile.email || "",
+        phone: profile.phone || "",
+        address: profile.address || "",
+        country: profile.country || "",
+        city: profile.city || ""
+      });
+    }
+  }, [profile]);
 
-  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  // Fetch user orders
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (!profile) return;
+      
+      setLoadingOrders(true);
+      try {
+        // This would fetch from MIKA_orders table in a real implementation
+        // For now, using mock data
+        const mockOrders = [
+          {
+            id: "ORD-001", date: "2026-02-20", status: "Delivered", total: 156990,
+            items: [
+              { name: "Brake Pad Set - Ceramic", qty: 2, price: 45990, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=80&h=80&fit=crop" },
+              { name: "Oil Filter - Premium", qty: 1, price: 12990, image: "https://images.unsplash.com/photo-1635784063407-577ca6097e01?w=80&h=80&fit=crop" },
+            ],
+          },
+          {
+            id: "ORD-002", date: "2026-02-18", status: "Shipped", total: 89500,
+            items: [
+              { name: "Alternator Assembly", qty: 1, price: 89500, image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=80&h=80&fit=crop" },
+            ],
+          },
+          {
+            id: "ORD-003", date: "2026-02-10", status: "Processing", total: 234000,
+            items: [
+              { name: "Suspension Kit - Complete", qty: 1, price: 189000, image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=80&h=80&fit=crop" },
+              { name: "Shock Absorber - Front", qty: 2, price: 22500, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=80&h=80&fit=crop" },
+            ],
+          },
+        ];
+        setOrders(mockOrders);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
 
-  const handleSave = () => {
-    setEditing(false);
-    toast.success("Profile updated successfully!");
+    fetchOrders();
+  }, [profile]);
+
+  const handleSave = async () => {
+    try {
+      await updateProfile(profileForm);
+      setEditing(false);
+      toast.success("Profile updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update profile. Please try again.");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate("/login");
+      toast.success("Logged out successfully!");
+    } catch (error) {
+      toast.error("Failed to logout. Please try again.");
+    }
   };
 
   const statusIcon = (status: string) => {
@@ -78,8 +141,8 @@ const Profile = () => {
                     <Camera className="h-3 w-3" />
                   </button>
                 </div>
-                <h2 className="font-display font-bold text-lg text-foreground mt-3">{profile.name}</h2>
-                <p className="text-sm text-muted-foreground">{profile.email}</p>
+                <h2 className="font-display font-bold text-lg text-foreground mt-3">{profile?.name || 'Loading...'}</h2>
+                <p className="text-sm text-muted-foreground">{profile?.email || 'Loading...'}</p>
               </div>
 
               <nav className="space-y-1">
@@ -96,9 +159,14 @@ const Profile = () => {
                     <Icon className="h-4 w-4" /> {label}
                   </button>
                 ))}
-                <Link to="/login" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors">
-                  <LogOut className="h-4 w-4" /> Sign Out
-                </Link>
+                <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors">
+                  {loading ? (
+                    <div className="h-4 w-4 border-2 border-destructive/30 border-t-destructive rounded-full animate-spin" />
+                  ) : (
+                    <LogOut className="h-4 w-4" />
+                  )}
+                  Sign Out
+                </button>
               </nav>
             </motion.div>
 
@@ -124,15 +192,15 @@ const Profile = () => {
                           <div className="relative">
                             <Icon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <input
-                              value={profile[field as keyof typeof profile]}
-                              onChange={(e) => setProfile({ ...profile, [field]: e.target.value })}
+                              value={profileForm[field as keyof typeof profileForm]}
+                              onChange={(e) => setProfileForm({ ...profileForm, [field]: e.target.value })}
                               className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-secondary"
                             />
                           </div>
                         ) : (
                           <div className="flex items-center gap-2 py-2.5">
                             <Icon className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm text-foreground">{profile[field as keyof typeof profile]}</span>
+                            <span className="text-sm text-foreground">{profileForm[field as keyof typeof profileForm]}</span>
                           </div>
                         )}
                       </div>
