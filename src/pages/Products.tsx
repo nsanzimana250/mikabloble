@@ -35,6 +35,27 @@ const Products = () => {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Transform product data to match Product interface
+  const transformProduct = (product: any) => ({
+    id: product.id,
+    name: product.name,
+    description: product.description || '',
+    price: parseFloat(product.price),
+    originalPrice: product.original_price ? parseFloat(product.original_price) : 
+                 product.originalPrice ?? undefined,
+    reviewCount: product.review_count ?? product.reviewCount ?? 0,
+    category: product.mika_categories?.name || product.category || 'Uncategorized',
+    category_id: product.category_id,
+    brand: product.mika_brands?.name || product.brand || 'Unbranded',
+    brand_id: product.brand_id,
+    inStock: product.in_stock ?? product.inStock ?? false,
+    lowStock: product.low_stock ?? product.lowStock ?? false,
+    image: product.image || '',
+    images: product.images || [],
+    specs: product.specs || {},
+    compatibility: product.compatibility || []
+  });
+
   // Fetch data from database
   useEffect(() => {
     const fetchData = async () => {
@@ -93,36 +114,29 @@ const Products = () => {
         
         if (productsError) {
           console.error('Error fetching products:', productsError);
-          setProducts([]);
+          // Fallback to static data
+          const { products: staticProducts } = await import("@/data/products");
+          const transformedProducts = staticProducts.map(transformProduct);
+          setProducts(transformedProducts);
         } else if (productsData) {
-           const transformedProducts = productsData.map(product => ({
-             id: product.id,
-             name: product.name,
-             description: product.description || '',
-             price: parseFloat(product.price),
-             originalPrice: product.original_price ? parseFloat(product.original_price) : undefined,
-             reviewCount: product.review_count || 0,
-             category: product.mika_categories?.name || 'Uncategorized',
-             category_id: product.category_id,
-             brand: product.mika_brands?.name || 'Unbranded',
-             brand_id: product.brand_id,
-             inStock: product.in_stock,
-             lowStock: product.low_stock || false,
-             image: product.image,
-             images: product.images || [],
-             specs: product.specs || {},
-             compatibility: product.compatibility || []
-           }));
-          
+          const transformedProducts = productsData.map(transformProduct);
           setProducts(transformedProducts);
         } else {
           setProducts([]);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
-        setProducts([]);
-        setCategories([]);
-        setBrands([]);
+        // Fallback to static data on any error
+        try {
+          const { products: staticProducts } = await import("@/data/products");
+          const transformedProducts = staticProducts.map(transformProduct);
+          setProducts(transformedProducts);
+        } catch (staticError) {
+          console.error('Error loading static data:', staticError);
+          setProducts([]);
+          setCategories([]);
+          setBrands([]);
+        }
       } finally {
         setLoading(false);
       }

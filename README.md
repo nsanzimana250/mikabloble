@@ -1,0 +1,1 @@
+https://www.epson.co.in/Support/Printers/All-In-One/L-Series/Epson-L3250/s/SPT_C11CJ67508?review-filter=Mac+OS+13+Ventura

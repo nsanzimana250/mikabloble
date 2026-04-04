@@ -1,40 +1,56 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/logo.png";
+import { supabase } from "@/supabase";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const { signIn, error, clearError, loading } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    clearError(); // Clear previous errors
-    
-    await signIn(email, password);
-    if (error) {
-      // error is set by the auth context, so we return and let the error display section show it
-      return;
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: form.email,
+        password: form.password,
+      });
+      
+      if (error) {
+        setError("Invalid email or password");
+        toast.error("Login failed. Please check your credentials.");
+        setIsLoading(false);
+        return;
+      }
+
+      if (data.user) {
+        toast.success("Login successful!");
+        // Small delay to ensure auth state is updated
+        setTimeout(() => {
+          navigate("/profile");
+        }, 100);
+      }
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setError("An error occurred. Please try again.");
+      toast.error("Login failed");
+      setIsLoading(false);
     }
-    toast.success("Login successful! Welcome back.");
-    navigate("/profile");
   };
 
-  // Display error from auth context (use effect to avoid state updates during render)
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-      clearError(); // Clear after showing
-    }
-  }, [error, clearError]);
+  const update = (field: string, value: string) => {
+    setForm({ ...form, [field]: value });
+    if (error) setError(null);
+  };
 
   return (
     <Layout>
@@ -56,13 +72,14 @@ const Login = () => {
                 <label className="text-sm font-medium text-foreground mb-1 block">Email</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-secondary"
-                    required
+                  <input 
+                    type="email" 
+                    value={form.email} 
+                    onChange={(e) => update("email", e.target.value)} 
+                    placeholder="you@example.com" 
+                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-secondary" 
+                    required 
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -71,58 +88,51 @@ const Login = () => {
                 <label className="text-sm font-medium text-foreground mb-1 block">Password</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-secondary"
-                    required
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    value={form.password} 
+                    onChange={(e) => update("password", e.target.value)} 
+                    placeholder="••••••••" 
+                    className="w-full pl-10 pr-10 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-secondary" 
+                    required 
+                    disabled={isLoading}
                   />
                   <button 
                     type="button" 
                     onClick={() => setShowPassword(!showPassword)} 
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    disabled={isLoading}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 text-muted-foreground">
-                  <input 
-                    type="checkbox" 
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="rounded border-border" 
-                  />
-                  Remember me
-                </label>
-                <a href="#" className="text-secondary hover:underline">Forgot password?</a>
-              </div>
+              {error && (
+                <p className="text-sm text-red-500 mt-1">{error}</p>
+              )}
 
-               <button
-                 type="submit"
-                 disabled={loading}
-                 className="btn-primary w-full flex items-center justify-center gap-2"
-               >
-                 {loading ? (
-                   <>
-                     <LogIn className="h-4 w-4" />
-                     Signing in...
-                   </>
-                 ) : (
-                   <>
-                     <LogIn className="h-4 w-4" /> Sign In
-                   </>
-                 )}
-               </button>
+              <button 
+                type="submit" 
+                className="btn-primary w-full flex items-center justify-center gap-2"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="h-4 w-4" /> Sign In
+                  </>
+                )}
+              </button>
             </form>
 
             <p className="text-center text-sm text-muted-foreground mt-6">
               Don't have an account?{" "}
-              <Link to="/signup" className="text-secondary font-semibold hover:underline">Sign Up</Link>
+              <Link to="/signup" className="text-secondary font-semibold hover:underline">Create Account</Link>
             </p>
           </motion.div>
         </div>
