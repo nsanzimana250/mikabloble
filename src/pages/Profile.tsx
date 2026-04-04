@@ -4,33 +4,33 @@ import Layout from "@/components/Layout";
 import { User, Mail, Phone, MapPin, Edit, ShoppingBag, Heart, LogOut, Camera, Package, Eye, ChevronRight, Clock, CheckCircle, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Profile = () => {
   const [editing, setEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<"profile" | "orders" | "wishlist">("profile");
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [orders] = useState<any[]>([
+    {
+      id: "ORD-001", date: "2026-02-20", status: "Delivered", total: 156990,
+      items: [
+        { name: "Brake Pad Set - Ceramic", qty: 2, price: 45990, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=80&h=80&fit=crop" },
+        { name: "Oil Filter - Premium", qty: 1, price: 12990, image: "https://images.unsplash.com/photo-1635784063407-577ca6097e01?w=80&h=80&fit=crop" },
+      ],
+    },
+  ]);
   
-  const { profile, updateProfile, loading, signOut } = useAuth();
+  const { profile, updateProfile, signOut, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!profile) {
-      navigate("/login");
-    }
-  }, [profile, navigate]);
-
-  // Initialize profile form with real data when profile loads
   const [profileForm, setProfileForm] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
     country: "",
-    city: ""
+    city: "",
+    avatar: ""
   });
 
   useEffect(() => {
@@ -41,52 +41,18 @@ const Profile = () => {
         phone: profile.phone || "",
         address: profile.address || "",
         country: profile.country || "",
-        city: profile.city || ""
+        city: profile.city || "",
+        avatar: profile.avatar || ""
       });
     }
   }, [profile]);
 
-  // Fetch user orders
+  // Check authentication status
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (!profile) return;
-      
-      setLoadingOrders(true);
-      try {
-        // This would fetch from MIKA_orders table in a real implementation
-        // For now, using mock data
-        const mockOrders = [
-          {
-            id: "ORD-001", date: "2026-02-20", status: "Delivered", total: 156990,
-            items: [
-              { name: "Brake Pad Set - Ceramic", qty: 2, price: 45990, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=80&h=80&fit=crop" },
-              { name: "Oil Filter - Premium", qty: 1, price: 12990, image: "https://images.unsplash.com/photo-1635784063407-577ca6097e01?w=80&h=80&fit=crop" },
-            ],
-          },
-          {
-            id: "ORD-002", date: "2026-02-18", status: "Shipped", total: 89500,
-            items: [
-              { name: "Alternator Assembly", qty: 1, price: 89500, image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=80&h=80&fit=crop" },
-            ],
-          },
-          {
-            id: "ORD-003", date: "2026-02-10", status: "Processing", total: 234000,
-            items: [
-              { name: "Suspension Kit - Complete", qty: 1, price: 189000, image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=80&h=80&fit=crop" },
-              { name: "Shock Absorber - Front", qty: 2, price: 22500, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=80&h=80&fit=crop" },
-            ],
-          },
-        ];
-        setOrders(mockOrders);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      } finally {
-        setLoadingOrders(false);
-      }
-    };
-
-    fetchOrders();
-  }, [profile]);
+    if (!loading && !profile) {
+      navigate("/login");
+    }
+  }, [profile, loading, navigate]);
 
   const handleSave = async () => {
     try {
@@ -94,7 +60,7 @@ const Profile = () => {
       setEditing(false);
       toast.success("Profile updated successfully!");
     } catch (error) {
-      toast.error("Failed to update profile. Please try again.");
+      toast.error("Failed to update profile");
     }
   };
 
@@ -104,7 +70,7 @@ const Profile = () => {
       navigate("/login");
       toast.success("Logged out successfully!");
     } catch (error) {
-      toast.error("Failed to logout. Please try again.");
+      toast.error("Failed to logout");
     }
   };
 
@@ -120,6 +86,25 @@ const Profile = () => {
     return "bg-yellow-100 text-yellow-700";
   };
 
+  // Show loading spinner while checking auth
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="h-12 w-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading profile...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Don't render anything if no profile (will redirect)
+  if (!profile) {
+    return null;
+  }
+
   return (
     <Layout>
       <section className="gradient-hero py-16">
@@ -134,15 +119,19 @@ const Profile = () => {
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="bg-card rounded-2xl p-6 shadow-[var(--card-shadow)] h-fit">
               <div className="text-center mb-6">
                 <div className="relative inline-block">
-                  <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                    <User className="h-12 w-12 text-primary" />
-                  </div>
+                  {profileForm.avatar ? (
+                    <img src={profileForm.avatar} alt="Avatar" className="w-24 h-24 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                      <User className="h-12 w-12 text-primary" />
+                    </div>
+                  )}
                   <button className="absolute bottom-0 right-0 p-1.5 bg-secondary text-secondary-foreground rounded-full shadow-lg">
                     <Camera className="h-3 w-3" />
                   </button>
                 </div>
-                <h2 className="font-display font-bold text-lg text-foreground mt-3">{profile?.name || 'Loading...'}</h2>
-                <p className="text-sm text-muted-foreground">{profile?.email || 'Loading...'}</p>
+                <h2 className="font-display font-bold text-lg text-foreground mt-3">{profileForm.name || profile.email}</h2>
+                <p className="text-sm text-muted-foreground">{profile.email}</p>
               </div>
 
               <nav className="space-y-1">
@@ -160,11 +149,7 @@ const Profile = () => {
                   </button>
                 ))}
                 <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors">
-                  {loading ? (
-                    <div className="h-4 w-4 border-2 border-destructive/30 border-t-destructive rounded-full animate-spin" />
-                  ) : (
-                    <LogOut className="h-4 w-4" />
-                  )}
+                  <LogOut className="h-4 w-4" />
                   Sign Out
                 </button>
               </nav>
@@ -185,6 +170,8 @@ const Profile = () => {
                       { icon: Mail, label: "Email", field: "email" },
                       { icon: Phone, label: "Phone", field: "phone" },
                       { icon: MapPin, label: "Address", field: "address" },
+                      { icon: MapPin, label: "City", field: "city" },
+                      { icon: MapPin, label: "Country", field: "country" },
                     ].map(({ icon: Icon, label, field }) => (
                       <div key={field}>
                         <label className="text-xs font-medium text-muted-foreground mb-1 block">{label}</label>
@@ -200,7 +187,7 @@ const Profile = () => {
                         ) : (
                           <div className="flex items-center gap-2 py-2.5">
                             <Icon className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm text-foreground">{profileForm[field as keyof typeof profileForm]}</span>
+                            <span className="text-sm text-foreground">{profileForm[field as keyof typeof profileForm] || "Not provided"}</span>
                           </div>
                         )}
                       </div>
@@ -215,19 +202,6 @@ const Profile = () => {
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="font-display font-bold text-lg text-foreground">My Orders</h3>
                       <span className="text-sm text-muted-foreground">{orders.length} orders</span>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3 mb-6">
-                      {[
-                        { label: "Total Orders", value: orders.length, color: "bg-primary/10 text-primary" },
-                        { label: "Delivered", value: orders.filter(o => o.status === "Delivered").length, color: "bg-green-100 text-green-700" },
-                        { label: "In Progress", value: orders.filter(o => o.status !== "Delivered").length, color: "bg-yellow-100 text-yellow-700" },
-                      ].map(({ label, value, color }) => (
-                        <div key={label} className={`rounded-xl p-4 text-center ${color}`}>
-                          <div className="font-display font-bold text-2xl">{value}</div>
-                          <div className="text-xs mt-1 opacity-80">{label}</div>
-                        </div>
-                      ))}
                     </div>
 
                     <div className="space-y-3">
@@ -254,42 +228,6 @@ const Profile = () => {
                               <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${expandedOrder === order.id ? "rotate-90" : ""}`} />
                             </div>
                           </button>
-
-                          {expandedOrder === order.id && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              className="border-t border-border"
-                            >
-                              <div className="p-4 space-y-3">
-                                {order.items.map((item, idx) => (
-                                  <div key={idx} className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
-                                    <img src={item.image} alt={item.name} className="w-14 h-14 rounded-lg object-cover" />
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
-                                      <p className="text-xs text-muted-foreground">Qty: {item.qty}</p>
-                                    </div>
-                                    <span className="text-sm font-semibold text-foreground">RWF {(item.price * item.qty).toLocaleString()}</span>
-                                  </div>
-                                ))}
-
-                                <div className="flex items-center justify-between pt-3 border-t border-border">
-                                  <div className="flex gap-2">
-                                    <button className="text-xs text-secondary hover:underline flex items-center gap-1">
-                                      <Eye className="h-3 w-3" /> View Invoice
-                                    </button>
-                                    <button className="text-xs text-secondary hover:underline flex items-center gap-1">
-                                      <Truck className="h-3 w-3" /> Track Shipment
-                                    </button>
-                                  </div>
-                                  <div className="text-right">
-                                    <span className="text-xs text-muted-foreground">Total: </span>
-                                    <span className="font-bold text-foreground">RWF {order.total.toLocaleString()}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </motion.div>
-                          )}
                         </div>
                       ))}
                     </div>
@@ -303,7 +241,9 @@ const Profile = () => {
                   <div className="text-center py-12">
                     <Heart className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
                     <p className="text-muted-foreground">Your wishlist is empty.</p>
-                    <Link to="/products" className="btn-primary inline-block mt-4 text-sm">Browse Products</Link>
+                    <Link to="/products" className="inline-block mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm">
+                      Browse Products
+                    </Link>
                   </div>
                 </div>
               )}
@@ -315,4 +255,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default Profile; // MAKE SURE THIS LINE EXISTS!

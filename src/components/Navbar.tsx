@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Search, User, ShoppingCart, Menu, X, LogIn, UserPlus } from "lucide-react";
-import { useCart } from "@/contexts/CartContext";
-import { useAuth } from "@/hooks/useAuth";
+import { Search, ShoppingCart, Menu, X, LogIn, UserPlus, User, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
@@ -17,9 +16,22 @@ const navLinks = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { totalItems } = useCart();
-  const { user } = useAuth();
+  const [totalItems, setTotalItems] = useState(0);
+  const { user, profile, signOut } = useAuth();
   const location = useLocation();
+
+  // Get cart items count from localStorage
+  useEffect(() => {
+    const updateCartCount = () => {
+      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const total = cart.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+      setTotalItems(total);
+    };
+
+    updateCartCount();
+    window.addEventListener("cartUpdated", updateCartCount);
+    return () => window.removeEventListener("cartUpdated", updateCartCount);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -28,6 +40,15 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => setIsOpen(false), [location]);
+
+  const handleLogout = async () => {
+    await signOut();
+  };
+
+  // Debug log to see auth state
+  useEffect(() => {
+    console.log("Navbar - Auth State:", { user: !!user, profile: !!profile });
+  }, [user, profile]);
 
   return (
     <nav
@@ -70,24 +91,44 @@ const Navbar = () => {
             <Search className="h-5 w-5" />
           </button>
           
-          {/* Authenticated user */}
+          {/* Auth buttons based on state */}
           {user ? (
-            <Link to="/profile" className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}>
-              <User className="h-5 w-5" />
-            </Link>
+            <>
+              {/* Profile Icon with Name */}
+              <Link 
+                to="/profile" 
+                className={`hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10"}`}
+              >
+                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+                  <User className="h-4 w-4" />
+                </div>
+                <span className="text-sm font-medium">
+                  {profile?.name?.split(' ')[0] || 'Profile'}
+                </span>
+              </Link>
+              
+              {/* Logout Button */}
+              <button 
+                onClick={handleLogout}
+                className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}
+                title="Logout"
+              >
+                <LogOut className="h-5 w-5" />
+              </button>
+            </>
           ) : (
             <>
-              {/* Login */}
               <Link 
                 to="/login" 
                 className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}
+                title="Login"
               >
                 <LogIn className="h-5 w-5" />
               </Link>
-              {/* Sign Up */}
               <Link 
                 to="/signup" 
                 className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}
+                title="Sign Up"
               >
                 <UserPlus className="h-5 w-5" />
               </Link>
@@ -137,6 +178,27 @@ const Navbar = () => {
                   {link.name}
                 </Link>
               ))}
+              <div className="border-t border-border my-2 pt-2">
+                {user ? (
+                  <>
+                    <Link to="/profile" className="px-4 py-3 rounded-lg font-medium text-foreground hover:bg-muted flex items-center gap-2">
+                      <User className="h-4 w-4" /> My Profile
+                    </Link>
+                    <button onClick={handleLogout} className="w-full text-left px-4 py-3 rounded-lg font-medium text-destructive hover:bg-destructive/10 flex items-center gap-2">
+                      <LogOut className="h-4 w-4" /> Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="px-4 py-3 rounded-lg font-medium text-foreground hover:bg-muted flex items-center gap-2">
+                      <LogIn className="h-4 w-4" /> Sign In
+                    </Link>
+                    <Link to="/signup" className="px-4 py-3 rounded-lg font-medium text-foreground hover:bg-muted flex items-center gap-2">
+                      <UserPlus className="h-4 w-4" /> Sign Up
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </motion.div>
         )}

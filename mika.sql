@@ -42,45 +42,7 @@ CREATE INDEX idx_mika_products_brand ON MIKA_products(brand_id);
 CREATE INDEX idx_mika_products_price ON MIKA_products(price);
 
 
--- Create users table with location
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Create update timestamp function
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;      
--- Create users table with location
-CREATE TABLE MIKA_users (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name VARCHAR(255) NOT NULL,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  password VARCHAR(255) NOT NULL,
-  phone VARCHAR(20),
-  avatar TEXT,
-  country VARCHAR(100),
-  city VARCHAR(100),
-  address TEXT,
-  role VARCHAR(50) DEFAULT 'customer', -- 'customer', 'admin', 'vendor'
-  last_login TIMESTAMP WITH TIME ZONE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Create indexes for faster lookups
-CREATE INDEX idx_mika_users_email ON MIKA_users(email);
-CREATE INDEX idx_mika_users_country ON MIKA_users(country);
-CREATE INDEX idx_mika_users_city ON MIKA_users(city);
-
--- Add trigger for updated_at
-CREATE TRIGGER update_mika_users_updated_at
-  BEFORE UPDATE ON MIKA_users
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
 
   -- Create cart table
 CREATE TABLE MIKA_cart (
@@ -223,3 +185,6 @@ CREATE TRIGGER update_mika_contact_messages_updated_at
   BEFORE UPDATE ON MIKA_contact_messages
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
+
+
+  ---zawicoLTD@26 "" SUPPLIERS TABLE PASSWORDA
