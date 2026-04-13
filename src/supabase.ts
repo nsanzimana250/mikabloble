@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient, SupabaseClientOptions } from '@supabase/supabase-js';
 
-// Get environment variables with fallback values
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://mctmuhvjhlzduutcjwap.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jdG11aHZqaGx6ZHV1dGNqd2FwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MTE0OTgsImV4cCI6MjA4NjM4NzQ5OH0.QSVVQswhx3taOHNJU2Dfy555HM-BWb57atgzJRwY9Q4';
-const supabaseServiceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jdG11aHZqaGx6ZHV1dGNqd2FwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDgxMTQ5OCwiZXhwIjoyMDg2Mzg3NDk4fQ.7zMnRair65JfHeg2uXYYAhuAjSaYtRmXYVzZ7eideTc';
+// NEW Supabase credentials
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://ysrntyivcanyteircsum.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlzcm50eWl2Y2FueXRlaXJjc3VtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwOTA4MDcsImV4cCI6MjA5MTY2NjgwN30.omNcjs3QlPFSQT4KsNiTYgP3vLOWY_9eF3_aPbwejik';
+const supabaseServiceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlzcm50eWl2Y2FueXRlaXJjc3VtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjA5MDgwNywiZXhwIjoyMDkxNjY2ODA3fQ.omNcjs3QlPFSQT4KsNiTYgP3vLOWY_9eF3_aPbwejik';
 
 // Default client options
 const defaultOptions: SupabaseClientOptions<any> = {
