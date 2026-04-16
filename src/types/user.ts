@@ -1,7 +1,7 @@
 export interface MikaUser {
   id: string;
+  email?: string;  // Add email field
   name: string;
-  email?: string;
   phone?: string;
   address?: string;
   country?: string;
@@ -14,15 +14,4 @@ export interface MikaUser {
   is_active: boolean;
   preferred_language: string;
   currency: string;
-}
-
-export interface UpdateUserProfile {
-  name?: string;
-  phone?: string;
-  address?: string;
-  country?: string;
-  city?: string;
-  avatar?: string;
-  preferred_language?: string;
-  currency?: string;
 }

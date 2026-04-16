@@ -5,27 +5,20 @@ import { User, Mail, Phone, MapPin, Edit, ShoppingBag, Heart, LogOut, Camera, Pa
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/supabase"; // Add this import
 
 const Profile = () => {
   const [editing, setEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<"profile" | "orders" | "wishlist">("profile");
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
-  const [orders] = useState<any[]>([
-    {
-      id: "ORD-001", date: "2026-02-20", status: "Delivered", total: 156990,
-      items: [
-        { name: "Brake Pad Set - Ceramic", qty: 2, price: 45990, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=80&h=80&fit=crop" },
-        { name: "Oil Filter - Premium", qty: 1, price: 12990, image: "https://images.unsplash.com/photo-1635784063407-577ca6097e01?w=80&h=80&fit=crop" },
-      ],
-    },
-  ]);
+  const [orders, setOrders] = useState<any[]>([]); // Changed from mock data to state
+  const [loadingOrders, setLoadingOrders] = useState(false);
   
-  const { profile, updateProfile, signOut, loading } = useAuth();
+  const { profile, updateProfile, signOut, loading, user } = useAuth();
   const navigate = useNavigate();
 
   const [profileForm, setProfileForm] = useState({
     name: "",
-    email: "",
     phone: "",
     address: "",
     country: "",
@@ -33,11 +26,44 @@ const Profile = () => {
     avatar: ""
   });
 
+  // Fetch real orders from database
+  const fetchOrders = async () => {
+    if (!user) return;
+    
+    setLoadingOrders(true);
+    try {
+      const { data, error } = await supabase
+        .from('mika_orders')
+        .select(`
+          *,
+          items:mika_order_items(*)
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      // Transform data for display
+      const formattedOrders = data?.map(order => ({
+        id: order.order_number,
+        date: new Date(order.created_at).toLocaleDateString(),
+        status: order.order_status,
+        total: order.total,
+        items: order.items || []
+      })) || [];
+      
+      setOrders(formattedOrders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
   useEffect(() => {
     if (profile) {
       setProfileForm({
         name: profile.name || "",
-        email: profile.email || "",
         phone: profile.phone || "",
         address: profile.address || "",
         country: profile.country || "",
@@ -46,6 +72,13 @@ const Profile = () => {
       });
     }
   }, [profile]);
+
+  // Fetch orders when orders tab is selected
+  useEffect(() => {
+    if (activeTab === "orders" && user) {
+      fetchOrders();
+    }
+  }, [activeTab, user]);
 
   // Check authentication status
   useEffect(() => {
@@ -75,14 +108,14 @@ const Profile = () => {
   };
 
   const statusIcon = (status: string) => {
-    if (status === "Delivered") return <CheckCircle className="h-4 w-4" />;
-    if (status === "Shipped") return <Truck className="h-4 w-4" />;
+    if (status === "delivered") return <CheckCircle className="h-4 w-4" />;
+    if (status === "shipped") return <Truck className="h-4 w-4" />;
     return <Clock className="h-4 w-4" />;
   };
 
   const statusColor = (status: string) => {
-    if (status === "Delivered") return "bg-green-100 text-green-700";
-    if (status === "Shipped") return "bg-blue-100 text-blue-700";
+    if (status === "delivered") return "bg-green-100 text-green-700";
+    if (status === "shipped") return "bg-blue-100 text-blue-700";
     return "bg-yellow-100 text-yellow-700";
   };
 
@@ -131,7 +164,7 @@ const Profile = () => {
                   </button>
                 </div>
                 <h2 className="font-display font-bold text-lg text-foreground mt-3">{profileForm.name || profile.email}</h2>
-                <p className="text-sm text-muted-foreground">{profile.email}</p>
+                <p className="text-sm text-muted-foreground">{user?.email}</p>
               </div>
 
               <nav className="space-y-1">
@@ -167,7 +200,6 @@ const Profile = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {[
                       { icon: User, label: "Full Name", field: "name" },
-                      { icon: Mail, label: "Email", field: "email" },
                       { icon: Phone, label: "Phone", field: "phone" },
                       { icon: MapPin, label: "Address", field: "address" },
                       { icon: MapPin, label: "City", field: "city" },
@@ -204,33 +236,68 @@ const Profile = () => {
                       <span className="text-sm text-muted-foreground">{orders.length} orders</span>
                     </div>
 
-                    <div className="space-y-3">
-                      {orders.map((order) => (
-                        <div key={order.id} className="border border-border rounded-xl overflow-hidden">
-                          <button
-                            onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
-                            className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 bg-muted rounded-lg">
-                                <Package className="h-5 w-5 text-primary" />
+                    {loadingOrders ? (
+                      <div className="text-center py-8">
+                        <div className="h-8 w-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
+                        <p className="text-muted-foreground">Loading orders...</p>
+                      </div>
+                    ) : orders.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Package className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
+                        <p className="text-muted-foreground">No orders yet.</p>
+                        <Link to="/products" className="inline-block mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm">
+                          Start Shopping
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {orders.map((order) => (
+                          <div key={order.id} className="border border-border rounded-xl overflow-hidden">
+                            <button
+                              onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
+                              className="w-full flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-muted rounded-lg">
+                                  <Package className="h-5 w-5 text-primary" />
+                                </div>
+                                <div className="text-left">
+                                  <span className="font-semibold text-sm text-foreground block">{order.id}</span>
+                                  <span className="text-xs text-muted-foreground">{order.date} · {order.items.length} item{order.items.length > 1 ? "s" : ""}</span>
+                                </div>
                               </div>
-                              <div className="text-left">
-                                <span className="font-semibold text-sm text-foreground block">{order.id}</span>
-                                <span className="text-xs text-muted-foreground">{order.date} · {order.items.length} item{order.items.length > 1 ? "s" : ""}</span>
+                              <div className="flex items-center gap-3">
+                                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${statusColor(order.status)}`}>
+                                  {statusIcon(order.status)} {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                </span>
+                                <span className="font-bold text-sm text-foreground hidden sm:block">RWF {order.total.toLocaleString()}</span>
+                                <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${expandedOrder === order.id ? "rotate-90" : ""}`} />
                               </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${statusColor(order.status)}`}>
-                                {statusIcon(order.status)} {order.status}
-                              </span>
-                              <span className="font-bold text-sm text-foreground hidden sm:block">RWF {order.total.toLocaleString()}</span>
-                              <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${expandedOrder === order.id ? "rotate-90" : ""}`} />
-                            </div>
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                            </button>
+                            
+                            {expandedOrder === order.id && (
+                              <div className="border-t border-border p-4 bg-muted/20">
+                                <h4 className="font-semibold text-sm mb-3">Order Items</h4>
+                                <div className="space-y-2">
+                                  {order.items.map((item: any, idx: number) => (
+                                    <div key={idx} className="flex justify-between text-sm">
+                                      <span>{item.product_name} x {item.quantity}</span>
+                                      <span>RWF {item.total.toLocaleString()}</span>
+                                    </div>
+                                  ))}
+                                  <div className="border-t border-border pt-2 mt-2">
+                                    <div className="flex justify-between font-semibold">
+                                      <span>Total</span>
+                                      <span>RWF {order.total.toLocaleString()}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -255,4 +322,4 @@ const Profile = () => {
   );
 };
 
-export default Profile; // MAKE SURE THIS LINE EXISTS!
+export default Profile;

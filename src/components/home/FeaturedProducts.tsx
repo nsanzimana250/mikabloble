@@ -2,35 +2,21 @@ import { Link } from "react-router-dom";
 import ProductCard from "@/components/ProductCard";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { supabase } from "@/supabase";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  reviewCount: number;
-  category: string;
-  brand: string;
-  inStock: boolean;
-  lowStock?: boolean;
-  image: string;
-  images?: string[];
-  specs?: Record<string, string>;
-  compatibility?: string[];
-}
+import { supabase } from "@/supabase"; // FIXED: Correct import path
+import { Product } from "@/types/product";
 
 const FeaturedProducts = () => {
   const [featured, setFeatured] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
         setLoading(true);
+        setError(null);
         
-        // Fetch the last 6 inserted products that are in stock, ordered by creation date
+        // Fetch the last 8 inserted products that are in stock, ordered by creation date
         const { data, error } = await supabase
           .from('mika_products')
           .select(`
@@ -47,20 +33,21 @@ const FeaturedProducts = () => {
             specs,
             compatibility,
             created_at,
-            mika_categories (name),
-            mika_brands (name)
+            mika_categories (id, name),
+            mika_brands (id, name)
           `)
           .eq('in_stock', true)
           .order('created_at', { ascending: false })
-          .limit(6);
+          .limit(8); // CHANGED: from 6 to 8 products
 
         if (error) {
           console.error('Error fetching featured products:', error);
-          // Fallback to static data if database fetch fails
-          const { products } = await import("@/data/products");
-          const staticFeatured = products.filter((p) => p.inStock).slice(0, 6);
-          setFeatured(staticFeatured);
-        } else if (data) {
+          setError('Failed to load products');
+          setFeatured([]);
+          return;
+        }
+        
+        if (data && data.length > 0) {
           // Transform the data to match the Product interface
           const transformedProducts = data.map(product => ({
             id: product.id,
@@ -69,8 +56,8 @@ const FeaturedProducts = () => {
             price: parseFloat(product.price),
             originalPrice: product.original_price ? parseFloat(product.original_price) : undefined,
             reviewCount: product.review_count || 0,
-            category: product.mika_categories?.[0]?.name || 'Uncategorized',
-            brand: product.mika_brands?.[0]?.name || 'Unbranded',
+            category: product.mika_categories?.name || 'Uncategorized',
+            brand: product.mika_brands?.name || 'Unbranded',
             inStock: product.in_stock,
             lowStock: product.low_stock || false,
             image: product.image || '',
@@ -80,13 +67,13 @@ const FeaturedProducts = () => {
           }));
 
           setFeatured(transformedProducts);
+        } else {
+          setFeatured([]);
         }
-      } catch (error) {
-        console.error('Error fetching featured products:', error);
-        // Fallback to static data if there's any error
-        const { products } = await import("@/data/products");
-        const staticFeatured = products.filter((p) => p.inStock).slice(0, 6);
-        setFeatured(staticFeatured);
+      } catch (err) {
+        console.error('Error fetching featured products:', err);
+        setError('An error occurred while loading products');
+        setFeatured([]);
       } finally {
         setLoading(false);
       }
@@ -102,10 +89,10 @@ const FeaturedProducts = () => {
           <div className="text-center mb-12">
             <h2 className="section-title">Best Selling Spare Parts</h2>
             <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
-            <p className="section-subtitle mt-3">Top-rated parts trusted by professionals</p>
+            <p className="section-subtitle mt-3">Latest products from our inventory</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {[...Array(4)].map((_, i) => (
+            {[...Array(8)].map((_, i) => ( // CHANGED: from 4 to 8 skeleton loaders
               <div key={i} className="bg-card rounded-xl p-6 border border-border animate-pulse">
                 <div className="h-32 sm:h-48 bg-muted rounded-lg mb-4"></div>
                 <div className="h-4 bg-muted rounded mb-2"></div>
@@ -113,6 +100,29 @@ const FeaturedProducts = () => {
                 <div className="h-8 bg-muted rounded"></div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-20">
+        <div className="section-container">
+          <div className="text-center mb-12">
+            <h2 className="section-title">Best Selling Spare Parts</h2>
+            <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
+            <p className="section-subtitle mt-3">Latest products from our inventory</p>
+          </div>
+          <div className="text-center py-12">
+            <p className="text-red-500 mb-4">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="btn-primary inline-block"
+            >
+              Try Again
+            </button>
           </div>
         </div>
       </section>
@@ -136,7 +146,7 @@ const FeaturedProducts = () => {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ delay: i * 0.05 }} // CHANGED: faster animation for more products
               >
                 <ProductCard product={product} />
               </motion.div>
@@ -159,4 +169,3 @@ const FeaturedProducts = () => {
 };
 
 export default FeaturedProducts;
-

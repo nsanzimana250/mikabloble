@@ -5,7 +5,7 @@ import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
-import { supabase } from "@/supabase";
+import { supabase } from "@/supabase"; // Fixed import path
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -34,10 +34,11 @@ const Login = () => {
 
       if (data.user) {
         toast.success("Login successful!");
-        // Small delay to ensure auth state is updated
+        // Force a small delay to ensure session is set
         setTimeout(() => {
-          navigate("/profile");
-        }, 100);
+          navigate("/");
+          window.location.reload(); // Force refresh to update auth state
+        }, 500);
       }
     } catch (err: any) {
       console.error("Login error:", err);

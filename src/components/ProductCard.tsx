@@ -1,20 +1,48 @@
 import { ShoppingCart, Eye, Truck } from "lucide-react";
-import { Product } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+
+// Define Product interface locally instead of importing from static data
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  reviewCount: number;
+  category: string;
+  category_id?: string;
+  brand: string;
+  brand_id?: string;
+  inStock: boolean;
+  lowStock: boolean;
+  image: string;
+  images: string[];
+  specs: Record<string, any>;
+  compatibility: string[];
+}
 
 const ProductCard = ({ product }: { product: Product }) => {
   const { addToCart } = useCart();
   const [hovered, setHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
 
-  const discount = product.originalPrice
+  const discount = product.originalPrice && product.originalPrice > product.price
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
   // Fallback image in case the product image fails to load
   const fallbackImage = "/images/placeholder.jpg"; // Update this path to your actual placeholder image
+
+  // Use a default placeholder if no image is provided
+  const productImage = product.image || fallbackImage;
+
+  const handleAddToCart = () => {
+    if (product.inStock) {
+      addToCart(product);
+    }
+  };
 
   return (
     <div
@@ -25,7 +53,7 @@ const ProductCard = ({ product }: { product: Product }) => {
       {/* Image Container - Fixed aspect ratio with full width */}
       <div className="relative w-full bg-muted overflow-hidden" style={{ aspectRatio: '4/3' }}>
         <img
-          src={imageError ? fallbackImage : product.image}
+          src={imageError ? fallbackImage : productImage}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           loading="lazy"
@@ -36,6 +64,13 @@ const ProductCard = ({ product }: { product: Product }) => {
         {discount > 0 && (
           <span className="absolute top-3 left-3 bg-secondary text-secondary-foreground text-xs font-bold px-2 py-1 rounded-md z-10">
             -{discount}%
+          </span>
+        )}
+        
+        {/* Low Stock Badge */}
+        {product.inStock && product.lowStock && (
+          <span className="absolute top-3 left-3 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-md z-10">
+            Low Stock
           </span>
         )}
         
@@ -68,6 +103,23 @@ const ProductCard = ({ product }: { product: Product }) => {
           </h3>
         </Link>
 
+        {/* Brand & Category (optional - for more info) */}
+        <div className="flex items-center gap-2 mt-1">
+          {product.brand && product.brand !== 'Unbranded' && (
+            <span className="text-xs text-muted-foreground">
+              {product.brand}
+            </span>
+          )}
+          {product.brand && product.brand !== 'Unbranded' && product.category && (
+            <span className="text-xs text-muted-foreground">•</span>
+          )}
+          {product.category && product.category !== 'Uncategorized' && (
+            <span className="text-xs text-muted-foreground">
+              {product.category}
+            </span>
+          )}
+        </div>
+
         {/* Free Delivery Badge */}
         <div className="flex items-center gap-1 mt-2 text-green-600">
           <Truck className="h-3 w-3 flex-shrink-0" />
@@ -88,7 +140,7 @@ const ProductCard = ({ product }: { product: Product }) => {
           </div>
           
           <button
-            onClick={() => addToCart(product)}
+            onClick={handleAddToCart}
             disabled={!product.inStock}
             className="p-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Add to cart"

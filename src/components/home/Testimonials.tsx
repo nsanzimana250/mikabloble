@@ -1,10 +1,75 @@
-import { testimonials } from "@/data/products";
 import { Star, Quote } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "@/supabase";
+
+interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  text: string;
+  rating: number;
+}
 
 const Testimonials = () => {
   const [current, setCurrent] = useState(0);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('testimonials')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching testimonials:', error);
+          // Fallback to empty array if table doesn't exist yet
+          setTestimonials([]);
+        } else {
+          setTestimonials(data || []);
+        }
+      } catch (err) {
+        console.error('Error fetching testimonials:', err);
+        setTestimonials([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
+
+  // Show placeholder if no testimonials or loading
+  if (loading) {
+    return (
+      <section className="py-20">
+        <div className="section-container">
+          <div className="text-center">
+            <h2 className="section-title">What Our Customers Say</h2>
+            <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
+            <p className="text-muted-foreground mt-8">Loading testimonials...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (testimonials.length === 0) {
+    return (
+      <section className="py-20">
+        <div className="section-container">
+          <div className="text-center">
+            <h2 className="section-title">What Our Customers Say</h2>
+            <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
+            <p className="text-muted-foreground mt-8">Testimonials coming soon!</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-20">

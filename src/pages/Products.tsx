@@ -4,8 +4,7 @@ import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
 import { Search, SlidersHorizontal, Grid3X3, List, ChevronRight, X } from "lucide-react";
 import { motion } from "framer-motion";
-import { supabase } from "@/supabase";
-import { Product } from "@/data/products";
+import { supabase } from "@/supabase"; // FIXED: Correct import path
 
 interface Category {
   id: string;
@@ -16,6 +15,25 @@ interface Category {
 interface Brand {
   id: string;
   name: string;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  reviewCount: number;
+  category: string;
+  category_id?: string;
+  brand: string;
+  brand_id?: string;
+  inStock: boolean;
+  lowStock: boolean;
+  image: string;
+  images: string[];
+  specs: Record<string, any>;
+  compatibility: string[];
 }
 
 const Products = () => {
@@ -29,80 +47,39 @@ const Products = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
   
-  // Data states
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Transform product data to match Product interface
-  const transformProduct = (product: any) => ({
+  const transformProduct = (product: any): Product => ({
     id: product.id,
     name: product.name,
     description: product.description || '',
     price: parseFloat(product.price),
-    originalPrice: product.original_price ? parseFloat(product.original_price) : 
-                 product.originalPrice ?? undefined,
-    reviewCount: product.review_count ?? product.reviewCount ?? 0,
-    category: product.mika_categories?.name || product.category || 'Uncategorized',
+    originalPrice: product.original_price ? parseFloat(product.original_price) : undefined,
+    reviewCount: product.review_count || 0,
+    category: product.mika_categories?.name || 'Uncategorized',
     category_id: product.category_id,
-    brand: product.mika_brands?.name || product.brand || 'Unbranded',
+    brand: product.mika_brands?.name || 'Unbranded',
     brand_id: product.brand_id,
-    inStock: product.in_stock ?? product.inStock ?? false,
-    lowStock: product.low_stock ?? product.lowStock ?? false,
+    inStock: product.in_stock ?? true,
+    lowStock: product.low_stock ?? false,
     image: product.image || '',
     images: product.images || [],
     specs: product.specs || {},
     compatibility: product.compatibility || []
   });
 
-  // Fetch data from database
+  // Simplified fetch - get everything in one go
   useEffect(() => {
-    const fetchData = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
+        setError(null);
         
-        // Fetch categories with product count
-        const { data: categoriesData, error: categoriesError } = await supabase
-          .from('mika_categories')
-          .select('*');
-        
-        if (categoriesError) {
-          console.error('Error fetching categories:', categoriesError);
-          setCategories([]);
-        } else {
-          // Get product count for each category
-          const categoriesWithCount = await Promise.all(
-            (categoriesData || []).map(async (category) => {
-              const { count } = await supabase
-                .from('mika_products')
-                .select('*', { count: 'exact', head: true })
-                .eq('category_id', category.id);
-              
-              return {
-                ...category,
-                count: count || 0
-              };
-            })
-          );
-          
-          setCategories(categoriesWithCount);
-        }
-
-        // Fetch brands
-        const { data: brandsData, error: brandsError } = await supabase
-          .from('mika_brands')
-          .select('*')
-          .order('name');
-        
-        if (brandsError) {
-          console.error('Error fetching brands:', brandsError);
-          setBrands([]);
-        } else {
-          setBrands(brandsData || []);
-        }
-
-        // Fetch products
+        // Fetch products with their relations
         const { data: productsData, error: productsError } = await supabase
           .from('mika_products')
           .select(`
@@ -113,52 +90,105 @@ const Products = () => {
           .order('created_at', { ascending: false });
         
         if (productsError) {
-          console.error('Error fetching products:', productsError);
-          // Fallback to static data
-          const { products: staticProducts } = await import("@/data/products");
-          const transformedProducts = staticProducts.map(transformProduct);
-          setProducts(transformedProducts);
-        } else if (productsData) {
+          console.error('Products error:', productsError);
+          setError('Failed to load products. Please try again.');
+          return;
+        }
+        
+        // Fetch categories
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from('mika_categories')
+          .select('*')
+          .order('name');
+        
+        if (categoriesError) {
+          console.error('Categories error:', categoriesError);
+        }
+        
+        // Fetch brands
+        const { data: brandsData, error: brandsError } = await supabase
+          .from('mika_brands')
+          .select('*')
+          .order('name');
+        
+        if (brandsError) {
+          console.error('Brands error:', brandsError);
+        }
+        
+        // Transform products
+        if (productsData && productsData.length > 0) {
           const transformedProducts = productsData.map(transformProduct);
           setProducts(transformedProducts);
         } else {
           setProducts([]);
         }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        // Fallback to static data on any error
-        try {
-          const { products: staticProducts } = await import("@/data/products");
-          const transformedProducts = staticProducts.map(transformProduct);
-          setProducts(transformedProducts);
-        } catch (staticError) {
-          console.error('Error loading static data:', staticError);
-          setProducts([]);
+        
+        // Process categories with counts
+        if (categoriesData && categoriesData.length > 0) {
+          // Count products per category
+          const productCounts: Record<string, number> = {};
+          (productsData || []).forEach(product => {
+            if (product.category_id) {
+              productCounts[product.category_id] = (productCounts[product.category_id] || 0) + 1;
+            }
+          });
+          
+          const categoriesWithCount = categoriesData.map(cat => ({
+            id: cat.id,
+            name: cat.name,
+            description: cat.description,
+            image: cat.image,
+            count: productCounts[cat.id] || 0
+          }));
+          setCategories(categoriesWithCount);
+        } else {
           setCategories([]);
-          setBrands([]);
         }
+        
+        // Set brands
+        setBrands(brandsData || []);
+        
+      } catch (err) {
+        console.error('Error loading data:', err);
+        setError('Failed to load products. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    loadData();
   }, []);
 
   const toggleCategory = (cat: string) =>
     setSelectedCategories((prev) => prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]);
+  
   const toggleBrand = (brand: string) =>
     setSelectedBrands((prev) => prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]);
 
   const filtered = useMemo(() => {
-    let result = products.filter((p) => {
-      if (search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.description.toLowerCase().includes(search.toLowerCase())) return false;
-      if (selectedCategories.length && !selectedCategories.includes(p.category)) return false;
-      if (selectedBrands.length && !selectedBrands.includes(p.brand)) return false;
-      return true;
-    });
-    if (sortBy === "price-asc") result.sort((a, b) => a.price - b.price);
-    else if (sortBy === "price-desc") result.sort((a, b) => b.price - a.price);
+    let result = [...products];
+    
+    if (search) {
+      result = result.filter((p) => 
+        p.name.toLowerCase().includes(search.toLowerCase()) || 
+        p.description.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    
+    if (selectedCategories.length) {
+      result = result.filter((p) => selectedCategories.includes(p.category));
+    }
+    
+    if (selectedBrands.length) {
+      result = result.filter((p) => selectedBrands.includes(p.brand));
+    }
+    
+    if (sortBy === "price-asc") {
+      result.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price-desc") {
+      result.sort((a, b) => b.price - a.price);
+    }
+    
     return result;
   }, [search, selectedCategories, selectedBrands, sortBy, products]);
 
@@ -188,43 +218,73 @@ const Products = () => {
 
       <div>
         <label className="text-sm font-semibold text-foreground mb-2 block">Categories</label>
-        <div className="space-y-2">
-          {categories.map((cat) => (
-            <label key={cat.id} className="flex items-center gap-2 text-sm text-foreground cursor-pointer hover:text-secondary transition-colors">
-              <input
-                type="checkbox"
-                checked={selectedCategories.includes(cat.name)}
-                onChange={() => toggleCategory(cat.name)}
-                className="rounded border-border accent-secondary"
-              />
-              {cat.name} <span className="text-muted-foreground ml-auto">({cat.count})</span>
-            </label>
-          ))}
+        <div className="space-y-2 max-h-60 overflow-y-auto">
+          {categories.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No categories available</p>
+          ) : (
+            categories.map((cat) => (
+              <label key={cat.id} className="flex items-center gap-2 text-sm text-foreground cursor-pointer hover:text-secondary transition-colors">
+                <input
+                  type="checkbox"
+                  checked={selectedCategories.includes(cat.name)}
+                  onChange={() => toggleCategory(cat.name)}
+                  className="rounded border-border accent-secondary"
+                  disabled={cat.count === 0}
+                />
+                {cat.name} <span className="text-muted-foreground ml-auto">({cat.count || 0})</span>
+              </label>
+            ))
+          )}
         </div>
       </div>
 
       <div>
         <label className="text-sm font-semibold text-foreground mb-2 block">Brands</label>
         <div className="space-y-2 max-h-40 overflow-y-auto">
-          {brands.slice(0, 8).map((brand) => (
-            <label key={brand.id} className="flex items-center gap-2 text-sm text-foreground cursor-pointer hover:text-secondary transition-colors">
-              <input
-                type="checkbox"
-                checked={selectedBrands.includes(brand.name)}
-                onChange={() => toggleBrand(brand.name)}
-                className="rounded border-border accent-secondary"
-              />
-              {brand.name}
-            </label>
-          ))}
+          {brands.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No brands available</p>
+          ) : (
+            brands.map((brand) => (
+              <label key={brand.id} className="flex items-center gap-2 text-sm text-foreground cursor-pointer hover:text-secondary transition-colors">
+                <input
+                  type="checkbox"
+                  checked={selectedBrands.includes(brand.name)}
+                  onChange={() => toggleBrand(brand.name)}
+                  className="rounded border-border accent-secondary"
+                />
+                {brand.name}
+              </label>
+            ))
+          )}
         </div>
       </div>
 
-      <button onClick={resetFilters} className="w-full py-2 text-sm text-muted-foreground hover:text-foreground border border-border rounded-lg transition-colors">
+      <button 
+        onClick={resetFilters} 
+        className="w-full py-2 text-sm text-muted-foreground hover:text-foreground border border-border rounded-lg transition-colors"
+      >
         Reset Filters
       </button>
     </div>
   );
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="section-container py-8">
+          <div className="text-center py-20">
+            <div className="text-red-500 text-lg mb-4">{error}</div>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="btn-primary"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -308,12 +368,21 @@ const Products = () => {
                     <button onClick={() => toggleBrand(brand)}><X className="h-3 w-3" /></button>
                   </span>
                 ))}
+                {search && (
+                  <span className="flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+                    Search: {search}
+                    <button onClick={() => setSearch("")}><X className="h-3 w-3" /></button>
+                  </span>
+                )}
               </div>
             )}
 
             {loading ? (
               <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading products...</p>
+                </div>
               </div>
             ) : filtered.length > 0 ? (
               <div className={`grid gap-4 sm:gap-6 ${viewMode === "grid" ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}>
@@ -330,8 +399,8 @@ const Products = () => {
               </div>
             ) : (
               <div className="text-center py-20">
-                <p className="text-muted-foreground text-lg">No products found matching your criteria.</p>
-                <button onClick={resetFilters} className="btn-primary mt-4">Reset Filters</button>
+                <p className="text-muted-foreground text-lg mb-4">No products found matching your criteria.</p>
+                <button onClick={resetFilters} className="btn-primary">Reset Filters</button>
               </div>
             )}
           </div>

@@ -45,11 +45,6 @@ const Navbar = () => {
     await signOut();
   };
 
-  // Debug log to see auth state
-  useEffect(() => {
-    console.log("Navbar - Auth State:", { user: !!user, profile: !!profile });
-  }, [user, profile]);
-
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${

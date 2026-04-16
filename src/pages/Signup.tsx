@@ -5,7 +5,7 @@ import { Mail, Lock, Eye, EyeOff, UserPlus, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
-import { supabase } from "@/supabase";
+import { supabase } from "@/supabase"; // Fixed import path
 
 const Signup = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
@@ -69,29 +69,9 @@ const Signup = () => {
       }
 
       if (authData.user) {
-        // 2. Create profile in mika_users table
-        const { error: profileError } = await supabase
-          .from('mika_users')
-          .insert({
-            id: authData.user.id,
-            email: form.email,
-            name: form.name,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            role: 'user',
-            is_active: true,
-            preferred_language: 'en',
-            currency: 'RWF'
-          });
+        toast.success("Account created successfully! Please sign in.");
 
-        if (profileError) {
-          console.error("Profile creation error:", profileError);
-          toast.error("Account created but profile setup encountered an issue. Please contact support.");
-        } else {
-          toast.success("Account created successfully! Please sign in.");
-        }
-        
-        // 3. Redirect to login
+        // Redirect to login
         setTimeout(() => {
           navigate("/login");
         }, 1500);
