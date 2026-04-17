@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Search, ShoppingCart, Menu, X, LogIn, UserPlus, User, LogOut } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Search, ShoppingCart, Menu, X, LogIn, UserPlus, User, LogOut, Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
@@ -16,22 +18,10 @@ const navLinks = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [totalItems, setTotalItems] = useState(0);
   const { user, profile, signOut } = useAuth();
+  const { totalItems } = useCart();
   const location = useLocation();
-
-  // Get cart items count from localStorage
-  useEffect(() => {
-    const updateCartCount = () => {
-      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-      const total = cart.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
-      setTotalItems(total);
-    };
-
-    updateCartCount();
-    window.addEventListener("cartUpdated", updateCartCount);
-    return () => window.removeEventListener("cartUpdated", updateCartCount);
-  }, []);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -42,7 +32,13 @@ const Navbar = () => {
   useEffect(() => setIsOpen(false), [location]);
 
   const handleLogout = async () => {
-    await signOut();
+    try {
+      await signOut();
+      toast.success("Logged out successfully!");
+      navigate("/");
+    } catch (error) {
+      toast.error("Failed to logout");
+    }
   };
 
   return (
@@ -100,6 +96,15 @@ const Navbar = () => {
                 <span className="text-sm font-medium">
                   {profile?.name?.split(' ')[0] || 'Profile'}
                 </span>
+              </Link>
+              
+              {/* Notification Bell */}
+              <Link 
+                to="/notifications"
+                className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}
+                title="Notifications"
+              >
+                <Bell className="h-5 w-5" />
               </Link>
               
               {/* Logout Button */}

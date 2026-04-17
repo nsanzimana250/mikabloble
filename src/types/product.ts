@@ -27,5 +27,4 @@ export interface Brand {
   id: string;
   name: string;
   count?: number;
-}</content>
-<parameter name="filePath">src/types/product.ts
+}

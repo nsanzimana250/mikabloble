@@ -1,10 +1,11 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
+import { useAuth } from "@/contexts/AuthContext";
 import { Search, SlidersHorizontal, Grid3X3, List, ChevronRight, X } from "lucide-react";
 import { motion } from "framer-motion";
-import { supabase } from "@/supabase"; // FIXED: Correct import path
+import { supabase } from "@/supabase";
 
 interface Category {
   id: string;
@@ -37,6 +38,7 @@ interface Product {
 }
 
 const Products = () => {
+  const { authReady, session } = useAuth();
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "";
 
@@ -72,92 +74,155 @@ const Products = () => {
     compatibility: product.compatibility || []
   });
 
-  // Simplified fetch - get everything in one go
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // Fetch products with their relations
-        const { data: productsData, error: productsError } = await supabase
-          .from('mika_products')
-          .select(`
-            *,
-            mika_categories!left (id, name),
-            mika_brands!left (id, name)
-          `)
-          .order('created_at', { ascending: false });
-        
-        if (productsError) {
-          console.error('Products error:', productsError);
-          setError('Failed to load products. Please try again.');
-          return;
-        }
-        
-        // Fetch categories
-        const { data: categoriesData, error: categoriesError } = await supabase
-          .from('mika_categories')
-          .select('*')
-          .order('name');
-        
-        if (categoriesError) {
-          console.error('Categories error:', categoriesError);
-        }
-        
-        // Fetch brands
-        const { data: brandsData, error: brandsError } = await supabase
-          .from('mika_brands')
-          .select('*')
-          .order('name');
-        
-        if (brandsError) {
-          console.error('Brands error:', brandsError);
-        }
-        
-        // Transform products
-        if (productsData && productsData.length > 0) {
-          const transformedProducts = productsData.map(transformProduct);
-          setProducts(transformedProducts);
-        } else {
-          setProducts([]);
-        }
-        
-        // Process categories with counts
-        if (categoriesData && categoriesData.length > 0) {
-          // Count products per category
-          const productCounts: Record<string, number> = {};
-          (productsData || []).forEach(product => {
-            if (product.category_id) {
-              productCounts[product.category_id] = (productCounts[product.category_id] || 0) + 1;
-            }
-          });
-          
-          const categoriesWithCount = categoriesData.map(cat => ({
-            id: cat.id,
-            name: cat.name,
-            description: cat.description,
-            image: cat.image,
-            count: productCounts[cat.id] || 0
-          }));
-          setCategories(categoriesWithCount);
-        } else {
-          setCategories([]);
-        }
-        
-        // Set brands
-        setBrands(brandsData || []);
-        
-      } catch (err) {
-        console.error('Error loading data:', err);
-        setError('Failed to load products. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Helper: Debug log Supabase session state
+  const logSessionState = async (context: string) => {
+    try {
+      const { data: { session: localSession }, error: sessionError } = await supabase.auth.getSession();
+      
+      const authState = !localSession 
+        ? 'unauthenticated' 
+        : localSession.expires_at && localSession.expires_at * 1000 < Date.now() 
+          ? 'expired' 
+          : 'authenticated';
+      
+      console.log(`[Products] ${context} - Session State:`, {
+        hasSession: !!localSession,
+        userId: localSession?.user?.id,
+        userEmail: localSession?.user?.email,
+        authState,
+        expiresAt: localSession?.expires_at ? new Date(localSession.expires_at * 1000).toISOString() : null,
+        error: sessionError?.message
+      });
+      
+      return { session: localSession, authState };
+    } catch (err) {
+      console.error('[Products] Session check error:', err);
+      return { session: null, authState: 'error' };
+    }
+  };
 
-    loadData();
+  // Check auth state and wait for it to be ready (from context)
+  useEffect(() => {
+    if (!authReady) {
+      console.log('[Products] Waiting for auth to be ready...');
+      return;
+    }
+    
+    console.log('[Products] Auth ready, current session:', session?.user?.id || 'none');
+  }, [authReady, session]);
+
+  // Listen for auth state changes and refetch when user logs in/out
+  // Note: Auth state is now managed by AuthContext, this is just for data refetching
+  useEffect(() => {
+    if (!authReady) return;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      console.log('[Products] Auth state changed:', {
+        event: _event,
+        hasSession: !!session,
+        userId: session?.user?.id
+      });
+
+      // Reload data when auth state changes
+      loadData();
+    });
+
+    return () => subscription.unsubscribe();
+  }, [authReady]);
+
+  // Data loading function
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { session } = await logSessionState('Before fetch');
+      console.log('[Products] Current user:', session?.user || 'none');
+
+      const { data: productsData, error: productsError } = await supabase
+        .from('mika_products')
+        .select(`
+          *,
+          mika_categories!left (id, name),
+          mika_brands!left (id, name)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (productsError) {
+        console.error('[Products] Products fetch error:', {
+          code: productsError.code,
+          message: productsError.message,
+          details: productsError.details,
+          hint: productsError.hint
+        });
+        setError(`Failed to load products: ${productsError.message}`);
+        return;
+      }
+
+      console.log('[Products] Raw products data:', productsData?.length || 0, 'products');
+
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('mika_categories')
+        .select('*')
+        .order('name');
+
+      if (categoriesError) {
+        console.error('Categories error:', categoriesError);
+      }
+
+      const { data: brandsData, error: brandsError } = await supabase
+        .from('mika_brands')
+        .select('*')
+        .order('name');
+
+      if (brandsError) {
+        console.error('Brands error:', brandsError);
+      }
+
+      if (productsData && productsData.length > 0) {
+        const transformedProducts = productsData.map(transformProduct);
+        console.log('[Products] Transformed products:', transformedProducts.length);
+        setProducts(transformedProducts);
+      } else {
+        console.warn('[Products] No products returned - possible RLS issue');
+        setProducts([]);
+      }
+
+      if (categoriesData && categoriesData.length > 0) {
+        const productCounts: Record<string, number> = {};
+        (productsData || []).forEach(product => {
+          if (product.category_id) {
+            productCounts[product.category_id] = (productCounts[product.category_id] || 0) + 1;
+          }
+        });
+
+        const categoriesWithCount = categoriesData.map(cat => ({
+          id: cat.id,
+          name: cat.name,
+          description: cat.description,
+          image: cat.image,
+          count: productCounts[cat.id] || 0
+        }));
+        setCategories(categoriesWithCount);
+      } else {
+        setCategories([]);
+      }
+
+      setBrands(brandsData || []);
+
+    } catch (err) {
+      console.error('Error loading data:', err);
+      setError('Failed to load products. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  // Fetch when auth is ready
+  useEffect(() => {
+    if (!authReady) return;
+    loadData();
+  }, [authReady, loadData]);
 
   const toggleCategory = (cat: string) =>
     setSelectedCategories((prev) => prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]);
@@ -377,11 +442,13 @@ const Products = () => {
               </div>
             )}
 
-            {loading ? (
+            {(!authReady || loading) ? (
               <div className="flex items-center justify-center h-64">
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                  <p className="text-muted-foreground">Loading products...</p>
+                  <p className="text-muted-foreground">
+                    {!authReady ? 'Checking auth...' : 'Loading products...'}
+                  </p>
                 </div>
               </div>
             ) : filtered.length > 0 ? (

@@ -3,9 +3,10 @@ import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { ChevronRight, Minus, Plus, Heart, ShoppingCart, Truck, ShieldCheck, RotateCcw, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
-import { supabase } from "@/supabase"; // FIXED: Changed to correct path
+import { supabase } from "@/supabase";
 
 interface Product {
   id: string;
@@ -29,6 +30,7 @@ interface Product {
 const ProductDetail = () => {
   const { id } = useParams();
   const { addToCart } = useCart();
+  const { authReady, session } = useAuth();
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<"specs" | "compatibility">("specs");
   
@@ -38,9 +40,49 @@ const ProductDetail = () => {
   const [error, setError] = useState<string | null>(null);
   const [mainImage, setMainImage] = useState<string>('');
 
+  // Helper: Debug log Supabase session state
+  const logSessionState = async (context: string) => {
+    try {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      const localSession = sessionData?.session;
+      const sessionUser = localSession?.user;
+      
+      const authState = !localSession 
+        ? 'unauthenticated' 
+        : localSession.expires_at && localSession.expires_at * 1000 < Date.now() 
+          ? 'expired' 
+          : 'authenticated';
+      
+      console.log(`[ProductDetail] ${context} - Session State:`, {
+        hasSession: !!localSession,
+        userId: sessionUser?.id,
+        userEmail: sessionUser?.email,
+        authState,
+        expiresAt: localSession?.expires_at ? new Date(localSession.expires_at * 1000).toISOString() : null,
+        error: sessionError?.message
+      });
+      
+      return { session: localSession, sessionUser, authState };
+    } catch (err) {
+      console.error('[ProductDetail] Session check error:', err);
+      return { session: null, sessionUser: null, authState: 'error' };
+    }
+  };
+
   useEffect(() => {
+    if (!authReady) {
+      console.log('[ProductDetail] Waiting for auth...');
+      return;
+    }
+
+    console.log('[ProductDetail] Auth ready, current user:', session?.id);
+
     const fetchData = async () => {
       try {
+        // Debug: Log session before fetching
+        const { session: localSession } = await logSessionState('Before fetch');
+        console.log('[ProductDetail] Current user:', localSession?.user);
+        
         setLoading(true);
         setError(null);
         
@@ -61,7 +103,12 @@ const ProductDetail = () => {
           .single();
         
         if (productError) {
-          console.error('Error fetching product:', productError);
+          console.error('[ProductDetail] Fetch error:', {
+            code: productError.code,
+            message: productError.message,
+            details: productError.details,
+            hint: productError.hint
+          });
           setError("Product not found");
           setProduct(null);
           return;

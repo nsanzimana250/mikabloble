@@ -22,6 +22,7 @@ import AdminProducts from "./pages/admin/AdminProducts";
 import AdminContacts from "./pages/admin/AdminContacts";
 import AdminBookings from "./pages/admin/AdminBookings";
 import NotFound from "./pages/NotFound";
+import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -33,24 +34,33 @@ const App = () => (
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <ScrollToTop />
           <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/products/:id" element={<ProductDetail />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/request-quote" element={<RequestQuote />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            
-            {/* Protected Routes - User must be logged in */}
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
+             {/* Public Routes */}
+             <Route path="/" element={<Index />} />
+             <Route path="/products" element={<Products />} />
+             <Route path="/products/:id" element={<ProductDetail />} />
+             <Route path="/cart" element={<Cart />} />
+             <Route path="/checkout" element={
+               <ProtectedRoute>
+                 <Checkout />
+               </ProtectedRoute>
+             } />
+             <Route path="/about" element={<About />} />
+             <Route path="/contact" element={<Contact />} />
+             <Route path="/request-quote" element={<RequestQuote />} />
+             <Route path="/login" element={<Login />} />
+             <Route path="/signup" element={<Signup />} />
+             
+             {/* Protected Routes - User must be logged in */}
+<Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
+              <Route path="/notifications" element={
+                <ProtectedRoute>
+                  <Notifications />
+                </ProtectedRoute>
+              } />
             
             {/* Admin Routes */}
             <Route path="/admin/login" element={<AdminLogin />} />

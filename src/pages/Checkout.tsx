@@ -1,16 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CreditCard, Lock, ChevronLeft, Check, Truck, Shield } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Layout from "@/components/Layout";
 import { motion } from "framer-motion";
+import { supabase } from "@/supabase";
 
 const Checkout = () => {
   const { items, subtotal, clearCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [processing, setProcessing] = useState(false);
@@ -27,16 +30,87 @@ const Checkout = () => {
     paymentMethod: "card",
   });
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user && !orderPlaced) {
+      navigate("/login?returnTo=/checkout");
+    }
+  }, [user, navigate, orderPlaced]);
+
   const update = (field: string, value: string) => setForm((p) => ({ ...p, [field]: value }));
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
+    if (!user) {
+      navigate("/login?returnTo=/checkout");
+      return;
+    }
+
+    // Basic validation
+    if (!form.firstName || !form.lastName || !form.email || !form.phone || !form.address || !form.city) {
+      toast.error("Please fill in all required shipping fields");
+      return;
+    }
+
     setProcessing(true);
-    setTimeout(() => {
-      setProcessing(false);
+    try {
+      // Generate unique order number
+      const orderNumber = `MG-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+
+      // Insert order
+      const { data: orderData, error: orderError } = await supabase
+        .from('mika_orders')
+        .insert({
+          order_number: orderNumber,
+          user_id: user.id,
+          first_name: form.firstName,
+          last_name: form.lastName,
+          email: form.email,
+          phone: form.phone,
+          address: form.address,
+          city: form.city,
+          zip: form.zip,
+          country: form.country,
+          subtotal: subtotal,
+          shipping_cost: shipping,
+          tax: tax,
+          total: total,
+          payment_method: form.paymentMethod,
+          payment_status: 'pending',
+          order_status: 'processing'
+        })
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      // Insert order items
+      const orderItems = items.map(item => ({
+        order_id: orderData.id,
+        product_id: item.product.id,
+        product_name: item.product.name,
+        product_price: item.product.price,
+        quantity: item.quantity,
+        total: item.product.price * item.quantity,
+        created_at: new Date().toISOString()
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('mika_order_items')
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      // Clear cart
+      await clearCart();
+
       setOrderPlaced(true);
-      clearCart();
       toast.success("Order placed successfully!");
-    }, 2500);
+  } catch (error) {
+    console.error('Order placement error:', error);
+    const message = error instanceof Error ? error.message : "Failed to place order. Please try again.";
+    toast.error(message);
+    setProcessing(false);
+  }
   };
 
   if (items.length === 0 && !orderPlaced) {
