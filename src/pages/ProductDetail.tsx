@@ -353,7 +353,7 @@ const ProductDetail = () => {
               </button>
 
               <a
-                href={`https://wa.me/250793903992?text=${encodeURIComponent(`Hi! I'd like to order: ${product.name} (Qty: ${quantity}) - RWF ${(product.price * quantity).toLocaleString()}`)}`}
+                href={`https://wa.me/250793903992?text=${encodeURIComponent(`Hi MIKA! 👋 I'd like to order:\n\n🔧 *${product.name}*\nQty: ${quantity}\nPrice: RWF ${(product.price * quantity).toLocaleString()}\n\n🔗 View product: ${window.location.origin}/products/${product.id}\n\nPlease confirm availability. Thanks!`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 border border-green-500 rounded-lg bg-green-50 hover:bg-green-100 transition-colors text-green-600 flex items-center gap-2"
