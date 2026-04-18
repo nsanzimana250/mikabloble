@@ -1,6 +1,6 @@
 export interface MikaUser {
   id: string;
-  email?: string;  // Add email field
+  email?: string;
   name: string;
   phone?: string;
   address?: string;
@@ -15,3 +15,5 @@ export interface MikaUser {
   preferred_language: string;
   currency: string;
 }
+
+export type UpdateUserProfile = Partial<Omit<MikaUser, 'id' | 'created_at' | 'updated_at'>>;

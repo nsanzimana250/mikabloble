@@ -75,7 +75,7 @@ const ProductDetail = () => {
       return;
     }
 
-    console.log('[ProductDetail] Auth ready, current user:', session?.id);
+    console.log('[ProductDetail] Auth ready, current user:', session?.user?.id);
 
     const fetchData = async () => {
       try {

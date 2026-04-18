@@ -21,10 +21,21 @@ import Dashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminContacts from "./pages/admin/AdminContacts";
 import AdminBookings from "./pages/admin/AdminBookings";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminUsers from "./pages/admin/AdminUsers";
 import NotFound from "./pages/NotFound";
 import Notifications from "./pages/Notifications";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      gcTime: 5 * 60_000,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -88,6 +99,24 @@ const App = () => (
               element={
                 <ProtectedRoute requireAdmin={true}>
                   <AdminProducts />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/admin/orders" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminOrders />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/admin/users" 
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminUsers />
                 </ProtectedRoute>
               } 
             />
