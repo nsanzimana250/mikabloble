@@ -24,45 +24,28 @@ const Login = () => {
         email: form.email,
         password: form.password,
       });
-      
-      if (error) {
+
+      if (error || !data.user) {
         setError("Invalid email or password");
         toast.error("Login failed. Please check your credentials.");
         setIsLoading(false);
         return;
       }
 
-      if (data.user) {
-        // Check user role in mika_users table
-        const { data: userProfile, error: profileError } = await supabase
-          .from("mika_users")
-          .select("role")
-          .eq("id", data.user.id)
-          .single();
+      // Check role to redirect appropriately (no full reload — AuthContext picks it up)
+      const { data: userProfile } = await supabase
+        .from("mika_users")
+        .select("role")
+        .eq("id", data.user.id)
+        .maybeSingle();
 
-        if (profileError) {
-          console.error("Error fetching user profile:", profileError);
-          toast.error("Error loading profile. Please try again.");
-          setIsLoading(false);
-          return;
-        }
-
-        toast.success("Login successful!");
-
-        // Redirect based on role
-        if (userProfile?.role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/");
-        }
-
-        // Force refresh to update auth state
-        window.location.reload();
-      }
-    } catch (err: any) {
+      toast.success("Login successful!");
+      navigate(userProfile?.role === "admin" ? "/admin" : "/", { replace: true });
+    } catch (err) {
       console.error("Login error:", err);
       setError("An error occurred. Please try again.");
       toast.error("Login failed");
+    } finally {
       setIsLoading(false);
     }
   };
