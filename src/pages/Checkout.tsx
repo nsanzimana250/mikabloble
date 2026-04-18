@@ -18,6 +18,7 @@ const Checkout = () => {
   const [step, setStep] = useState(1);
   const [processing, setProcessing] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [placedOrderNumber, setPlacedOrderNumber] = useState<string>("");
 
   const shipping = 0;
   const tax = subtotal * 0.18;
@@ -103,6 +104,7 @@ const Checkout = () => {
       // Clear cart
       await clearCart();
 
+      setPlacedOrderNumber(orderNumber);
       setOrderPlaced(true);
       toast.success("Order placed successfully!");
   } catch (error) {
@@ -132,7 +134,7 @@ const Checkout = () => {
             <Check className="h-10 w-10 text-white" />
           </motion.div>
           <h1 className="section-title mb-2">Order Confirmed!</h1>
-          <p className="text-muted-foreground mb-2">Order #MG-{Math.random().toString(36).substring(2, 8).toUpperCase()}</p>
+          <p className="text-muted-foreground mb-2">Order #{placedOrderNumber}</p>
           <p className="text-muted-foreground mb-8 max-w-md">Thank you for your purchase. You'll receive a confirmation email shortly.</p>
           <div className="flex gap-4">
             <Link to="/"><Button variant="outline">Back to Home</Button></Link>

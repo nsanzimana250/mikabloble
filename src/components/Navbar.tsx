@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, Menu, X, LogIn, UserPlus, User, LogOut, Bell } from "lucide-react";
+import { ShoppingCart, Menu, X, LogIn, UserPlus, User, LogOut, Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -78,10 +78,6 @@ const Navbar = () => {
 
         {/* Icons */}
         <div className="flex items-center gap-3">
-          <button className={`p-2 rounded-lg transition-colors ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}>
-            <Search className="h-5 w-5" />
-          </button>
-          
           {/* Auth buttons based on state */}
           {user ? (
             <>

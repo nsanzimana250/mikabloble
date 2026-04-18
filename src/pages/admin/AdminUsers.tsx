@@ -96,9 +96,16 @@ const AdminUsers = () => {
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">{u.phone || "—"}</td>
                     <td className="px-4 py-3">
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${u.role === "admin" ? "bg-secondary/10 text-secondary" : "bg-muted text-muted-foreground"}`}>
-                        {u.role}
-                      </span>
+                      <select
+                        value={u.role || "user"}
+                        disabled={updateUser.isPending}
+                        onChange={(e) => updateUser.mutate({ id: u.id, updates: { role: e.target.value } })}
+                        className={`text-xs px-2 py-1 rounded-md font-medium capitalize border bg-background cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary ${u.role === "admin" ? "border-secondary text-secondary" : u.role === "moderator" ? "border-blue-500 text-blue-600" : "border-border text-muted-foreground"}`}
+                      >
+                        <option value="user">User</option>
+                        <option value="moderator">Moderator</option>
+                        <option value="admin">Admin</option>
+                      </select>
                     </td>
                     <td className="px-4 py-3">
                       <span className={`text-xs px-2 py-1 rounded-full font-medium ${u.is_active ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-500"}`}>
@@ -108,13 +115,6 @@ const AdminUsers = () => {
                     <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1 justify-end">
-                        <button
-                          title={u.role === "admin" ? "Demote to user" : "Promote to admin"}
-                          onClick={() => updateUser.mutate({ id: u.id, updates: { role: u.role === "admin" ? "user" : "admin" } })}
-                          className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-secondary"
-                        >
-                          {u.role === "admin" ? <ShieldOff className="h-4 w-4" /> : <Shield className="h-4 w-4" />}
-                        </button>
                         <button
                           title={u.is_active ? "Deactivate" : "Activate"}
                           onClick={() => updateUser.mutate({ id: u.id, updates: { is_active: !u.is_active } })}

@@ -29,7 +29,7 @@ const AdminOrders = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("mika_orders")
-        .select("*, items:mika_order_items(*)")
+        .select("*, items:mika_order_items(*, product:mika_products(id, name, image, images))")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data || [];
@@ -112,12 +112,24 @@ const AdminOrders = () => {
                         <div>
                           <p className="text-xs text-muted-foreground mb-2">Items</p>
                           <div className="space-y-2">
-                            {(o.items || []).map((it: any) => (
-                              <div key={it.id} className="flex justify-between text-sm bg-muted/50 rounded-lg px-3 py-2">
-                                <span className="truncate">{it.product_name} × {it.quantity}</span>
-                                <span className="font-medium shrink-0">{fmtRWF(it.total)}</span>
-                              </div>
-                            ))}
+                            {(o.items || []).map((it: any) => {
+                              const img = it.product?.image || it.product?.images?.[0] || "/placeholder.svg";
+                              return (
+                                <div key={it.id} className="flex items-center gap-3 bg-muted/50 rounded-lg p-2">
+                                  <img
+                                    src={img}
+                                    alt={it.product_name}
+                                    className="h-14 w-14 rounded-md object-cover bg-background shrink-0"
+                                    onError={(e) => ((e.target as HTMLImageElement).src = "/placeholder.svg")}
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium truncate">{it.product_name}</p>
+                                    <p className="text-xs text-muted-foreground">Qty: {it.quantity} · {fmtRWF(it.product_price)}</p>
+                                  </div>
+                                  <span className="font-semibold text-sm shrink-0">{fmtRWF(it.total)}</span>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                         <div>
