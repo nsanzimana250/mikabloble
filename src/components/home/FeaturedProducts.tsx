@@ -56,8 +56,8 @@ const FeaturedProducts = () => {
             price: parseFloat(product.price),
             originalPrice: product.original_price ? parseFloat(product.original_price) : undefined,
             reviewCount: product.review_count || 0,
-            category: product.mika_categories?.name || 'Uncategorized',
-            brand: product.mika_brands?.name || 'Unbranded',
+            category: (Array.isArray(product.mika_categories) ? product.mika_categories[0]?.name : (product.mika_categories as any)?.name) || 'Uncategorized',
+            brand: (Array.isArray(product.mika_brands) ? product.mika_brands[0]?.name : (product.mika_brands as any)?.name) || 'Unbranded',
             inStock: product.in_stock,
             lowStock: product.low_stock || false,
             image: product.image || '',
@@ -148,7 +148,7 @@ const FeaturedProducts = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }} // CHANGED: faster animation for more products
               >
-                <ProductCard product={product} />
+                <ProductCard product={product as any} />
               </motion.div>
             ))}
           </div>

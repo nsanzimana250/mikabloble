@@ -27,8 +27,8 @@ const mapProduct = (p: Record<string, unknown>): Product => {
     id: p.id as string,
     name: p.name as string,
     description: (p.description as string) || '',
-    price: parseFloat(p.price as string | number),
-    originalPrice: p.original_price ? parseFloat(p.original_price as string | number) : undefined,
+    price: parseFloat(String(p.price)),
+    originalPrice: p.original_price ? parseFloat(String(p.original_price)) : undefined,
     reviewCount: p.review_count ? Number(p.review_count) : 0,
     category: (p.category as string) || '',
     category_id: p.category_id as string | undefined,
@@ -38,7 +38,7 @@ const mapProduct = (p: Record<string, unknown>): Product => {
     lowStock: (p.low_stock as boolean | null | undefined) ?? false,
     image: (p.image as string) || '',
     images: (p.images as string[]) || [],
-    specs: (p.specs as Record<string, unknown>) || {},
+    specs: (p.specs as Record<string, string>) || {},
     compatibility: (p.compatibility as string[]) || []
   };
 };
