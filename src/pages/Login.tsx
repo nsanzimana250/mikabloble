@@ -33,12 +33,31 @@ const Login = () => {
       }
 
       if (data.user) {
+        // Check user role in mika_users table
+        const { data: userProfile, error: profileError } = await supabase
+          .from("mika_users")
+          .select("role")
+          .eq("id", data.user.id)
+          .single();
+
+        if (profileError) {
+          console.error("Error fetching user profile:", profileError);
+          toast.error("Error loading profile. Please try again.");
+          setIsLoading(false);
+          return;
+        }
+
         toast.success("Login successful!");
-        // Force a small delay to ensure session is set
-        setTimeout(() => {
+
+        // Redirect based on role
+        if (userProfile?.role === "admin") {
+          navigate("/admin");
+        } else {
           navigate("/");
-          window.location.reload(); // Force refresh to update auth state
-        }, 500);
+        }
+
+        // Force refresh to update auth state
+        window.location.reload();
       }
     } catch (err: any) {
       console.error("Login error:", err);
