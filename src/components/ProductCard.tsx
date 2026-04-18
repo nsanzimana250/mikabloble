@@ -51,7 +51,7 @@ const ProductCard = ({ product }: { product: Product }) => {
       onMouseLeave={() => setHovered(false)}
     >
       {/* Image Container - Fixed aspect ratio with full width */}
-      <div className="relative w-full bg-muted overflow-hidden" style={{ aspectRatio: '4/3' }}>
+      <Link to={`/products/${product.id}`} className="relative block w-full bg-muted overflow-hidden" style={{ aspectRatio: '4/3' }} aria-label={`View ${product.name}`}>
         <img
           src={imageError ? fallbackImage : productImage}
           alt={product.name}
@@ -85,15 +85,14 @@ const ProductCard = ({ product }: { product: Product }) => {
         
         {/* Quick View Button on Hover */}
         {hovered && product.inStock && (
-          <Link
-            to={`/products/${product.id}`}
-            className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors z-10"
+          <span
+            className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-lg z-10"
             aria-label="Quick view"
           >
             <Eye className="h-4 w-4 text-gray-700" />
-          </Link>
+          </span>
         )}
-      </div>
+      </Link>
 
       {/* Product Info */}
       <div className="p-4 flex flex-col flex-grow">
