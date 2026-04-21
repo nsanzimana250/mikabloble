@@ -106,7 +106,7 @@
     @apply text-muted-foreground text-lg mt-2;
   }
   .btn-primary {
-    @apply bg-secondary text-secondary-foreground font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:shadow-[var(--orange-glow)] hover:brightness-110;
+    @apply bg-secondary text-secondary-foreground font-bold px-6 py-3 rounded-lg transition-all duration-300 hover:shadow-[var(--orange-glow)] hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2;
   }
   .btn-outline-hero {
     @apply border-2 border-primary-foreground text-primary-foreground font-semibold px-6 py-3 rounded-lg transition-all duration-300 hover:bg-primary-foreground hover:text-primary;

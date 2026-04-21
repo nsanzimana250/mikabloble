@@ -24,14 +24,19 @@ const Footer = () => {
           {/* Company Info */}
           <div>
             <div className="mb-4">
-              <img src={logo} alt="MIKA GLOBAL BUSINESS LTD" className="h-14 w-auto brightness-0 invert" />
+              <img src={logo} alt="MIKA GLOBAL BUSINESS LTD" width="240" height="56" className="h-14 w-auto brightness-0 invert" />
             </div>
-            <p className="text-primary-foreground/70 text-sm leading-relaxed mb-4">
+            <p className="text-primary-foreground/90 text-sm leading-relaxed mb-4">
               Your trusted partner for quality car spare parts. From small clips to major engine components, we deliver excellence worldwide.
             </p>
             <div className="flex gap-3">
-              {[Facebook, Instagram, Linkedin, Twitter].map((Icon, i) => (
-                <a key={i} href="#" className="p-2 rounded-lg bg-primary-foreground/10 hover:bg-secondary hover:text-secondary-foreground transition-colors">
+              {[
+                { Icon: Facebook, label: "Facebook" },
+                { Icon: Instagram, label: "Instagram" },
+                { Icon: Linkedin, label: "LinkedIn" },
+                { Icon: Twitter, label: "Twitter" },
+              ].map(({ Icon, label }) => (
+                <a key={label} href="#" aria-label={`Follow us on ${label}`} className="p-2 rounded-lg bg-primary-foreground/10 hover:bg-secondary hover:text-secondary-foreground transition-colors">
                   <Icon className="h-4 w-4" />
                 </a>
               ))}
@@ -49,7 +54,7 @@ const Footer = () => {
                 { name: "Contact", path: "/contact" },
                 { name: "Request Quote", path: "/request-quote" },
               ].map((link) => (
-                <Link key={link.path} to={link.path} className="text-primary-foreground/70 hover:text-secondary transition-colors text-sm">
+                <Link key={link.path} to={link.path} className="text-primary-foreground/90 hover:text-secondary transition-colors text-sm">
                   {link.name}
                 </Link>
               ))}
@@ -60,17 +65,17 @@ const Footer = () => {
           <div>
             <h3 className="font-display font-semibold text-lg mb-4">Contact Us</h3>
             <div className="flex flex-col gap-3">
-              <div className="flex items-start gap-3 text-sm text-primary-foreground/70">
-                <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-secondary" />
+              <div className="flex items-start gap-3 text-sm text-primary-foreground/90">
+                <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-secondary" aria-hidden="true" />
                 <span>KN 4 Ave, Kigali City, Rwanda</span>
               </div>
-              <div className="flex items-center gap-3 text-sm text-primary-foreground/70">
-                <Phone className="h-4 w-4 shrink-0 text-secondary" />
-                <span>+44 20 1234 5678</span>
+              <div className="flex items-center gap-3 text-sm text-primary-foreground/90">
+                <Phone className="h-4 w-4 shrink-0 text-secondary" aria-hidden="true" />
+                <a href="tel:+442012345678" className="hover:text-secondary transition-colors">+44 20 1234 5678</a>
               </div>
-              <div className="flex items-center gap-3 text-sm text-primary-foreground/70">
-                <Mail className="h-4 w-4 shrink-0 text-secondary" />
-                <span>info@mikaglobal.com</span>
+              <div className="flex items-center gap-3 text-sm text-primary-foreground/90">
+                <Mail className="h-4 w-4 shrink-0 text-secondary" aria-hidden="true" />
+                <a href="mailto:info@mikaglobal.com" className="hover:text-secondary transition-colors">info@mikaglobal.com</a>
               </div>
             </div>
           </div>
@@ -78,14 +83,17 @@ const Footer = () => {
           {/* Newsletter */}
           <div>
             <h3 className="font-display font-semibold text-lg mb-4">Newsletter</h3>
-            <p className="text-primary-foreground/70 text-sm mb-4">Subscribe for the latest updates and offers.</p>
+            <p className="text-primary-foreground/90 text-sm mb-4">Subscribe for the latest updates and offers.</p>
             <form onSubmit={handleSubscribe} className="flex gap-2">
+              <label htmlFor="newsletter-email" className="sr-only">Email address</label>
               <input
+                id="newsletter-email"
                 type="email"
                 placeholder="Your email"
+                aria-label="Email address for newsletter"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg bg-primary-foreground/10 border border-primary-foreground/20 text-sm text-primary-foreground placeholder:text-primary-foreground/40 focus:outline-none focus:border-secondary"
+                className="flex-1 px-3 py-2 rounded-lg bg-primary-foreground/10 border border-primary-foreground/30 text-sm text-primary-foreground placeholder:text-primary-foreground/60 focus:outline-none focus:border-secondary"
                 required
               />
               <button type="submit" className="btn-primary px-4 py-2 text-sm rounded-lg">
@@ -99,13 +107,13 @@ const Footer = () => {
       {/* Bottom bar */}
       <div className="border-t border-primary-foreground/10">
         <div className="section-container py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="text-primary-foreground/50 text-xs text-center sm:text-left">
+          <div className="text-primary-foreground/80 text-xs text-center sm:text-left">
             <p>© 2026 MIKA GLOBAL BUSINESS LTD. All rights reserved.</p>
-            <p className="mt-1">Developed by <a href="https://esdras-kappa.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-secondary hover:underline">dev esdras</a></p>
-            <Link to="/admin/login" className="text-primary-foreground/30 hover:text-primary-foreground/60 transition-colors mt-1 inline-block">Admin</Link>
+            <p className="mt-1">Developed by <a href="https://esdras-kappa.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-secondary underline underline-offset-2 hover:brightness-125">dev esdras</a></p>
+            <Link to="/admin/login" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors mt-1 inline-block underline underline-offset-2">Admin</Link>
           </div>
-          <button onClick={scrollToTop} className="p-2 rounded-full bg-secondary text-secondary-foreground hover:brightness-110 transition-all">
-            <ArrowUp className="h-4 w-4" />
+          <button onClick={scrollToTop} aria-label="Scroll to top" className="p-2 rounded-full bg-secondary text-secondary-foreground hover:brightness-110 transition-all">
+            <ArrowUp className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>
