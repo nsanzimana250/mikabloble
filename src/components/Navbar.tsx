@@ -12,7 +12,6 @@ const navLinks = [
   { name: "Products", path: "/products" },
   { name: "About", path: "/about" },
   { name: "Contact", path: "/contact" },
-  { name: "Request Quote", path: "/request-quote" },
 ];
 
 const Navbar = () => {
