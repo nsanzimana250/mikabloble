@@ -24,16 +24,16 @@ const Newsletter = () => {
           Get exclusive deals, new arrivals, and industry news delivered to your inbox.
         </p>
 
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto flex gap-2">
+        <form onSubmit={handleSubmit} className="max-w-sm mx-auto flex gap-2">
           <input
             type="email"
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="flex-1 px-4 py-3 rounded-lg bg-primary-foreground/10 border border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40 text-sm focus:outline-none focus:border-secondary"
+            className="flex-1 px-3 py-2 h-9 rounded-md bg-primary-foreground/10 border border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40 text-xs focus:outline-none focus:border-secondary"
             required
           />
-          <button type="submit" className="btn-primary rounded-lg">
+          <button type="submit" className="px-4 h-9 rounded-md bg-secondary text-secondary-foreground text-xs font-semibold hover:brightness-110 transition-all">
             Subscribe
           </button>
         </form>
