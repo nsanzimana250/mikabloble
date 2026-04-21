@@ -43,7 +43,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       <aside className={`fixed top-0 left-0 z-50 h-screen w-64 shrink-0 bg-primary text-primary-foreground flex flex-col transition-transform lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="p-5 border-b border-primary-foreground/10">
           <Link to="/admin" className="block">
-            <img src={logo} alt="MIKA GLOBLE" className="h-10 brightness-0 invert" />
+            <img src={logo} alt="MIKA GLOBAL" className="h-10 brightness-0 invert" />
           </Link>
           <p className="text-[10px] uppercase tracking-widest text-primary-foreground/50 mt-1">Admin Panel</p>
         </div>

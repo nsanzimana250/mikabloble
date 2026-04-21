@@ -15,7 +15,7 @@ const About = () => {
       <section className="gradient-hero py-20">
         <div className="section-container text-center">
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-display font-black text-4xl md:text-5xl text-primary-foreground">
-            About MIKA GLOBLE
+            About MIKA GLOBAL
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-primary-foreground/70 text-lg mt-4 max-w-2xl mx-auto">
             Your trusted global partner for quality automotive spare parts since 2014.
@@ -29,7 +29,7 @@ const About = () => {
             <h2 className="section-title">Our Story</h2>
             <div className="w-16 h-1 bg-secondary mt-3 rounded-full" />
             <p className="text-muted-foreground mt-6 leading-relaxed">
-              Founded in 2014, MIKA GLOBLE BUSINESS LTD started with a simple mission: to make quality car spare parts accessible to everyone, everywhere. What began as a small operation has grown into a global enterprise, serving mechanics, fleet managers, and car enthusiasts across 120+ countries.
+              Founded in 2014, MIKA GLOBAL BUSINESS LTD started with a simple mission: to make quality car spare parts accessible to everyone, everywhere. What began as a small operation has grown into a global enterprise, serving mechanics, fleet managers, and car enthusiasts across 120+ countries.
             </p>
             <p className="text-muted-foreground mt-4 leading-relaxed">
               Today, we offer over 50,000 genuine parts from the world's leading manufacturers. Our commitment to authenticity, competitive pricing, and exceptional customer service continues to drive everything we do.

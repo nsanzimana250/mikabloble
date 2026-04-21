@@ -109,9 +109,9 @@ const Signup = () => {
             className="bg-card rounded-2xl p-8 shadow-[var(--card-shadow)]"
           >
             <div className="text-center mb-8">
-              <img src={logo} alt="MIKA GLOBLE" className="h-16 mx-auto mb-4" />
+              <img src={logo} alt="MIKA GLOBAL" className="h-16 mx-auto mb-4" />
               <h1 className="font-display font-bold text-2xl text-foreground">Create Account</h1>
-              <p className="text-muted-foreground text-sm mt-1">Join MIKA GLOBLE today</p>
+              <p className="text-muted-foreground text-sm mt-1">Join MIKA GLOBAL today</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">

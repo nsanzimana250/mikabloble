@@ -210,7 +210,7 @@ const Checkout = () => {
                   {form.paymentMethod === "bank" && (
                     <div className="bg-muted rounded-lg p-4 text-sm text-muted-foreground space-y-1">
                       <p className="font-semibold text-foreground">Bank Transfer Details</p>
-                      <p>Bank: Bank of Kigali</p><p>Account: MIKA GLOBLE BUSINESS LTD</p><p>SWIFT: BKIGRWRW</p><p>Account No: 100-XXXX-XXXX</p>
+                      <p>Bank: Bank of Kigali</p><p>Account: MIKA GLOBAL BUSINESS LTD</p><p>SWIFT: BKIGRWRW</p><p>Account No: 100-XXXX-XXXX</p>
                     </div>
                   )}
                   <div className="flex gap-3 mt-6">

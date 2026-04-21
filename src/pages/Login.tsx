@@ -65,7 +65,7 @@ const Login = () => {
             className="bg-card rounded-2xl p-8 shadow-[var(--card-shadow)]"
           >
             <div className="text-center mb-8">
-              <img src={logo} alt="MIKA GLOBLE" className="h-16 mx-auto mb-4" />
+              <img src={logo} alt="MIKA GLOBAL" className="h-16 mx-auto mb-4" />
               <h1 className="font-display font-bold text-2xl text-foreground">Welcome Back</h1>
               <p className="text-muted-foreground text-sm mt-1">Sign in to your account</p>
             </div>
