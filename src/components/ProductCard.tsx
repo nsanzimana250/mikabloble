@@ -50,12 +50,12 @@ const ProductCard = ({ product }: { product: Product }) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Image Container - Fixed aspect ratio with full width */}
-      <Link to={`/products/${product.id}`} className="relative block w-full bg-muted overflow-hidden" style={{ aspectRatio: '4/3' }} aria-label={`View ${product.name}`}>
+      {/* Image Container - 80% of card, fully visible product */}
+      <Link to={`/products/${product.id}`} className="relative block w-full bg-white overflow-hidden" style={{ aspectRatio: '1/1' }} aria-label={`View ${product.name}`}>
         <img
           src={imageError ? fallbackImage : productImage}
           alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
           onError={() => setImageError(true)}
         />
@@ -94,59 +94,27 @@ const ProductCard = ({ product }: { product: Product }) => {
         )}
       </Link>
 
-      {/* Product Info */}
-      <div className="p-4 flex flex-col flex-grow">
-        <Link to={`/products/${product.id}`} className="hover:no-underline">
-          <h3 className="font-semibold text-sm text-foreground hover:text-secondary transition-colors line-clamp-2 min-h-[2.5rem]">
-            {product.name}
-          </h3>
-        </Link>
-
-        {/* Brand & Category (optional - for more info) */}
-        <div className="flex items-center gap-2 mt-1">
-          {product.brand && product.brand !== 'Unbranded' && (
-            <span className="text-xs text-muted-foreground">
-              {product.brand}
-            </span>
-          )}
-          {product.brand && product.brand !== 'Unbranded' && product.category && (
-            <span className="text-xs text-muted-foreground">•</span>
-          )}
-          {product.category && product.category !== 'Uncategorized' && (
-            <span className="text-xs text-muted-foreground">
-              {product.category}
-            </span>
-          )}
+      {/* Product Info - 20% area, compact */}
+      <div className="p-2 sm:p-3 flex items-center justify-between gap-2 flex-grow">
+        <div className="flex flex-col min-w-0 flex-1">
+          <Link to={`/products/${product.id}`} className="hover:no-underline">
+            <h3 className="font-semibold text-xs sm:text-sm text-foreground hover:text-secondary transition-colors line-clamp-1">
+              {product.name}
+            </h3>
+          </Link>
+          <span className="text-sm sm:text-base font-bold text-foreground mt-0.5">
+            RWF {product.price.toLocaleString()}
+          </span>
         </div>
 
-        {/* Free Delivery Badge */}
-        <div className="flex items-center gap-1 mt-2 text-green-600">
-          <Truck className="h-3 w-3 flex-shrink-0" />
-          <span className="text-xs font-medium">Free Delivery</span>
-        </div>
-
-        {/* Price and Add to Cart Button */}
-        <div className="flex items-center justify-between mt-3 pt-2 border-t border-border">
-          <div className="flex flex-col">
-            <span className="text-lg font-bold text-foreground">
-              RWF {product.price.toLocaleString()}
-            </span>
-            {product.originalPrice && product.originalPrice > product.price && (
-              <span className="text-xs text-muted-foreground line-through">
-                RWF {product.originalPrice.toLocaleString()}
-              </span>
-            )}
-          </div>
-          
-          <button
-            onClick={handleAddToCart}
-            disabled={!product.inStock}
-            className="p-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Add to cart"
-          >
-            <ShoppingCart className="h-4 w-4" />
-          </button>
-        </div>
+        <button
+          onClick={handleAddToCart}
+          disabled={!product.inStock}
+          className="p-1.5 sm:p-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+          aria-label="Add to cart"
+        >
+          <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        </button>
       </div>
     </div>
   );

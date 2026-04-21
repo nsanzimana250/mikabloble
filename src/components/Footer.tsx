@@ -67,11 +67,11 @@ const Footer = () => {
             <div className="flex flex-col gap-3">
               <div className="flex items-start gap-3 text-sm text-primary-foreground/90">
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-secondary" aria-hidden="true" />
-                <span>KN 4 Ave, Kigali City, Rwanda</span>
+                <span>KN 8 Ave/RN3 and KG 14 Ave – Kinamba to Genocide Memorial Site, Kigali, Rwanda</span>
               </div>
               <div className="flex items-center gap-3 text-sm text-primary-foreground/90">
                 <Phone className="h-4 w-4 shrink-0 text-secondary" aria-hidden="true" />
-                <a href="tel:+442012345678" className="hover:text-secondary transition-colors">+44 20 1234 5678</a>
+                <a href="tel:+250793209175" className="hover:text-secondary transition-colors">+250 793 209 175</a>
               </div>
               <div className="flex items-center gap-3 text-sm text-primary-foreground/90">
                 <Mail className="h-4 w-4 shrink-0 text-secondary" aria-hidden="true" />
@@ -93,10 +93,10 @@ const Footer = () => {
                 aria-label="Email address for newsletter"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg bg-primary-foreground/10 border border-primary-foreground/30 text-sm text-primary-foreground placeholder:text-primary-foreground/60 focus:outline-none focus:border-secondary"
+                className="flex-1 min-w-0 px-2 py-1.5 h-8 rounded-md bg-primary-foreground/10 border border-primary-foreground/30 text-xs text-primary-foreground placeholder:text-primary-foreground/60 focus:outline-none focus:border-secondary"
                 required
               />
-              <button type="submit" className="btn-primary px-4 py-2 text-sm rounded-lg">
+              <button type="submit" className="px-3 h-8 text-xs font-semibold rounded-md bg-secondary text-secondary-foreground hover:brightness-110 transition-all">
                 Join
               </button>
             </form>
