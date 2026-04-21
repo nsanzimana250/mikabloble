@@ -24,7 +24,7 @@ const Footer = () => {
           {/* Company Info */}
           <div>
             <div className="mb-4">
-              <img src={logo} alt="MIKA GLOBLE BUSINESS LTD" className="h-14 w-auto brightness-0 invert" />
+              <img src={logo} alt="MIKA GLOBAL BUSINESS LTD" className="h-14 w-auto brightness-0 invert" />
             </div>
             <p className="text-primary-foreground/70 text-sm leading-relaxed mb-4">
               Your trusted partner for quality car spare parts. From small clips to major engine components, we deliver excellence worldwide.
@@ -70,7 +70,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-3 text-sm text-primary-foreground/70">
                 <Mail className="h-4 w-4 shrink-0 text-secondary" />
-                <span>info@mikagloble.com</span>
+                <span>info@mikaglobal.com</span>
               </div>
             </div>
           </div>
@@ -100,7 +100,7 @@ const Footer = () => {
       <div className="border-t border-primary-foreground/10">
         <div className="section-container py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="text-primary-foreground/50 text-xs text-center sm:text-left">
-            <p>© 2026 MIKA GLOBLE BUSINESS LTD. All rights reserved.</p>
+            <p>© 2026 MIKA GLOBAL BUSINESS LTD. All rights reserved.</p>
             <p className="mt-1">Developed by <a href="https://esdras-kappa.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-secondary hover:underline">dev esdras</a></p>
             <Link to="/admin/login" className="text-primary-foreground/30 hover:text-primary-foreground/60 transition-colors mt-1 inline-block">Admin</Link>
           </div>

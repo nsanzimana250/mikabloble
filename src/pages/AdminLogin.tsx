@@ -77,7 +77,7 @@ const AdminLogin = () => {
         <div className="bg-card rounded-2xl shadow-[0_8px_40px_-12px_hsl(224_76%_33%/0.25)] border border-border p-8">
           <div className="text-center mb-8">
             <Link to="/">
-              <img src={logo} alt="MIKA GLOBLE" className="h-12 mx-auto mb-4" />
+              <img src={logo} alt="MIKA GLOBAL" className="h-12 mx-auto mb-4" />
             </Link>
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold mb-3">
               <ShieldCheck className="h-3.5 w-3.5" /> Admin Portal
@@ -94,7 +94,7 @@ const AdminLogin = () => {
                 <Input 
                   className="pl-10" 
                   type="email" 
-                  placeholder="admin@mikagloble.com" 
+                  placeholder="admin@mikaglobal.com" 
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)} 
                   required 

@@ -39,7 +39,7 @@ const HeroSection = () => {
             transition={{ duration: 0.7, delay: 0.2 }}
             className="text-primary-foreground/70 text-base sm:text-lg md:text-xl mt-4 sm:mt-6 max-w-lg"
           >
-            From small clips to major engine components — MIKA GLOBLE delivers excellence worldwide.
+            From small clips to major engine components — MIKA GLOBAL delivers excellence worldwide.
           </motion.p>
 
           <motion.div

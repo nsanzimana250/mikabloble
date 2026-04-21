@@ -150,7 +150,7 @@ const RequestQuote = () => {
                 <h3 className="font-display font-semibold text-lg text-card-foreground mb-4">Contact Info</h3>
                 <div className="space-y-3 text-sm text-muted-foreground">
                   <div className="flex items-center gap-3"><Phone className="h-4 w-4 text-secondary" /> +44 20 1234 5678</div>
-                  <div className="flex items-center gap-3"><Mail className="h-4 w-4 text-secondary" /> quotes@mikagloble.com</div>
+                  <div className="flex items-center gap-3"><Mail className="h-4 w-4 text-secondary" /> quotes@mikaglobal.com</div>
                   <div className="flex items-center gap-3"><Clock className="h-4 w-4 text-secondary" /> Mon-Fri: 8AM-6PM</div>
                 </div>
               </div>
