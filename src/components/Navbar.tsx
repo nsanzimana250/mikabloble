@@ -51,8 +51,8 @@ const Navbar = () => {
     >
       <div className="section-container flex items-center justify-between h-16 md:h-20">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 shrink-0">
-          <img src={logo} alt="MIKA GLOBAL BUSINESS LTD" className="h-10 md:h-14 w-auto max-w-[180px] md:max-w-[240px]" />
+        <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="MIKA GLOBAL BUSINESS LTD - Home">
+          <img src={logo} alt="MIKA GLOBAL BUSINESS LTD" width="240" height="56" className="h-10 md:h-14 w-auto max-w-[180px] md:max-w-[240px]" />
         </Link>
 
         {/* Desktop Nav */}
@@ -133,6 +133,7 @@ const Navbar = () => {
           
           <Link
             to="/cart"
+            aria-label={`Shopping cart${totalItems > 0 ? ` with ${totalItems} items` : ''}`}
             className={`p-2 rounded-lg transition-colors relative ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}
           >
             <ShoppingCart className="h-5 w-5" />
@@ -143,6 +144,8 @@ const Navbar = () => {
             )}
           </Link>
           <button
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
             className={`lg:hidden p-2 rounded-lg transition-colors ${scrolled ? "text-foreground" : "text-primary-foreground"}`}
             onClick={() => setIsOpen(!isOpen)}
           >
