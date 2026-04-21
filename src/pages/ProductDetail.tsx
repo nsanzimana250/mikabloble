@@ -353,7 +353,7 @@ const ProductDetail = () => {
               </button>
 
               <a
-                href={`https://wa.me/250793903992?text=${encodeURIComponent(`Hi MIKA! 👋 I'd like to order:\n\n🔧 *${product.name}*\nQty: ${quantity}\nPrice: RWF ${(product.price * quantity).toLocaleString()}\n\n🔗 View product: ${window.location.origin}/products/${product.id}\n\nPlease confirm availability. Thanks!`)}`}
+                href={`https://wa.me/250793209175?text=${encodeURIComponent(`🛒 *ORDER REQUEST* 🛒\n\n*Product Details:*\n━━━━━━━━━━━━━━━━━━━━\n📦 *Product:* ${product.name}\n💰 *Price:* RWF ${product.price.toLocaleString()}\n📊 *Category:* ${product.category}\n🔄 *Quantity:* ${quantity}\n💵 *Total:* RWF ${(product.price * quantity).toLocaleString()}\n📦 *Stock Status:* ${product.inStock ? 'Available ✅' : 'Out of Stock ❌'}\n\n*Customer Request:*\nI would like to order ${quantity} unit${quantity > 1 ? 's' : ''} of this product.\n\n*Product Link:*\n${window.location.origin}/products/${product.id}\n\n*Product Information:*\n${product.description || 'N/A'}\n━━━━━━━━━━━━━━━━━━━━\n\n📍 *Please confirm:*\n• Product availability\n• Total price including delivery\n• Estimated delivery time\n\nThank you! 🙏`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 border border-green-500 rounded-lg bg-green-50 hover:bg-green-100 transition-colors text-green-600 flex items-center gap-2"
