@@ -4,9 +4,10 @@ import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { ChevronRight, Minus, Plus, Heart, ShoppingCart, Truck, ShieldCheck, RotateCcw } from "lucide-react";
+import { ChevronRight, Minus, Plus, Heart, ShoppingCart, Truck, ShieldCheck, RotateCcw, ZoomIn } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/supabase";
+import ImageLightbox from "@/components/ImageLightbox";
 
 interface Product {
   id: string;
@@ -39,6 +40,8 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mainImage, setMainImage] = useState<string>('');
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   // Helper: Debug log Supabase session state
   const logSessionState = async (context: string) => {
@@ -254,25 +257,44 @@ const ProductDetail = () => {
             animate={{ opacity: 1, x: 0 }}
             className="bg-card rounded-2xl overflow-hidden shadow-[var(--card-shadow)] w-full"
           >
-            <div className="w-full bg-white flex items-center justify-center" style={{ aspectRatio: '1/1' }}>
-              <img 
-                src={mainImage || '/placeholder-image.jpg'} 
-                alt={product.name} 
-                className="w-full h-full object-contain p-4"
+            <button
+              type="button"
+              onClick={() => {
+                const gallery = product.images && product.images.length > 0 ? product.images : [mainImage];
+                const idx = Math.max(0, gallery.indexOf(mainImage));
+                setLightboxIndex(idx);
+                setLightboxOpen(true);
+              }}
+              className="group relative w-full bg-white flex items-center justify-center cursor-zoom-in"
+              style={{ aspectRatio: '1/1' }}
+              aria-label="Open image gallery to zoom"
+            >
+              <img
+                src={mainImage || '/placeholder-image.jpg'}
+                alt={product.name}
+                className="w-full h-full object-contain p-4 transition-transform duration-300 group-hover:scale-[1.02]"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
                 }}
               />
-            </div>
+              <span className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/70 text-white text-xs font-medium px-2.5 py-1.5 rounded-full opacity-90 group-hover:opacity-100 transition-opacity">
+                <ZoomIn className="h-3.5 w-3.5" />
+                Tap to zoom
+              </span>
+            </button>
             {product.images && product.images.length > 0 && (
               <div className="grid grid-cols-4 gap-2 p-2">
                 {product.images.map((img, index) => (
-                  <img 
-                    key={index} 
-                    src={img} 
-                    alt={`${product.name} - view ${index + 1}`} 
+                  <img
+                    key={index}
+                    src={img}
+                    alt={`${product.name} - view ${index + 1}`}
                     className={`w-full aspect-square object-contain bg-white p-1 rounded-lg cursor-pointer hover:opacity-80 transition-opacity ${mainImage === img ? 'ring-2 ring-secondary' : ''}`}
                     onClick={() => setMainImage(img)}
+                    onDoubleClick={() => {
+                      setLightboxIndex(index);
+                      setLightboxOpen(true);
+                    }}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
                     }}
@@ -281,6 +303,15 @@ const ProductDetail = () => {
               </div>
             )}
           </motion.div>
+
+          {lightboxOpen && (
+            <ImageLightbox
+              images={product.images && product.images.length > 0 ? product.images : [mainImage]}
+              startIndex={lightboxIndex}
+              alt={product.name}
+              onClose={() => setLightboxOpen(false)}
+            />
+          )}
 
           {/* Product Info */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="min-w-0">
