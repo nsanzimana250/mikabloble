@@ -1,8 +1,17 @@
 import Layout from "@/components/Layout";
-import { MapPin, Phone, Mail, Clock, Send, ChevronDown } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Send, ChevronDown, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { z } from "zod";
+import { supabase } from "@/supabase";
+
+const contactSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100),
+  email: z.string().trim().email("Invalid email").max(255),
+  phone: z.string().trim().max(30).optional().or(z.literal("")),
+  message: z.string().trim().min(1, "Message is required").max(2000),
+});
 
 const faqs = [
   { q: "How long does shipping take?", a: "Standard shipping takes 5-7 business days domestically and 10-15 days internationally. Express options are available." },
@@ -13,13 +22,33 @@ const faqs = [
 ];
 
 const Contact = () => {
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Message sent successfully! We'll get back to you soon.");
-    setForm({ name: "", email: "", subject: "", message: "" });
+    const parsed = contactSchema.safeParse(form);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Please check the form");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.from("contact_messages").insert({
+        name: parsed.data.name,
+        email: parsed.data.email,
+        phone: parsed.data.phone || null,
+        message: parsed.data.message,
+      });
+      if (error) throw error;
+      toast.success("Message sent successfully! We'll get back to you soon.");
+      setForm({ name: "", email: "", phone: "", message: "" });
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to send message. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -73,7 +102,7 @@ const Contact = () => {
               {[
                 { name: "name", label: "Full Name", type: "text" },
                 { name: "email", label: "Email Address", type: "email" },
-                { name: "subject", label: "Subject", type: "text" },
+                { name: "phone", label: "Phone (optional)", type: "tel" },
               ].map((field) => (
                 <div key={field.name}>
                   <label className="text-sm font-medium text-foreground mb-1 block">{field.label}</label>
@@ -81,8 +110,8 @@ const Contact = () => {
                     type={field.type}
                     value={form[field.name as keyof typeof form]}
                     onChange={(e) => setForm({ ...form, [field.name]: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-secondary"
-                    required
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-secondary"
+                    required={field.name !== "phone"}
                   />
                 </div>
               ))}
@@ -96,8 +125,13 @@ const Contact = () => {
                   required
                 />
               </div>
-              <button type="submit" className="btn-primary flex items-center gap-2">
-                <Send className="h-4 w-4" /> Send Message
+              <button
+                type="submit"
+                disabled={submitting}
+                className="btn-primary flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                {submitting ? "Sending…" : "Send Message"}
               </button>
             </motion.form>
           </div>
