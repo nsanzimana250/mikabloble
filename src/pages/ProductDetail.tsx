@@ -4,7 +4,7 @@ import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { ChevronRight, Minus, Plus, Heart, ShoppingCart, Truck, ShieldCheck, RotateCcw, MessageCircle } from "lucide-react";
+import { ChevronRight, Minus, Plus, Heart, ShoppingCart, Truck, ShieldCheck, RotateCcw } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/supabase";
 
@@ -254,14 +254,16 @@ const ProductDetail = () => {
             animate={{ opacity: 1, x: 0 }}
             className="bg-card rounded-2xl overflow-hidden shadow-[var(--card-shadow)] w-full"
           >
-            <img 
-              src={mainImage || '/placeholder-image.jpg'} 
-              alt={product.name} 
-              className="w-full aspect-[4/3] object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
-              }}
-            />
+            <div className="w-full bg-white flex items-center justify-center" style={{ aspectRatio: '1/1' }}>
+              <img 
+                src={mainImage || '/placeholder-image.jpg'} 
+                alt={product.name} 
+                className="w-full h-full object-contain p-4"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
+                }}
+              />
+            </div>
             {product.images && product.images.length > 0 && (
               <div className="grid grid-cols-4 gap-2 p-2">
                 {product.images.map((img, index) => (
@@ -269,7 +271,7 @@ const ProductDetail = () => {
                     key={index} 
                     src={img} 
                     alt={`${product.name} - view ${index + 1}`} 
-                    className={`w-full aspect-[4/3] object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity ${mainImage === img ? 'ring-2 ring-secondary' : ''}`}
+                    className={`w-full aspect-square object-contain bg-white p-1 rounded-lg cursor-pointer hover:opacity-80 transition-opacity ${mainImage === img ? 'ring-2 ring-secondary' : ''}`}
                     onClick={() => setMainImage(img)}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
@@ -301,9 +303,9 @@ const ProductDetail = () => {
 
             {/* Delivery & Stock Info */}
             <div className="mt-4 space-y-2">
-              <div className="flex items-center gap-2 text-green-600">
-                <Truck className="h-4 w-4 shrink-0" />
-                <span className="text-sm font-semibold">🚚 FREE DELIVERY — Nationwide</span>
+              <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 px-3 py-2 rounded-lg">
+                <Truck className="h-5 w-5 shrink-0" />
+                <span className="text-sm font-bold">FREE DELIVERY — Nationwide</span>
               </div>
               {product.inStock ? (
                 product.lowStock ? (
@@ -353,14 +355,16 @@ const ProductDetail = () => {
               </button>
 
               <a
-                href={`https://wa.me/250793209175?text=${encodeURIComponent(`🛒 *ORDER REQUEST* 🛒\n\n*Product Details:*\n━━━━━━━━━━━━━━━━━━━━\n📦 *Product:* ${product.name}\n💰 *Price:* RWF ${product.price.toLocaleString()}\n📊 *Category:* ${product.category}\n🔄 *Quantity:* ${quantity}\n💵 *Total:* RWF ${(product.price * quantity).toLocaleString()}\n📦 *Stock Status:* ${product.inStock ? 'Available ✅' : 'Out of Stock ❌'}\n\n*Customer Request:*\nI would like to order ${quantity} unit${quantity > 1 ? 's' : ''} of this product.\n\n*Product Link:*\n${window.location.origin}/products/${product.id}\n\n*Product Information:*\n${product.description || 'N/A'}\n━━━━━━━━━━━━━━━━━━━━\n\n📍 *Please confirm:*\n• Product availability\n• Total price including delivery\n• Estimated delivery time\n\nThank you! 🙏`)}`}
+                href={`https://wa.me/250793903992?text=${encodeURIComponent(`🛒 *ORDER REQUEST* 🛒\n\n*Product Details:*\n━━━━━━━━━━━━━━━━━━━━\n📦 *Product:* ${product.name}\n💰 *Price:* RWF ${product.price.toLocaleString()}\n📊 *Category:* ${product.category}\n🔄 *Quantity:* ${quantity}\n💵 *Total:* RWF ${(product.price * quantity).toLocaleString()}\n📦 *Stock Status:* ${product.inStock ? 'Available ✅' : 'Out of Stock ❌'}\n\n*Customer Request:*\nI would like to order ${quantity} unit${quantity > 1 ? 's' : ''} of this product.\n\n*Product Link:*\n${window.location.origin}/products/${product.id}\n\n*Product Information:*\n${product.description || 'N/A'}\n━━━━━━━━━━━━━━━━━━━━\n\n📍 *Please confirm:*\n• Product availability\n• Total price including delivery\n• Estimated delivery time\n\nThank you! 🙏`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 border border-green-500 rounded-lg bg-green-50 hover:bg-green-100 transition-colors text-green-600 flex items-center gap-2"
+                className="px-4 py-2.5 rounded-lg bg-[#25D366] hover:bg-[#1ebe57] transition-colors text-white flex items-center gap-2 shadow-md font-semibold"
                 title="Order on WhatsApp"
               >
-                <MessageCircle className="h-4 w-4" />
-                <span className="text-xs font-medium hidden sm:inline">WhatsApp</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+                <span className="text-sm hidden sm:inline">Order on WhatsApp</span>
               </a>
             </div>
 
