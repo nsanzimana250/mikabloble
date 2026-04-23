@@ -600,11 +600,11 @@ const AdminProducts = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-3 sm:p-6">
         {/* Header with Management Toggles */}
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="relative flex-1 max-w-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div className="relative flex-1 lg:max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 className="pl-10" 
@@ -613,16 +613,18 @@ const AdminProducts = () => {
                 onChange={(e) => setSearch(e.target.value)} 
               />
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setShowCategorySection(!showCategorySection)}>
-                <Tag className="h-4 w-4 mr-2" />
-                {showCategorySection ? 'Hide' : 'Manage'} Categories
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={() => setShowCategorySection(!showCategorySection)} className="flex-1 sm:flex-none">
+                <Tag className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">{showCategorySection ? 'Hide' : 'Manage'} Categories</span>
+                <span className="sm:hidden ml-1">Categories</span>
               </Button>
-              <Button variant="outline" onClick={() => setShowBrandSection(!showBrandSection)}>
-                <Package className="h-4 w-4 mr-2" />
-                {showBrandSection ? 'Hide' : 'Manage'} Brands
+              <Button variant="outline" size="sm" onClick={() => setShowBrandSection(!showBrandSection)} className="flex-1 sm:flex-none">
+                <Package className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">{showBrandSection ? 'Hide' : 'Manage'} Brands</span>
+                <span className="sm:hidden ml-1">Brands</span>
               </Button>
-              <Button onClick={openAddProduct}>
+              <Button size="sm" onClick={openAddProduct} className="flex-1 sm:flex-none">
                 <Plus className="h-4 w-4 mr-1" /> Add Product
               </Button>
             </div>
