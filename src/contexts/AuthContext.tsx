@@ -32,9 +32,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .from("mika_users")
         .select("*")
         .eq("id", userId)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== "PGRST116") {
+      if (error) {
         console.error("[Auth] Error fetching profile:", error.message);
         return null;
       }

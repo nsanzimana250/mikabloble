@@ -1,7 +1,6 @@
 import { Star, Quote } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/supabase";
 
 interface Testimonial {
   id: string;
@@ -14,33 +13,11 @@ interface Testimonial {
 const Testimonials = () => {
   const [current, setCurrent] = useState(0);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchTestimonials = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('testimonials')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error fetching testimonials:', error);
-          // Fallback to empty array if table doesn't exist yet
-          setTestimonials([]);
-        } else {
-          setTestimonials(data || []);
-        }
-      } catch (err) {
-        console.error('Error fetching testimonials:', err);
-        setTestimonials([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTestimonials();
-  }, []);
+  // Note: testimonials table does not exist in the backend yet.
+  // When the table is created, restore the fetch logic below.
+  // useEffect(() => { ... supabase.from('testimonials')... }, []);
 
   // Show placeholder if no testimonials or loading
   if (loading) {
