@@ -239,13 +239,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log("[Auth] Refreshing session...");
       const { data: { session }, error } = await supabase.auth.refreshSession();
-      
+
       if (error) {
         console.error("[Auth] Refresh error:", error.message);
         throw error;
       }
-      
-      await handleAuthChange("REFRESH", session);
+
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        await loadProfile(session.user);
+      } else {
+        setProfile(null);
+      }
     } catch (err) {
       console.error("[Auth] Refresh exception:", err);
       throw err;
