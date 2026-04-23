@@ -39,7 +39,7 @@ const AdminLogin = () => {
         .from("mika_users")
         .select("role")
         .eq("id", authData.user.id)
-        .single();
+        .maybeSingle();
 
       if (profileError) throw profileError;
 
