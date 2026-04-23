@@ -600,11 +600,11 @@ const AdminProducts = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-3 sm:p-6">
         {/* Header with Management Toggles */}
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="relative flex-1 max-w-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div className="relative flex-1 lg:max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 className="pl-10" 
@@ -613,16 +613,18 @@ const AdminProducts = () => {
                 onChange={(e) => setSearch(e.target.value)} 
               />
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setShowCategorySection(!showCategorySection)}>
-                <Tag className="h-4 w-4 mr-2" />
-                {showCategorySection ? 'Hide' : 'Manage'} Categories
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={() => setShowCategorySection(!showCategorySection)} className="flex-1 sm:flex-none">
+                <Tag className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">{showCategorySection ? 'Hide' : 'Manage'} Categories</span>
+                <span className="sm:hidden ml-1">Categories</span>
               </Button>
-              <Button variant="outline" onClick={() => setShowBrandSection(!showBrandSection)}>
-                <Package className="h-4 w-4 mr-2" />
-                {showBrandSection ? 'Hide' : 'Manage'} Brands
+              <Button variant="outline" size="sm" onClick={() => setShowBrandSection(!showBrandSection)} className="flex-1 sm:flex-none">
+                <Package className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">{showBrandSection ? 'Hide' : 'Manage'} Brands</span>
+                <span className="sm:hidden ml-1">Brands</span>
               </Button>
-              <Button onClick={openAddProduct}>
+              <Button size="sm" onClick={openAddProduct} className="flex-1 sm:flex-none">
                 <Plus className="h-4 w-4 mr-1" /> Add Product
               </Button>
             </div>
@@ -875,7 +877,7 @@ const AdminProducts = () => {
                 initial={{ scale: 0.95, opacity: 0 }} 
                 animate={{ scale: 1, opacity: 1 }} 
                 exit={{ scale: 0.95, opacity: 0 }} 
-                className="bg-card rounded-2xl p-6 w-full max-w-3xl my-8 shadow-xl border border-border" 
+                className="bg-card rounded-2xl p-4 sm:p-6 w-full max-w-3xl my-4 sm:my-8 shadow-xl border border-border" 
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-6 sticky top-0 bg-card z-10 pb-2 border-b">
@@ -901,7 +903,7 @@ const AdminProducts = () => {
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="product-price">Price (RWF) *</Label>
                         <Input 
@@ -929,7 +931,7 @@ const AdminProducts = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="product-category">Category *</Label>
                         <select 
@@ -1063,7 +1065,7 @@ const AdminProducts = () => {
                     <div>
                       <Label>Additional Images URLs (Max 3)</Label>
                       <div className="mt-2 space-y-3">
-                        <div className="grid grid-cols-4 gap-2 mb-3">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-3">
                           {productForm.images.map((img, index) => (
                             <div key={index} className="relative group aspect-square">
                               <img 
@@ -1379,7 +1381,7 @@ const AdminProducts = () => {
                 initial={{ scale: 0.95, opacity: 0 }} 
                 animate={{ scale: 1, opacity: 1 }} 
                 exit={{ scale: 0.95, opacity: 0 }} 
-                className="bg-card rounded-2xl p-6 w-full max-w-4xl my-8 shadow-xl border border-border" 
+                className="bg-card rounded-2xl p-4 sm:p-6 w-full max-w-4xl my-4 sm:my-8 shadow-xl border border-border" 
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-6 sticky top-0 bg-card z-10 pb-2 border-b">
