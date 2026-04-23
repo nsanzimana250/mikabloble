@@ -1,7 +1,6 @@
 import { Star, Quote } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/supabase";
 
 interface Testimonial {
   id: string;
