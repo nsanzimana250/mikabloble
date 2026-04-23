@@ -1381,7 +1381,7 @@ const AdminProducts = () => {
                 initial={{ scale: 0.95, opacity: 0 }} 
                 animate={{ scale: 1, opacity: 1 }} 
                 exit={{ scale: 0.95, opacity: 0 }} 
-                className="bg-card rounded-2xl p-6 w-full max-w-4xl my-8 shadow-xl border border-border" 
+                className="bg-card rounded-2xl p-4 sm:p-6 w-full max-w-4xl my-4 sm:my-8 shadow-xl border border-border" 
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-6 sticky top-0 bg-card z-10 pb-2 border-b">
