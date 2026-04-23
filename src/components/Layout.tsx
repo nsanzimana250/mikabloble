@@ -1,6 +1,7 @@
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import WhatsAppWidget from "./WhatsAppWidget";
+import { Analytics } from "@vercel/analytics/react";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
