@@ -74,90 +74,70 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Handle session and user state update
-  const handleAuthChange = useCallback(async (event: string, session: Session | null) => {
-    console.log("[Auth] State change:", event, { 
-      hasSession: !!session, 
-      userId: session?.user?.id 
-    });
-
-    setSession(session);
-    setUser(session?.user ?? null);
-
-    if (session?.user) {
-      // Fetch or create profile
-      let userProfile = await fetchProfile(session.user.id);
-      
-      if (!userProfile) {
-        console.log("[Auth] No profile found, creating...");
-        userProfile = await createProfile(session.user);
-      }
-      
-      setProfile(userProfile);
-    } else {
-      setProfile(null);
+  // Load profile (deferred — never call directly inside onAuthStateChange)
+  const loadProfile = useCallback(async (authUser: User) => {
+    let userProfile = await fetchProfile(authUser.id);
+    if (!userProfile) {
+      console.log("[Auth] No profile found, creating...");
+      userProfile = await createProfile(authUser);
     }
-
-    // 🔥 FIX: Always set loading false and authReady true after handling
-    setLoading(false);
-    setAuthReady(true);
-    console.log("[Auth] Auth ready set to TRUE");
+    setProfile(userProfile);
   }, [fetchProfile, createProfile]);
 
   // Initialize auth state on mount
   useEffect(() => {
     let mounted = true;
-    let timeoutId: NodeJS.Timeout;
 
-    const initializeAuth = async () => {
-      console.log("[Auth] Initializing...");
-      
-      try {
-        // Get current session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-        if (sessionError) {
-          console.error("[Auth] Session error:", sessionError.message);
-        }
-
-        if (mounted) {
-          await handleAuthChange(session ? "INITIAL_SESSION" : "NO_SESSION", session);
-        }
-      } catch (err) {
-        console.error("[Auth] Initialization error:", err);
-        if (mounted) {
-          setLoading(false);
-          setAuthReady(true); // 🔥 FIX: Even on error, mark as ready
-        }
-      }
-    };
-
-    initializeAuth();
-
-    // 🔥 FIX: Add a safety timeout - force authReady after 3 seconds
-    timeoutId = setTimeout(() => {
-      if (mounted && !authReady) {
-        console.warn("[Auth] ⚠️ Force setting authReady after timeout");
-        setLoading(false);
-        setAuthReady(true);
-      }
-    }, 3000);
-
-    // Listen for auth state changes
+    // 1) Set up listener FIRST — only synchronous state updates here.
+    //    Defer any Supabase calls with setTimeout to avoid deadlocks.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        if (mounted) {
-          await handleAuthChange(_event, session);
+      (event, session) => {
+        if (!mounted) return;
+        console.log("[Auth] State change:", event, { hasSession: !!session, userId: session?.user?.id });
+
+        setSession(session);
+        setUser(session?.user ?? null);
+        setAuthReady(true);
+        setLoading(false);
+
+        if (session?.user) {
+          setTimeout(() => {
+            if (mounted) loadProfile(session.user);
+          }, 0);
+        } else {
+          setProfile(null);
         }
       }
     );
 
+    // 2) THEN check existing session
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (!mounted) return;
+      if (error) console.error("[Auth] Session error:", error.message);
+
+      setSession(session);
+      setUser(session?.user ?? null);
+      setAuthReady(true);
+      setLoading(false);
+
+      if (session?.user) {
+        setTimeout(() => {
+          if (mounted) loadProfile(session.user);
+        }, 0);
+      }
+    }).catch((err) => {
+      console.error("[Auth] Initialization error:", err);
+      if (mounted) {
+        setLoading(false);
+        setAuthReady(true);
+      }
+    });
+
     return () => {
       mounted = false;
-      clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
-  }, [handleAuthChange]);
+  }, [loadProfile]);
 
   // Sign in method
   const signIn = async (email: string, password: string) => {
