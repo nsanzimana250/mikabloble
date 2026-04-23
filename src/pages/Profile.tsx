@@ -72,11 +72,8 @@ const Profile = () => {
     }
   }, [activeTab, user]);
 
-  useEffect(() => {
-    if (!profile) {
-      navigate("/login");
-    }
-  }, [profile, navigate]);
+  // Note: route is already wrapped in <ProtectedRoute>, so auth is guaranteed.
+  // Do NOT redirect on missing profile — it may still be loading after refresh.
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
