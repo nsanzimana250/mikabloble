@@ -1065,7 +1065,7 @@ const AdminProducts = () => {
                     <div>
                       <Label>Additional Images URLs (Max 3)</Label>
                       <div className="mt-2 space-y-3">
-                        <div className="grid grid-cols-4 gap-2 mb-3">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-3">
                           {productForm.images.map((img, index) => (
                             <div key={index} className="relative group aspect-square">
                               <img 
