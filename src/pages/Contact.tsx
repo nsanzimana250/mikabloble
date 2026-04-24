@@ -82,13 +82,18 @@ const Contact = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {/* Map placeholder */}
-            <div className="bg-muted rounded-2xl h-[400px] flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
-                <p className="text-muted-foreground">Google Maps integration</p>
-                <p className="text-xs text-muted-foreground/60 mt-1">KN 8 Ave/RN3 and KG 14 Ave, Kigali, Rwanda</p>
-              </div>
+            {/* Google Maps Embed */}
+            <div className="bg-muted rounded-2xl h-[400px] overflow-hidden">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1993.7772254082786!2d30.06423432739651!3d-1.930222191730555!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2srw!4v1777029959873!5m2!1sen!2srw"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="MIKA GLOBAL BUSINESS LTD Location"
+              />
             </div>
 
             {/* Contact Form */}
