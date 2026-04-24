@@ -66,9 +66,9 @@ const Contact = () => {
           {/* Contact Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
             {[
-              { icon: MapPin, title: "Address", text: "KN 4 Ave, Kigali City, Rwanda" },
-              { icon: Phone, title: "Phone", text: "+250 788 123 456" },
-              { icon: Mail, title: "Email", text: "info@mikaglobal.com" },
+              { icon: MapPin, title: "Address", text: "KN 8 Ave/RN3 and KG 14 Ave, Kigali, Rwanda" },
+              { icon: Phone, title: "Phone", text: "+250 793 209 175" },
+              { icon: Mail, title: "Email", text: "info@mikaglobalbusiness.com" },
               { icon: Clock, title: "Hours", text: "Mon-Fri: 8AM-6PM\nSat: 9AM-2PM" },
             ].map(({ icon: Icon, title, text }) => (
               <div key={title} className="bg-card rounded-xl p-5 shadow-[var(--card-shadow)] text-center">
@@ -87,7 +87,7 @@ const Contact = () => {
               <div className="text-center">
                 <MapPin className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
                 <p className="text-muted-foreground">Google Maps integration</p>
-                <p className="text-xs text-muted-foreground/60 mt-1">KN 4 Ave, Kigali City, Rwanda</p>
+                <p className="text-xs text-muted-foreground/60 mt-1">KN 8 Ave/RN3 and KG 14 Ave, Kigali, Rwanda</p>
               </div>
             </div>
 
