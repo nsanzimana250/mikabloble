@@ -52,7 +52,6 @@ const Footer = () => {
                 { name: "Products", path: "/products" },
                 { name: "About Us", path: "/about" },
                 { name: "Contact", path: "/contact" },
-                { name: "Request Quote", path: "/request-quote" },
               ].map((link) => (
                 <Link key={link.path} to={link.path} className="text-primary-foreground/90 hover:text-secondary transition-colors text-sm">
                   {link.name}
@@ -75,7 +74,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-3 text-sm text-primary-foreground/90">
                 <Mail className="h-4 w-4 shrink-0 text-secondary" aria-hidden="true" />
-                <a href="mailto:info@mikaglobal.com" className="hover:text-secondary transition-colors">info@mikaglobal.com</a>
+                <a href="mailto:info@mikaglobalbusiness.com" className="hover:text-secondary transition-colors">info@mikaglobalbusiness.com</a>
               </div>
             </div>
           </div>

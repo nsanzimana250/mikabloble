@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://mikaglobalsupplier.com/sitemap.xml
+Sitemap: https://www.mikaglobalbusiness.com/sitemap.xml

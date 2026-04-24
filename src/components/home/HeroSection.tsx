@@ -64,7 +64,7 @@ const HeroSection = () => {
             className="mt-6 sm:mt-8 flex flex-wrap gap-3 sm:gap-4"
           >
             <Link to="/products" className="btn-primary text-sm sm:text-base">Shop Now</Link>
-            <Link to="/request-quote" className="btn-outline-hero text-sm sm:text-base">Request Quote</Link>
+            <Link to="/contact" className="btn-outline-hero text-sm sm:text-base">Request Quote</Link>
           </motion.div>
 
           <motion.div
