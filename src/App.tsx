@@ -133,15 +133,6 @@ const App = () => (
               } 
             />
             
-            <Route 
-              path="/admin/bookings" 
-              element={
-                <ProtectedRoute requireAdmin={true}>
-                  <AdminBookings />
-                </ProtectedRoute>
-              } 
-            />
-            
             {/* 404 Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
