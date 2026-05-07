@@ -13,7 +13,7 @@ import { supabase } from "@/supabase";
 
 const Checkout = () => {
   const { items, subtotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [processing, setProcessing] = useState(false);
@@ -27,8 +27,8 @@ const Checkout = () => {
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", phone: "",
     address: "", city: "", zip: "", country: "Rwanda",
-    cardNumber: "", cardName: "", expiry: "", cvv: "",
-    paymentMethod: "card",
+    momoNumber: "",
+    paymentMethod: "momo",
   });
 
   // Redirect to login if not authenticated
@@ -38,7 +38,31 @@ const Checkout = () => {
     }
   }, [user, navigate, orderPlaced]);
 
+  // Prefill from profile / auth user
+  useEffect(() => {
+    if (!user) return;
+    const fullName = (profile?.name || user.user_metadata?.name || "").trim();
+    const [fn, ...rest] = fullName.split(" ");
+    setForm((p) => ({
+      ...p,
+      firstName: p.firstName || fn || "",
+      lastName: p.lastName || rest.join(" ") || "",
+      email: p.email || user.email || "",
+      phone: p.phone || profile?.phone || "",
+      address: p.address || profile?.address || "",
+      city: p.city || profile?.city || "",
+      country: profile?.country || p.country,
+    }));
+  }, [user, profile]);
+
   const update = (field: string, value: string) => setForm((p) => ({ ...p, [field]: value }));
+
+  const shippingValid =
+    form.firstName.trim() && form.lastName.trim() && form.email.trim() &&
+    form.phone.trim() && form.address.trim() && form.city.trim() &&
+    form.zip.trim() && form.country.trim();
+
+  const paymentValid = form.paymentMethod === "momo" && form.momoNumber.trim();
 
   const handlePlaceOrder = async () => {
     if (!user) {
@@ -167,55 +191,47 @@ const Checkout = () => {
                 <>
                   <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><Truck className="h-5 w-5 text-secondary" /> Shipping Information</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
-                    <div><Label>First Name</Label><Input value={form.firstName} onChange={(e) => update("firstName", e.target.value)} placeholder="John" /></div>
-                    <div><Label>Last Name</Label><Input value={form.lastName} onChange={(e) => update("lastName", e.target.value)} placeholder="Doe" /></div>
-                    <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="john@example.com" /></div>
-                    <div><Label>Phone</Label><Input value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+250 7XX XXX XXX" /></div>
-                    <div className="sm:col-span-2"><Label>Address</Label><Input value={form.address} onChange={(e) => update("address", e.target.value)} placeholder="KN 4 Ave, Kigali" /></div>
-                    <div><Label>City</Label><Input value={form.city} onChange={(e) => update("city", e.target.value)} placeholder="Kigali" /></div>
-                    <div><Label>ZIP Code</Label><Input value={form.zip} onChange={(e) => update("zip", e.target.value)} placeholder="00000" /></div>
+                    <div><Label>First Name <span className="text-red-500">*</span></Label><Input required value={form.firstName} onChange={(e) => update("firstName", e.target.value)} placeholder="John" /></div>
+                    <div><Label>Last Name <span className="text-red-500">*</span></Label><Input required value={form.lastName} onChange={(e) => update("lastName", e.target.value)} placeholder="Doe" /></div>
+                    <div><Label>Email <span className="text-red-500">*</span></Label><Input required type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="john@example.com" /></div>
+                    <div><Label>Phone <span className="text-red-500">*</span></Label><Input required value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+250 7XX XXX XXX" /></div>
+                    <div className="sm:col-span-2"><Label>Address <span className="text-red-500">*</span></Label><Input required value={form.address} onChange={(e) => update("address", e.target.value)} placeholder="KN 4 Ave, Kigali" /></div>
+                    <div><Label>City <span className="text-red-500">*</span></Label><Input required value={form.city} onChange={(e) => update("city", e.target.value)} placeholder="Kigali" /></div>
+                    <div><Label>ZIP Code <span className="text-red-500">*</span></Label><Input required value={form.zip} onChange={(e) => update("zip", e.target.value)} placeholder="00000" /></div>
+                    <div><Label>Country <span className="text-red-500">*</span></Label><Input required value={form.country} onChange={(e) => update("country", e.target.value)} placeholder="Rwanda" /></div>
                   </div>
-                  <Button className="mt-6 w-full sm:w-auto" onClick={() => setStep(2)}>Continue to Payment</Button>
+                  <Button className="mt-6 w-full sm:w-auto" disabled={!shippingValid} onClick={() => {
+                    if (!shippingValid) { toast.error("Please fill in all required shipping fields"); return; }
+                    setStep(2);
+                  }}>Continue to Payment</Button>
                 </>
               )}
 
               {step === 2 && (
                 <>
                   <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><CreditCard className="h-5 w-5 text-secondary" /> Payment Method</h2>
-                  <div className="grid sm:grid-cols-3 gap-3 mb-6">
-                    {[
-                      { id: "card", label: "Credit Card" },
-                      { id: "momo", label: "Mobile Money" },
-                      { id: "bank", label: "Bank Transfer" },
-                    ].map((m) => (
-                      <button key={m.id} onClick={() => update("paymentMethod", m.id)} className={`p-4 rounded-xl border-2 text-sm font-medium transition-all ${form.paymentMethod === m.id ? "border-secondary bg-secondary/10 text-foreground" : "border-border text-muted-foreground hover:border-muted-foreground"}`}>
-                        {m.label}
-                      </button>
-                    ))}
+
+                  <div className="mb-6 p-4 rounded-xl border-2 border-secondary bg-secondary/10">
+                    <p className="font-semibold text-foreground">MoMo Pay</p>
+                    <p className="text-sm text-muted-foreground mt-1">Mobile Money payment</p>
                   </div>
 
-                  {form.paymentMethod === "card" && (
-                    <div className="space-y-4">
-                      <div><Label>Card Number</Label><Input value={form.cardNumber} onChange={(e) => update("cardNumber", e.target.value)} placeholder="4242 4242 4242 4242" /></div>
-                      <div><Label>Name on Card</Label><Input value={form.cardName} onChange={(e) => update("cardName", e.target.value)} placeholder="John Doe" /></div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div><Label>Expiry</Label><Input value={form.expiry} onChange={(e) => update("expiry", e.target.value)} placeholder="MM/YY" /></div>
-                        <div><Label>CVV</Label><Input value={form.cvv} onChange={(e) => update("cvv", e.target.value)} placeholder="123" /></div>
-                      </div>
-                    </div>
-                  )}
-                  {form.paymentMethod === "momo" && (
-                    <div><Label>Mobile Money Number</Label><Input placeholder="+250 7XX XXX XXX" /></div>
-                  )}
-                  {form.paymentMethod === "bank" && (
-                    <div className="bg-muted rounded-lg p-4 text-sm text-muted-foreground space-y-1">
-                      <p className="font-semibold text-foreground">Bank Transfer Details</p>
-                      <p>Bank: Bank of Kigali</p><p>Account: MIKA GLOBAL BUSINESS LTD</p><p>SWIFT: BKIGRWRW</p><p>Account No: 100-XXXX-XXXX</p>
-                    </div>
-                  )}
+                  <div className="bg-muted rounded-lg p-4 text-sm space-y-1 mb-4">
+                    <p className="font-semibold text-foreground">ISHURA NA MOMO PAY K'UBUNTU – MIKA GLOBAL BUSINESS LTD</p>
+                    <p className="text-foreground">Code: <span className="font-mono font-bold">182813529609#</span></p>
+                  </div>
+
+                  <div>
+                    <Label>Mobile Money Number <span className="text-red-500">*</span></Label>
+                    <Input required value={form.momoNumber} onChange={(e) => update("momoNumber", e.target.value)} placeholder="+250 7XX XXX XXX" />
+                  </div>
+
                   <div className="flex gap-3 mt-6">
                     <Button variant="outline" onClick={() => setStep(1)}><ChevronLeft className="h-4 w-4 mr-1" />Back</Button>
-                    <Button onClick={() => setStep(3)}>Review Order</Button>
+                    <Button disabled={!paymentValid} onClick={() => {
+                      if (!paymentValid) { toast.error("Please enter your Mobile Money number"); return; }
+                      setStep(3);
+                    }}>Review Order</Button>
                   </div>
                 </>
               )}
@@ -237,7 +253,7 @@ const Checkout = () => {
                   </div>
                   <div className="mt-4 space-y-1 text-sm bg-muted rounded-lg p-4">
                     <p><span className="text-muted-foreground">Ship to:</span> {form.address || "KN 4 Ave"}, {form.city || "Kigali"}</p>
-                    <p><span className="text-muted-foreground">Payment:</span> {form.paymentMethod === "card" ? "Credit Card" : form.paymentMethod === "momo" ? "Mobile Money" : "Bank Transfer"}</p>
+                    <p><span className="text-muted-foreground">Payment:</span> MoMo Pay</p>
                   </div>
                   <div className="flex gap-3 mt-6">
                     <Button variant="outline" onClick={() => setStep(2)}><ChevronLeft className="h-4 w-4 mr-1" />Back</Button>

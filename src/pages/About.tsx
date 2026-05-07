@@ -6,7 +6,7 @@ const stats = [
   { icon: Users, value: "15,000+", label: "Happy Customers" },
   { icon: Package, value: "50,000+", label: "Parts Available" },
   { icon: Globe, value: "120+", label: "Countries Served" },
-  { icon: Award, value: "12+", label: "Years in Business" },
+  { icon: Award, value: "1+", label: "Years in Business" },
 ];
 
 const About = () => {
@@ -29,7 +29,7 @@ const About = () => {
             <h2 className="section-title">Our Story</h2>
             <div className="w-16 h-1 bg-secondary mt-3 rounded-full" />
             <p className="text-muted-foreground mt-6 leading-relaxed">
-              Founded in 2014, MIKA GLOBAL BUSINESS LTD started with a simple mission: to make quality car spare parts accessible to everyone, everywhere. What began as a small operation has grown into a global enterprise, serving mechanics, fleet managers, and car enthusiasts across 120+ countries.
+              Founded in 2024, MIKA GLOBAL BUSINESS LTD started with a simple mission: to make quality car spare parts accessible to everyone, everywhere. What began as a small operation has grown into a global enterprise, serving mechanics, fleet managers, and car enthusiasts across 120+ countries.
             </p>
             <p className="text-muted-foreground mt-4 leading-relaxed">
               Today, we offer over 50,000 genuine parts from the world's leading manufacturers. Our commitment to authenticity, competitive pricing, and exceptional customer service continues to drive everything we do.
