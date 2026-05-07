@@ -206,20 +206,45 @@ const AdminOrders = () => {
                             })}
                           </div>
                         </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-2">Update Status</p>
-                          <div className="flex flex-wrap gap-2">
-                            {statusOptions.map((s) => (
-                              <button
-                                key={s}
-                                disabled={updateStatus.isPending || o.order_status === s}
-                                onClick={() => updateStatus.mutate({ id: o.id, status: s })}
-                                className={`text-xs px-3 py-1.5 rounded-full font-medium capitalize transition-colors ${o.order_status === s ? statusColors[s] : "bg-muted hover:bg-muted/70"}`}
-                              >
-                                {s}
-                              </button>
-                            ))}
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-2">Order Status</p>
+                            <div className="flex flex-wrap gap-2">
+                              {statusOptions.map((s) => (
+                                <button
+                                  key={s}
+                                  disabled={updateStatus.isPending || o.order_status === s}
+                                  onClick={() => updateStatus.mutate({ id: o.id, status: s })}
+                                  className={`text-xs px-3 py-1.5 rounded-full font-medium capitalize transition-colors ${o.order_status === s ? statusColors[s] : "bg-muted hover:bg-muted/70"}`}
+                                >
+                                  {s}
+                                </button>
+                              ))}
+                            </div>
                           </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-2">Payment Status</p>
+                            <div className="flex flex-wrap gap-2">
+                              {paymentStatusOptions.map((s) => (
+                                <button
+                                  key={s}
+                                  disabled={updatePayment.isPending || o.payment_status === s}
+                                  onClick={() => updatePayment.mutate({ id: o.id, status: s })}
+                                  className={`text-xs px-3 py-1.5 rounded-full font-medium capitalize transition-colors ${o.payment_status === s ? statusColors[s] : "bg-muted hover:bg-muted/70"}`}
+                                >
+                                  {s}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="pt-2 border-t border-border">
+                          <button
+                            onClick={() => generateReceipt(o)}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium transition-colors"
+                          >
+                            <Receipt className="h-4 w-4" /> Generate Receipt
+                          </button>
                         </div>
                       </div>
                     </motion.div>
