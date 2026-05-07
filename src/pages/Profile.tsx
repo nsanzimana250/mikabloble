@@ -32,7 +32,7 @@ const Profile = () => {
     try {
       const { data, error } = await supabase
         .from("mika_orders")
-        .select(`*, items:mika_order_items(*)`)
+        .select(`*, items:mika_order_items(*, product:mika_products(id, name, image, images, brand, category))`)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -440,15 +440,43 @@ const Profile = () => {
                           </div>
                           
                           {expandedOrder === order.id && (
-                            <div className="p-4 border-t border-border">
+                            <div className="p-4 border-t border-border bg-background">
                               <h4 className="font-semibold mb-3">Order Items</h4>
-                              <div className="space-y-2">
-                                {order.items?.map((item: any, idx: number) => (
-                                  <div key={idx} className="flex justify-between text-sm py-2 border-b border-border last:border-0">
-                                    <span>{item.product_name || `Product #${item.product_id}`}</span>
-                                    <span>{item.quantity} × {item.unit_price?.toLocaleString()} RWF</span>
-                                  </div>
-                                ))}
+                              <div className="space-y-3">
+                                {order.items?.map((item: any, idx: number) => {
+                                  const img = item.product?.image || item.product?.images?.[0] || "/placeholder.svg";
+                                  const name = item.product?.name || item.product_name || `Product #${item.product_id}`;
+                                  const price = item.product_price ?? item.unit_price ?? 0;
+                                  const lineTotal = item.total ?? price * item.quantity;
+                                  return (
+                                    <Link
+                                      to={item.product?.id ? `/products/${item.product.id}` : "#"}
+                                      key={idx}
+                                      className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent/30 transition-colors"
+                                    >
+                                      <img
+                                        src={img}
+                                        alt={name}
+                                        className="h-16 w-16 rounded-md object-cover bg-muted shrink-0"
+                                        onError={(e) => ((e.target as HTMLImageElement).src = "/placeholder.svg")}
+                                      />
+                                      <div className="flex-1 min-w-0">
+                                        <p className="font-medium text-sm truncate">{name}</p>
+                                        {item.product?.brand && (
+                                          <p className="text-xs text-muted-foreground truncate">
+                                            {item.product.brand}{item.product.category ? ` · ${item.product.category}` : ""}
+                                          </p>
+                                        )}
+                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                          Qty: {item.quantity} × {Number(price).toLocaleString()} RWF
+                                        </p>
+                                      </div>
+                                      <span className="font-semibold text-sm shrink-0">
+                                        {Number(lineTotal).toLocaleString()} RWF
+                                      </span>
+                                    </Link>
+                                  );
+                                })}
                               </div>
                             </div>
                           )}

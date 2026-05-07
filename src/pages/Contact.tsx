@@ -85,7 +85,7 @@ const Contact = () => {
             {/* Google Maps Embed */}
             <div className="bg-muted rounded-2xl h-[400px] overflow-hidden">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1993.7772254082786!2d30.06423432739651!3d-1.930222191730555!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2srw!4v1777029959873!5m2!1sen!2srw"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.5545321848253!2d30.0641875!3d-1.9301875!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19dca5a726c158bb%3A0x94326368ce7f7884!2smika%20global%20business!5e0!3m2!1sen!2srw!4v1778145534260!5m2!1sen!2srw"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}

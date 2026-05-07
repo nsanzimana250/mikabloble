@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Package, MessageSquare, CalendarCheck, LogOut, Menu, ChevronRight, ShoppingBag, Users } from "lucide-react";
+import { LayoutDashboard, Package, MessageSquare, LogOut, Menu, ChevronRight, ShoppingBag, Users } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -11,7 +11,6 @@ const navItems = [
   { name: "Orders", path: "/admin/orders", icon: ShoppingBag },
   { name: "Users", path: "/admin/users", icon: Users },
   { name: "Contacts", path: "/admin/contacts", icon: MessageSquare },
-  { name: "Bookings", path: "/admin/bookings", icon: CalendarCheck },
 ];
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
