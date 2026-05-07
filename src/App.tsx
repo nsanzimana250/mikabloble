@@ -22,7 +22,7 @@ const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
 const AdminContacts = lazy(() => import("./pages/admin/AdminContacts"));
-const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
+
 const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const NotFound = lazy(() => import("./pages/NotFound"));
