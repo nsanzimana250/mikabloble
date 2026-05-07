@@ -146,7 +146,7 @@ const Products = () => {
           mika_categories!left (id, name),
           mika_brands!left (id, name)
         `)
-        .order('created_at', { ascending: false });
+        ;
 
       if (productsError) {
         console.error('[Products] Products fetch error:', {
@@ -180,7 +180,8 @@ const Products = () => {
       }
 
       if (productsData && productsData.length > 0) {
-        const transformedProducts = productsData.map(transformProduct);
+        const shuffled = [...productsData].sort(() => Math.random() - 0.5);
+        const transformedProducts = shuffled.map(transformProduct);
         console.log('[Products] Transformed products:', transformedProducts.length);
         setProducts(transformedProducts);
       } else {
