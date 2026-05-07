@@ -253,7 +253,7 @@ const Checkout = () => {
                   </div>
                   <div className="mt-4 space-y-1 text-sm bg-muted rounded-lg p-4">
                     <p><span className="text-muted-foreground">Ship to:</span> {form.address || "KN 4 Ave"}, {form.city || "Kigali"}</p>
-                    <p><span className="text-muted-foreground">Payment:</span> {form.paymentMethod === "card" ? "Credit Card" : form.paymentMethod === "momo" ? "Mobile Money" : "Bank Transfer"}</p>
+                    <p><span className="text-muted-foreground">Payment:</span> MoMo Pay</p>
                   </div>
                   <div className="flex gap-3 mt-6">
                     <Button variant="outline" onClick={() => setStep(2)}><ChevronLeft className="h-4 w-4 mr-1" />Back</Button>
