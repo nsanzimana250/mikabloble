@@ -13,7 +13,7 @@ import { supabase } from "@/supabase";
 
 const Checkout = () => {
   const { items, subtotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [processing, setProcessing] = useState(false);
@@ -27,8 +27,8 @@ const Checkout = () => {
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", phone: "",
     address: "", city: "", zip: "", country: "Rwanda",
-    cardNumber: "", cardName: "", expiry: "", cvv: "",
-    paymentMethod: "card",
+    momoNumber: "",
+    paymentMethod: "momo",
   });
 
   // Redirect to login if not authenticated
@@ -38,7 +38,31 @@ const Checkout = () => {
     }
   }, [user, navigate, orderPlaced]);
 
+  // Prefill from profile / auth user
+  useEffect(() => {
+    if (!user) return;
+    const fullName = (profile?.name || user.user_metadata?.name || "").trim();
+    const [fn, ...rest] = fullName.split(" ");
+    setForm((p) => ({
+      ...p,
+      firstName: p.firstName || fn || "",
+      lastName: p.lastName || rest.join(" ") || "",
+      email: p.email || user.email || "",
+      phone: p.phone || profile?.phone || "",
+      address: p.address || profile?.address || "",
+      city: p.city || profile?.city || "",
+      country: profile?.country || p.country,
+    }));
+  }, [user, profile]);
+
   const update = (field: string, value: string) => setForm((p) => ({ ...p, [field]: value }));
+
+  const shippingValid =
+    form.firstName.trim() && form.lastName.trim() && form.email.trim() &&
+    form.phone.trim() && form.address.trim() && form.city.trim() &&
+    form.zip.trim() && form.country.trim();
+
+  const paymentValid = form.paymentMethod === "momo" && form.momoNumber.trim();
 
   const handlePlaceOrder = async () => {
     if (!user) {
