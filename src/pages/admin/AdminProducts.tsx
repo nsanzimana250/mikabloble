@@ -107,6 +107,7 @@ const AdminProducts = () => {
   // URL input states
   const [imageUrlInput, setImageUrlInput] = useState("");
   const [additionalImageUrl, setAdditionalImageUrl] = useState("");
+  const [uploadingMainImage, setUploadingMainImage] = useState(false);
 
   // Fetch all data
   const fetchAllData = useCallback(async () => {
