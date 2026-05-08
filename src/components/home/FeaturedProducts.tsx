@@ -37,7 +37,6 @@ const FeaturedProducts = () => {
             mika_brands (id, name)
           `)
           .eq('in_stock', true)
-          .order('created_at', { ascending: false })
           .limit(8); // CHANGED: from 6 to 8 products
 
         if (error) {
@@ -66,7 +65,10 @@ const FeaturedProducts = () => {
             compatibility: product.compatibility || []
           }));
 
-          setFeatured(transformedProducts);
+          // Shuffle products randomly
+          const shuffled = transformedProducts.sort(() => Math.random() - 0.5);
+
+          setFeatured(shuffled);
         } else {
           setFeatured([]);
         }
