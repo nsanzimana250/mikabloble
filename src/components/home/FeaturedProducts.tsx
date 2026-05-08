@@ -65,7 +65,10 @@ const FeaturedProducts = () => {
             compatibility: product.compatibility || []
           }));
 
-          setFeatured(transformedProducts);
+          // Shuffle products randomly
+          const shuffled = transformedProducts.sort(() => Math.random() - 0.5);
+
+          setFeatured(shuffled);
         } else {
           setFeatured([]);
         }
