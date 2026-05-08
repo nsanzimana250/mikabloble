@@ -1045,13 +1045,13 @@ const AdminProducts = () => {
                     
                     {/* Main Image */}
                     <div>
-                      <Label>Main Product Image URL *</Label>
+                      <Label>Main Product Image *</Label>
                       <div className="mt-2 space-y-3">
                         {productForm.image && (
                           <div className="relative w-32 h-32 rounded-lg overflow-hidden border group">
-                            <img 
-                              src={productForm.image} 
-                              alt="Main product preview" 
+                            <img
+                              src={productForm.image}
+                              alt="Main product preview"
                               className="w-full h-full object-cover"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
@@ -1067,27 +1067,52 @@ const AdminProducts = () => {
                             </button>
                           </div>
                         )}
-                        
+
                         {!productForm.image && (
-                          <div className="flex gap-2">
-                            <Input
-                              value={imageUrlInput}
-                              onChange={(e) => setImageUrlInput(e.target.value)}
-                              placeholder="https://example.com/image.jpg"
-                              className="flex-1"
-                            />
-                            <Button 
-                              type="button" 
-                              onClick={addImageUrl}
-                              size="sm"
-                            >
-                              Add URL
-                            </Button>
-                          </div>
+                          <Tabs defaultValue="upload" className="w-full">
+                            <TabsList className="grid w-full grid-cols-2">
+                              <TabsTrigger value="upload">
+                                <Upload className="h-4 w-4 mr-2" /> Upload from device
+                              </TabsTrigger>
+                              <TabsTrigger value="url">
+                                <ImageIcon className="h-4 w-4 mr-2" /> Use URL
+                              </TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="upload" className="mt-3">
+                              <div className="flex flex-col gap-2">
+                                <Input
+                                  type="file"
+                                  accept="image/*"
+                                  disabled={uploadingMainImage}
+                                  onChange={(e) => {
+                                    const f = e.target.files?.[0];
+                                    if (f) uploadMainImageFile(f);
+                                    e.target.value = '';
+                                  }}
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                  {uploadingMainImage ? 'Uploading...' : 'PNG, JPG, WEBP up to 5MB'}
+                                </p>
+                              </div>
+                            </TabsContent>
+                            <TabsContent value="url" className="mt-3">
+                              <div className="flex gap-2">
+                                <Input
+                                  value={imageUrlInput}
+                                  onChange={(e) => setImageUrlInput(e.target.value)}
+                                  placeholder="https://example.com/image.jpg"
+                                  className="flex-1"
+                                />
+                                <Button type="button" onClick={addImageUrl} size="sm">
+                                  Add URL
+                                </Button>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-2">
+                                Must include http:// or https://
+                              </p>
+                            </TabsContent>
+                          </Tabs>
                         )}
-                        <p className="text-xs text-muted-foreground">
-                          Enter a valid image URL (must include http:// or https://)
-                        </p>
                       </div>
                     </div>
 
