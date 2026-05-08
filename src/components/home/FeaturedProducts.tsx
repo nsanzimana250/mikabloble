@@ -37,7 +37,6 @@ const FeaturedProducts = () => {
             mika_brands (id, name)
           `)
           .eq('in_stock', true)
-          .order('created_at', { ascending: false })
           .limit(8); // CHANGED: from 6 to 8 products
 
         if (error) {
