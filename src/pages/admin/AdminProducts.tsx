@@ -251,6 +251,34 @@ const AdminProducts = () => {
     setProductForm(prev => ({ ...prev, image: '' }));
   };
 
+  const uploadMainImageFile = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be smaller than 5MB');
+      return;
+    }
+    try {
+      setUploadingMainImage(true);
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from('product-images')
+        .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+      if (upErr) throw upErr;
+      const { data } = supabase.storage.from('product-images').getPublicUrl(path);
+      setProductForm(prev => ({ ...prev, image: data.publicUrl }));
+      toast.success('Image uploaded');
+    } catch (err: any) {
+      console.error('Upload error:', err);
+      toast.error(`Upload failed: ${err.message || 'Unknown error'}`);
+    } finally {
+      setUploadingMainImage(false);
+    }
+  };
+
   const removeAdditionalImage = (index: number) => {
     setProductForm(prev => ({
       ...prev,
