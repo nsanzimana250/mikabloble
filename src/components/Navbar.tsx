@@ -3,24 +3,27 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ShoppingCart, Menu, X, LogIn, UserPlus, User, LogOut, Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
+import LanguageSwitcher from "./LanguageSwitcher";
 import logo from "@/assets/logo.png";
 
-const navLinks = [
-  { name: "Home", path: "/" },
-  { name: "Products", path: "/products" },
-  { name: "About", path: "/about" },
-  { name: "Contact", path: "/contact" },
-];
-
 const Navbar = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, profile, signOut } = useAuth();
   const { totalItems } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const navLinks = [
+    { name: t("nav.home"), path: "/" },
+    { name: t("nav.products"), path: "/products" },
+    { name: t("nav.about"), path: "/about" },
+    { name: t("nav.contact"), path: "/contact" },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -33,19 +36,19 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await signOut();
-      toast.success("Logged out successfully!");
+      toast.success(t("auth.logoutSuccess"));
       navigate("/");
     } catch (error) {
-      toast.error("Failed to logout");
+      toast.error(t("auth.logoutFailed"));
     }
   };
+
+  const iconBtn = `p-2 rounded-lg transition-colors ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10"}`;
 
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-card/95 backdrop-blur-md shadow-lg"
-          : "bg-primary"
+        scrolled ? "bg-card/95 backdrop-blur-md shadow-lg" : "bg-primary"
       }`}
     >
       <div className="section-container flex items-center justify-between h-16 md:h-20">
@@ -76,64 +79,49 @@ const Navbar = () => {
         </div>
 
         {/* Icons */}
-        <div className="flex items-center gap-3">
-          {/* Auth buttons based on state */}
+        <div className="flex items-center gap-1 sm:gap-2">
+          <LanguageSwitcher scrolled={scrolled} />
+
           {user ? (
             <>
-              {/* Profile Icon with Name */}
-              <Link 
-                to="/profile" 
-                className={`hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10"}`}
+              {/* Profile Icon — visible on ALL screens */}
+              <Link
+                to="/profile"
+                className={`flex items-center gap-2 px-2 sm:px-3 py-2 rounded-lg transition-colors ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10"}`}
+                title={t("nav.profile")}
               >
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
                   <User className="h-4 w-4" />
                 </div>
-                <span className="text-sm font-medium">
-                  {profile?.name?.split(' ')[0] || 'Profile'}
+                <span className="text-sm font-medium hidden sm:inline">
+                  {profile?.name?.split(" ")[0] || t("nav.profile")}
                 </span>
               </Link>
-              
-              {/* Notification Bell */}
-              <Link 
-                to="/notifications"
-                className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}
-                title="Notifications"
-              >
+
+              <Link to="/notifications" className={`${iconBtn} hidden sm:block`} title={t("nav.notifications")}>
                 <Bell className="h-5 w-5" />
               </Link>
-              
-              {/* Logout Button */}
-              <button 
-                onClick={handleLogout}
-                className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}
-                title="Logout"
-              >
+
+              <button onClick={handleLogout} className={`${iconBtn} hidden sm:block`} title={t("nav.logout")}>
                 <LogOut className="h-5 w-5" />
               </button>
             </>
           ) : (
             <>
-              <Link 
-                to="/login" 
-                className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}
-                title="Login"
-              >
+              {/* Login icon — visible on ALL screens (next to cart on mobile) */}
+              <Link to="/login" className={iconBtn} title={t("nav.login")} aria-label={t("nav.login")}>
                 <LogIn className="h-5 w-5" />
               </Link>
-              <Link 
-                to="/signup" 
-                className={`p-2 rounded-lg transition-colors hidden sm:block ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}
-                title="Sign Up"
-              >
+              <Link to="/signup" className={`${iconBtn} hidden sm:block`} title={t("nav.signup")} aria-label={t("nav.signup")}>
                 <UserPlus className="h-5 w-5" />
               </Link>
             </>
           )}
-          
+
           <Link
             to="/cart"
-            aria-label={`Shopping cart${totalItems > 0 ? ` with ${totalItems} items` : ''}`}
-            className={`p-2 rounded-lg transition-colors relative ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground"}`}
+            aria-label={`${t("nav.cart")}${totalItems > 0 ? ` (${totalItems})` : ""}`}
+            className={`${iconBtn} relative`}
           >
             <ShoppingCart className="h-5 w-5" />
             {totalItems > 0 && (
@@ -142,8 +130,9 @@ const Navbar = () => {
               </span>
             )}
           </Link>
+
           <button
-            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-label={isOpen ? t("common.close") : t("nav.menu")}
             aria-expanded={isOpen}
             className={`lg:hidden p-2 rounded-lg transition-colors ${scrolled ? "text-foreground" : "text-primary-foreground"}`}
             onClick={() => setIsOpen(!isOpen)}
@@ -180,19 +169,22 @@ const Navbar = () => {
                 {user ? (
                   <>
                     <Link to="/profile" className="px-4 py-3 rounded-lg font-medium text-foreground hover:bg-muted flex items-center gap-2">
-                      <User className="h-4 w-4" /> My Profile
+                      <User className="h-4 w-4" /> {t("nav.profile")}
+                    </Link>
+                    <Link to="/notifications" className="px-4 py-3 rounded-lg font-medium text-foreground hover:bg-muted flex items-center gap-2">
+                      <Bell className="h-4 w-4" /> {t("nav.notifications")}
                     </Link>
                     <button onClick={handleLogout} className="w-full text-left px-4 py-3 rounded-lg font-medium text-destructive hover:bg-destructive/10 flex items-center gap-2">
-                      <LogOut className="h-4 w-4" /> Sign Out
+                      <LogOut className="h-4 w-4" /> {t("nav.logout")}
                     </button>
                   </>
                 ) : (
                   <>
                     <Link to="/login" className="px-4 py-3 rounded-lg font-medium text-foreground hover:bg-muted flex items-center gap-2">
-                      <LogIn className="h-4 w-4" /> Sign In
+                      <LogIn className="h-4 w-4" /> {t("nav.login")}
                     </Link>
                     <Link to="/signup" className="px-4 py-3 rounded-lg font-medium text-foreground hover:bg-muted flex items-center gap-2">
-                      <UserPlus className="h-4 w-4" /> Sign Up
+                      <UserPlus className="h-4 w-4" /> {t("nav.signup")}
                     </Link>
                   </>
                 )}
