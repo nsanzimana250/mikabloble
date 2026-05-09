@@ -1,10 +1,21 @@
 import { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Search, Users as UsersIcon, Loader2, Shield, ShieldOff, UserCheck, UserX } from "lucide-react";
+import { Search, Users as UsersIcon, Loader2, UserCheck, UserX, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/supabase";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const AdminUsers = () => {
   const qc = useQueryClient();
@@ -30,6 +41,19 @@ const AdminUsers = () => {
     onSuccess: () => {
       toast.success("User updated");
       qc.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const deleteUser = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("mika_users").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("User deleted");
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      qc.invalidateQueries({ queryKey: ["admin-dashboard-full"] });
     },
     onError: (e: any) => toast.error(e.message),
   });
@@ -122,6 +146,33 @@ const AdminUsers = () => {
                         >
                           {u.is_active ? <UserX className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
                         </button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button
+                              title="Delete user"
+                              className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete user?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently delete <strong>{u.name || u.email}</strong>. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                onClick={() => deleteUser.mutate(u.id)}
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </td>
                   </tr>

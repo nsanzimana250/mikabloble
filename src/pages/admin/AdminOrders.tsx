@@ -1,11 +1,22 @@
 import { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Search, ShoppingBag, Loader2, ChevronDown, ChevronUp, Receipt } from "lucide-react";
+import { Search, ShoppingBag, Loader2, ChevronDown, ChevronUp, Receipt, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/supabase";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const statusOptions = ["pending", "processing", "shipped", "delivered", "cancelled"];
 const paymentStatusOptions = ["pending", "paid", "cancelled"];
@@ -119,6 +130,20 @@ const AdminOrders = () => {
       toast.success("Order status updated");
       qc.invalidateQueries({ queryKey: ["admin-orders"] });
       qc.invalidateQueries({ queryKey: ["admin-dashboard"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const deleteOrder = useMutation({
+    mutationFn: async (id: string) => {
+      await supabase.from("mika_order_items").delete().eq("order_id", id);
+      const { error } = await supabase.from("mika_orders").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Order deleted");
+      qc.invalidateQueries({ queryKey: ["admin-orders"] });
+      qc.invalidateQueries({ queryKey: ["admin-dashboard-full"] });
     },
     onError: (e: any) => toast.error(e.message),
   });
@@ -238,13 +263,40 @@ const AdminOrders = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="pt-2 border-t border-border">
+                        <div className="pt-2 border-t border-border flex flex-wrap items-center gap-2">
                           <button
                             onClick={() => generateReceipt(o)}
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium transition-colors"
                           >
                             <Receipt className="h-4 w-4" /> Generate Receipt
                           </button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground text-sm font-medium transition-colors"
+                              >
+                                <Trash2 className="h-4 w-4" /> Delete Order
+                              </button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete this order?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Order <strong>{o.order_number}</strong> and all its items will be permanently removed. This cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  onClick={() => deleteOrder.mutate(o.id)}
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </div>
                     </motion.div>
