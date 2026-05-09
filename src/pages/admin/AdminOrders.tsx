@@ -134,6 +134,20 @@ const AdminOrders = () => {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const deleteOrder = useMutation({
+    mutationFn: async (id: string) => {
+      await supabase.from("mika_order_items").delete().eq("order_id", id);
+      const { error } = await supabase.from("mika_orders").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Order deleted");
+      qc.invalidateQueries({ queryKey: ["admin-orders"] });
+      qc.invalidateQueries({ queryKey: ["admin-dashboard-full"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   const filtered = orders.filter((o: any) => {
     const text = `${o.first_name} ${o.last_name} ${o.order_number} ${o.email}`.toLowerCase();
     const matchSearch = text.includes(search.toLowerCase());
