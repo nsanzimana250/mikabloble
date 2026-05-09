@@ -1,11 +1,22 @@
 import { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Search, ShoppingBag, Loader2, ChevronDown, ChevronUp, Receipt } from "lucide-react";
+import { Search, ShoppingBag, Loader2, ChevronDown, ChevronUp, Receipt, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/supabase";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const statusOptions = ["pending", "processing", "shipped", "delivered", "cancelled"];
 const paymentStatusOptions = ["pending", "paid", "cancelled"];
