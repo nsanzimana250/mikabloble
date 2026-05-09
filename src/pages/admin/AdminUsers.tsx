@@ -1,10 +1,21 @@
 import { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Search, Users as UsersIcon, Loader2, Shield, ShieldOff, UserCheck, UserX } from "lucide-react";
+import { Search, Users as UsersIcon, Loader2, UserCheck, UserX, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/supabase";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const AdminUsers = () => {
   const qc = useQueryClient();
