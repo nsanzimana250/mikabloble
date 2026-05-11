@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/supabase"; // FIXED: Correct import path
 
 interface Brand {
@@ -11,6 +12,7 @@ interface Brand {
 }
 
 const BrandsCarousel = () => {
+  const { t } = useTranslation();
   const { t } = useTranslation();
   const [brands, setBrands] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
