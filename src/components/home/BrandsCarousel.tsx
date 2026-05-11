@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/supabase"; // FIXED: Correct import path
 
 interface Brand {
@@ -10,6 +11,7 @@ interface Brand {
 }
 
 const BrandsCarousel = () => {
+  const { t } = useTranslation();
   const [brands, setBrands] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +30,7 @@ const BrandsCarousel = () => {
         
         if (brandsError) {
           console.error('Error fetching brands:', brandsError);
-          setError('Failed to load brands');
+          setError(t('home.failedBrands'));
           setBrands([]);
           return;
         }
@@ -42,7 +44,7 @@ const BrandsCarousel = () => {
         }
       } catch (err) {
         console.error('Error fetching brands:', err);
-        setError('An error occurred while loading brands');
+        setError(t('home.failedBrands'));
         setBrands([]);
       } finally {
         setLoading(false);
@@ -57,7 +59,7 @@ const BrandsCarousel = () => {
       <section className="py-16 bg-card overflow-hidden">
         <div className="section-container">
           <div className="text-center mb-10">
-            <h2 className="section-title">Popular Brands</h2>
+            <h2 className="section-title">{t("home.popularBrands")}</h2>
             <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
           </div>
         </div>
@@ -82,7 +84,7 @@ const BrandsCarousel = () => {
       <section className="py-16 bg-card overflow-hidden">
         <div className="section-container">
           <div className="text-center mb-10">
-            <h2 className="section-title">Popular Brands</h2>
+            <h2 className="section-title">{t("home.popularBrands")}</h2>
             <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
           </div>
           <div className="text-center py-8">
@@ -91,7 +93,7 @@ const BrandsCarousel = () => {
               onClick={() => window.location.reload()} 
               className="btn-primary inline-block"
             >
-              Try Again
+              {t("common.tryAgain")}
             </button>
           </div>
         </div>
@@ -104,11 +106,11 @@ const BrandsCarousel = () => {
       <section className="py-16 bg-card overflow-hidden">
         <div className="section-container">
           <div className="text-center mb-10">
-            <h2 className="section-title">Popular Brands</h2>
+            <h2 className="section-title">{t("home.popularBrands")}</h2>
             <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
           </div>
           <div className="text-center py-8">
-            <p className="text-muted-foreground">No brands available at the moment.</p>
+            <p className="text-muted-foreground">{t("home.noBrands")}</p>
           </div>
         </div>
       </section>
@@ -119,7 +121,7 @@ const BrandsCarousel = () => {
     <section className="py-16 bg-card overflow-hidden">
       <div className="section-container">
         <div className="text-center mb-10">
-          <h2 className="section-title">Popular Brands</h2>
+          <h2 className="section-title">{t("home.popularBrands")}</h2>
           <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
         </div>
       </div>
