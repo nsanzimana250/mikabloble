@@ -4,33 +4,35 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/supabase";
 
-const contactSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(100),
-  email: z.string().trim().email("Invalid email").max(255),
-  phone: z.string().trim().max(30).optional().or(z.literal("")),
-  message: z.string().trim().min(1, "Message is required").max(2000),
-});
-
-const faqs = [
-  { q: "How long does shipping take?", a: "Standard shipping takes 5-7 business days domestically and 10-15 days internationally. Express options are available." },
-  { q: "Do you offer warranties on parts?", a: "Yes, all genuine parts come with manufacturer warranty. OEM parts carry a 12-month warranty." },
-  { q: "Can I return a part if it doesn't fit?", a: "Absolutely. We have a 30-day return policy for unused parts in original packaging." },
-  { q: "Do you ship internationally?", a: "Yes, we ship to over 120 countries worldwide with various shipping options." },
-  { q: "How can I track my order?", a: "Once shipped, you'll receive a tracking number via email to monitor your delivery." },
-];
-
 const Contact = () => {
+  const { t } = useTranslation();
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const contactSchema = z.object({
+    name: z.string().trim().min(1, t("contact.nameRequired")).max(100),
+    email: z.string().trim().email(t("contact.emailInvalid")).max(255),
+    phone: z.string().trim().max(30).optional().or(z.literal("")),
+    message: z.string().trim().min(1, t("contact.messageRequired")).max(2000),
+  });
+
+  const faqs = [
+    { q: t("contact.faqs.q1"), a: t("contact.faqs.a1") },
+    { q: t("contact.faqs.q2"), a: t("contact.faqs.a2") },
+    { q: t("contact.faqs.q3"), a: t("contact.faqs.a3") },
+    { q: t("contact.faqs.q4"), a: t("contact.faqs.a4") },
+    { q: t("contact.faqs.q5"), a: t("contact.faqs.a5") },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = contactSchema.safeParse(form);
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? "Please check the form");
+      toast.error(parsed.error.issues[0]?.message ?? t("contact.messageFailed"));
       return;
     }
     setSubmitting(true);
@@ -42,10 +44,10 @@ const Contact = () => {
         message: parsed.data.message,
       });
       if (error) throw error;
-      toast.success("Message sent successfully! We'll get back to you soon.");
+      toast.success(t("contact.messageSent"));
       setForm({ name: "", email: "", phone: "", message: "" });
     } catch (err: any) {
-      toast.error(err?.message ?? "Failed to send message. Please try again.");
+      toast.error(err?.message ?? t("contact.messageFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -56,8 +58,8 @@ const Contact = () => {
       {/* Hero */}
       <section className="gradient-hero py-16">
         <div className="section-container text-center">
-          <h1 className="font-display font-black text-4xl text-primary-foreground">Contact Us</h1>
-          <p className="text-primary-foreground/70 mt-3">We're here to help. Reach out anytime.</p>
+          <h1 className="font-display font-black text-4xl text-primary-foreground">{t("contact.title")}</h1>
+          <p className="text-primary-foreground/70 mt-3">{t("contact.subtitle")}</p>
         </div>
       </section>
 
@@ -66,10 +68,10 @@ const Contact = () => {
           {/* Contact Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
             {[
-              { icon: MapPin, title: "Address", text: "KN 8 Ave/RN3 and KG 14 Ave, Kigali, Rwanda" },
-              { icon: Phone, title: "Phone", text: "+250 793 209 175" },
-              { icon: Mail, title: "Email", text: "info@mikaglobalbusiness.com" },
-              { icon: Clock, title: "Hours", text: "Mon-Fri: 8AM-6PM\nSat: 9AM-2PM" },
+              { icon: MapPin, title: t("contact.address"), text: t("contact.addressValue") },
+              { icon: Phone, title: t("contact.phone"), text: "+250 793 209 175" },
+              { icon: Mail, title: t("contact.email"), text: "info@mikaglobalbusiness.com" },
+              { icon: Clock, title: t("contact.hours"), text: t("contact.hoursValue") },
             ].map(({ icon: Icon, title, text }) => (
               <div key={title} className="bg-card rounded-xl p-5 shadow-[var(--card-shadow)] text-center">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
@@ -103,11 +105,11 @@ const Contact = () => {
               onSubmit={handleSubmit}
               className="bg-card rounded-2xl p-6 shadow-[var(--card-shadow)] space-y-4"
             >
-              <h2 className="font-display font-bold text-xl text-card-foreground mb-2">Send Us a Message</h2>
+              <h2 className="font-display font-bold text-xl text-card-foreground mb-2">{t("contact.sendMessage")}</h2>
               {[
-                { name: "name", label: "Full Name", type: "text" },
-                { name: "email", label: "Email Address", type: "email" },
-                { name: "phone", label: "Phone (optional)", type: "tel" },
+                { name: "name", label: t("contact.fullName"), type: "text" },
+                { name: "email", label: t("contact.emailAddress"), type: "email" },
+                { name: "phone", label: t("contact.phoneOptional"), type: "tel" },
               ].map((field) => (
                 <div key={field.name}>
                   <label className="text-sm font-medium text-foreground mb-1 block">{field.label}</label>
@@ -121,7 +123,7 @@ const Contact = () => {
                 </div>
               ))}
               <div>
-                <label className="text-sm font-medium text-foreground mb-1 block">Message</label>
+                <label className="text-sm font-medium text-foreground mb-1 block">{t("contact.message")}</label>
                 <textarea
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
@@ -136,14 +138,14 @@ const Contact = () => {
                 className="btn-primary flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                {submitting ? "Sending…" : "Send Message"}
+                {submitting ? t("contact.sending") : t("contact.send")}
               </button>
             </motion.form>
           </div>
 
           {/* FAQ */}
           <div className="mt-16">
-            <h2 className="section-title text-center mb-8">Frequently Asked Questions</h2>
+            <h2 className="section-title text-center mb-8">{t("contact.faq")}</h2>
             <div className="max-w-2xl mx-auto space-y-3">
               {faqs.map((faq, i) => (
                 <div key={i} className="bg-card rounded-xl overflow-hidden shadow-[var(--card-shadow)]">
