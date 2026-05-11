@@ -2,10 +2,12 @@ import { Link } from "react-router-dom";
 import ProductCard from "@/components/ProductCard";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/supabase"; // FIXED: Correct import path
 import { Product } from "@/types/product";
 
 const FeaturedProducts = () => {
+  const { t } = useTranslation();
   const [featured, setFeatured] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +43,7 @@ const FeaturedProducts = () => {
 
         if (error) {
           console.error('Error fetching featured products:', error);
-          setError('Failed to load products');
+          setError(t('home.failedProducts'));
           setFeatured([]);
           return;
         }
@@ -74,7 +76,7 @@ const FeaturedProducts = () => {
         }
       } catch (err) {
         console.error('Error fetching featured products:', err);
-        setError('An error occurred while loading products');
+        setError(t('home.failedProducts'));
         setFeatured([]);
       } finally {
         setLoading(false);
@@ -89,9 +91,9 @@ const FeaturedProducts = () => {
       <section className="py-20">
         <div className="section-container">
           <div className="text-center mb-12">
-            <h2 className="section-title">Best Selling Spare Parts</h2>
+            <h2 className="section-title">{t("home.bestSelling")}</h2>
             <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
-            <p className="section-subtitle mt-3">Latest products from our inventory</p>
+            <p className="section-subtitle mt-3">{t("home.bestSellingDesc")}</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[...Array(8)].map((_, i) => ( // CHANGED: from 4 to 8 skeleton loaders
@@ -113,9 +115,9 @@ const FeaturedProducts = () => {
       <section className="py-20">
         <div className="section-container">
           <div className="text-center mb-12">
-            <h2 className="section-title">Best Selling Spare Parts</h2>
+            <h2 className="section-title">{t("home.bestSelling")}</h2>
             <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
-            <p className="section-subtitle mt-3">Latest products from our inventory</p>
+            <p className="section-subtitle mt-3">{t("home.bestSellingDesc")}</p>
           </div>
           <div className="text-center py-12">
             <p className="text-red-500 mb-4">{error}</p>
@@ -123,7 +125,7 @@ const FeaturedProducts = () => {
               onClick={() => window.location.reload()} 
               className="btn-primary inline-block"
             >
-              Try Again
+              {t("common.tryAgain")}
             </button>
           </div>
         </div>
@@ -135,9 +137,9 @@ const FeaturedProducts = () => {
     <section className="py-20">
       <div className="section-container">
         <div className="text-center mb-12">
-          <h2 className="section-title">Best Selling Spare Parts</h2>
+          <h2 className="section-title">{t("home.bestSelling")}</h2>
           <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
-          <p className="section-subtitle mt-3">Latest products from our inventory</p>
+          <p className="section-subtitle mt-3">{t("home.bestSellingDesc")}</p>
         </div>
 
         {featured.length > 0 ? (
@@ -156,13 +158,13 @@ const FeaturedProducts = () => {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No products available at the moment.</p>
+            <p className="text-muted-foreground">{t("home.noProducts")}</p>
           </div>
         )}
 
         <div className="text-center mt-10">
           <Link to="/products" className="btn-primary inline-block">
-            View All Products
+            {t("home.viewAllProducts")}
           </Link>
         </div>
       </div>

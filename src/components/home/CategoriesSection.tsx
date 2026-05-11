@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Cog, Disc3, Zap, Car, ArrowUpDown, Droplets, Settings, Wrench, Filter, Battery, Gauge, Thermometer } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/supabase"; // FIXED: Correct import path
 
 // Map of icons for different categories
@@ -43,6 +44,7 @@ interface Category {
 }
 
 const CategoriesSection = () => {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +63,7 @@ const CategoriesSection = () => {
         
         if (categoriesError) {
           console.error('Error fetching categories:', categoriesError);
-          setError('Failed to load categories');
+          setError(t('home.failedCategories'));
           setCategories([]);
           return;
         }
@@ -110,7 +112,7 @@ const CategoriesSection = () => {
         }
       } catch (err) {
         console.error('Error fetching categories:', err);
-        setError('An error occurred while loading categories');
+        setError(t('home.failedCategories'));
         setCategories([]);
       } finally {
         setLoading(false);
@@ -125,9 +127,9 @@ const CategoriesSection = () => {
       <section className="py-20 bg-card">
         <div className="section-container">
           <div className="text-center mb-12">
-            <h2 className="section-title">Browse by Category</h2>
+            <h2 className="section-title">{t("home.browseCategory")}</h2>
             <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
-            <p className="section-subtitle mt-3">Find the right parts for your vehicle</p>
+            <p className="section-subtitle mt-3">{t("home.browseCategoryDesc")}</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
             {[...Array(6)].map((_, i) => (
@@ -148,9 +150,9 @@ const CategoriesSection = () => {
       <section className="py-20 bg-card">
         <div className="section-container">
           <div className="text-center mb-12">
-            <h2 className="section-title">Browse by Category</h2>
+            <h2 className="section-title">{t("home.browseCategory")}</h2>
             <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
-            <p className="section-subtitle mt-3">Find the right parts for your vehicle</p>
+            <p className="section-subtitle mt-3">{t("home.browseCategoryDesc")}</p>
           </div>
           <div className="text-center py-12">
             <p className="text-red-500 mb-4">{error}</p>
@@ -158,7 +160,7 @@ const CategoriesSection = () => {
               onClick={() => window.location.reload()} 
               className="btn-primary inline-block"
             >
-              Try Again
+              {t("common.tryAgain")}
             </button>
           </div>
         </div>
@@ -171,12 +173,12 @@ const CategoriesSection = () => {
       <section className="py-20 bg-card">
         <div className="section-container">
           <div className="text-center mb-12">
-            <h2 className="section-title">Browse by Category</h2>
+            <h2 className="section-title">{t("home.browseCategory")}</h2>
             <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
-            <p className="section-subtitle mt-3">Find the right parts for your vehicle</p>
+            <p className="section-subtitle mt-3">{t("home.browseCategoryDesc")}</p>
           </div>
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No categories available at the moment.</p>
+            <p className="text-muted-foreground">{t("home.noCategories")}</p>
           </div>
         </div>
       </section>
@@ -187,9 +189,9 @@ const CategoriesSection = () => {
     <section className="py-20 bg-card">
       <div className="section-container">
         <div className="text-center mb-12">
-          <h2 className="section-title">Browse by Category</h2>
+          <h2 className="section-title">{t("home.browseCategory")}</h2>
           <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
-          <p className="section-subtitle mt-3">Find the right parts for your vehicle</p>
+          <p className="section-subtitle mt-3">{t("home.browseCategoryDesc")}</p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
@@ -211,7 +213,7 @@ const CategoriesSection = () => {
                     <Icon className="h-7 w-7 text-primary" />
                   </div>
                   <h3 className="font-semibold text-sm text-card-foreground text-center">{cat.name}</h3>
-                  <span className="text-xs text-muted-foreground">{cat.count || 0} parts</span>
+                  <span className="text-xs text-muted-foreground">{cat.count || 0} {t("common.parts")}</span>
                 </Link>
               </motion.div>
             );

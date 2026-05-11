@@ -1,19 +1,21 @@
 import { Globe, ShieldCheck, Headphones, RotateCcw } from "lucide-react";
 import { motion } from "framer-motion";
-
-const features = [
-  { icon: Globe, title: "Worldwide Shipping", desc: "Fast delivery to over 120 countries with real-time tracking." },
-  { icon: ShieldCheck, title: "100% Authentic Parts", desc: "Every part is genuine and backed by manufacturer warranty." },
-  { icon: Headphones, title: "24/7 Customer Support", desc: "Expert assistance available around the clock via chat, email, or phone." },
-  { icon: RotateCcw, title: "Easy Returns", desc: "Hassle-free 30-day return policy on all orders." },
-];
+import { useTranslation } from "react-i18next";
 
 const WhyChooseUs = () => {
+  const { t } = useTranslation();
+  const features = [
+    { icon: Globe, title: t("home.feat1Title"), desc: t("home.feat1Desc") },
+    { icon: ShieldCheck, title: t("home.feat2Title"), desc: t("home.feat2Desc") },
+    { icon: Headphones, title: t("home.feat3Title"), desc: t("home.feat3Desc") },
+    { icon: RotateCcw, title: t("home.feat4Title"), desc: t("home.feat4Desc") },
+  ];
+
   return (
     <section className="py-20">
       <div className="section-container">
         <div className="text-center mb-12">
-          <h2 className="section-title">Why Choose Us</h2>
+          <h2 className="section-title">{t("home.whyChoose")}</h2>
           <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
         </div>
 

@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import saleBanner from "@/assets/sale-banner.jpg";
 
 const SpecialOffers = () => {
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 12, minutes: 45, seconds: 30 });
 
   useEffect(() => {
@@ -30,20 +32,20 @@ const SpecialOffers = () => {
             <div className="section-container">
               <div className="max-w-lg">
                 <span className="inline-block bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1 rounded-full mb-4">
-                  LIMITED TIME OFFER
+                  {t("home.limitedTime")}
                 </span>
                 <h2 className="font-display font-bold text-3xl md:text-4xl text-primary-foreground mb-3">
-                  Special Discount on Brake Parts
+                  {t("home.specialDiscount")}
                 </h2>
-                <p className="text-primary-foreground/70 mb-6">Up to 30% off on premium brake systems. Don't miss out!</p>
+                <p className="text-primary-foreground/70 mb-6">{t("home.specialDiscountDesc")}</p>
 
                 {/* Countdown */}
                 <div className="flex gap-3 mb-6">
                   {[
-                    { value: timeLeft.days, label: "Days" },
-                    { value: timeLeft.hours, label: "Hours" },
-                    { value: timeLeft.minutes, label: "Min" },
-                    { value: timeLeft.seconds, label: "Sec" },
+                    { value: timeLeft.days, label: t("home.days") },
+                    { value: timeLeft.hours, label: t("home.hours") },
+                    { value: timeLeft.minutes, label: t("home.min") },
+                    { value: timeLeft.seconds, label: t("home.sec") },
                   ].map((unit) => (
                     <div key={unit.label} className="bg-primary-foreground/10 backdrop-blur-sm rounded-lg px-4 py-3 text-center min-w-[60px]">
                       <div className="font-display font-bold text-2xl text-primary-foreground">{String(unit.value).padStart(2, "0")}</div>
@@ -53,7 +55,7 @@ const SpecialOffers = () => {
                 </div>
 
                 <Link to="/products?category=Brake+Systems" className="btn-primary inline-block">
-                  Shop Sale
+                  {t("home.shopSale")}
                 </Link>
               </div>
             </div>

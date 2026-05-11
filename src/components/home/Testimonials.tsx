@@ -1,4 +1,5 @@
 import { Star, Quote } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -11,6 +12,7 @@ interface Testimonial {
 }
 
 const Testimonials = () => {
+  const { t } = useTranslation();
   const [current, setCurrent] = useState(0);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(false);
@@ -25,9 +27,9 @@ const Testimonials = () => {
       <section className="py-20">
         <div className="section-container">
           <div className="text-center">
-            <h2 className="section-title">What Our Customers Say</h2>
+            <h2 className="section-title">{t("home.testimonials")}</h2>
             <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
-            <p className="text-muted-foreground mt-8">Loading testimonials...</p>
+            <p className="text-muted-foreground mt-8">{t("home.testimonialsLoading")}</p>
           </div>
         </div>
       </section>
@@ -39,9 +41,9 @@ const Testimonials = () => {
       <section className="py-20">
         <div className="section-container">
           <div className="text-center">
-            <h2 className="section-title">What Our Customers Say</h2>
+            <h2 className="section-title">{t("home.testimonials")}</h2>
             <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
-            <p className="text-muted-foreground mt-8">Testimonials coming soon!</p>
+            <p className="text-muted-foreground mt-8">{t("home.testimonialsSoon")}</p>
           </div>
         </div>
       </section>
@@ -52,7 +54,7 @@ const Testimonials = () => {
     <section className="py-20">
       <div className="section-container">
         <div className="text-center mb-12">
-          <h2 className="section-title">What Our Customers Say</h2>
+          <h2 className="section-title">{t("home.testimonials")}</h2>
           <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
         </div>
 
