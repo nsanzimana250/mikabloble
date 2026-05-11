@@ -2,10 +2,12 @@ import { Link } from "react-router-dom";
 import ProductCard from "@/components/ProductCard";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/supabase"; // FIXED: Correct import path
 import { Product } from "@/types/product";
 
 const FeaturedProducts = () => {
+  const { t } = useTranslation();
   const [featured, setFeatured] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
