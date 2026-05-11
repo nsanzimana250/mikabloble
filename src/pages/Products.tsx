@@ -438,7 +438,7 @@ const Products = () => {
                 ))}
                 {search && (
                   <span className="flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-                    Search: {search}
+                    {t('products.searchLabel')} {search}
                     <button onClick={() => setSearch("")}><X className="h-3 w-3" /></button>
                   </span>
                 )}
@@ -450,7 +450,7 @@ const Products = () => {
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
                   <p className="text-muted-foreground">
-                    {!authReady ? 'Checking auth...' : 'Loading products...'}
+                    {!authReady ? t('products.checkingAuth') : t('products.loading')}
                   </p>
                 </div>
               </div>
