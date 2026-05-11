@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const partners = [
   { name: "Mika Global", logo: "/pateners/mikaglobal.png" },
@@ -8,14 +9,13 @@ const partners = [
 ];
 
 const PartnersSection = () => {
+  const { t } = useTranslation();
   return (
     <section className="py-16 bg-background">
       <div className="section-container">
         <div className="text-center mb-12">
-          <h2 className="section-title">Our Trusted Partners</h2>
-          <p className="section-subtitle">
-            Working together with leading brands and businesses
-          </p>
+          <h2 className="section-title">{t("home.trustedPartners")}</h2>
+          <p className="section-subtitle">{t("home.trustedPartnersDesc")}</p>
           <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
         </div>
 

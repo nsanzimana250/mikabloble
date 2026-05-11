@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
 import { Search, Truck } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
+  const { t } = useTranslation();
   return (
     <section className="relative min-h-[520px] sm:min-h-[600px] md:min-h-[680px] flex items-center gradient-hero overflow-hidden">
       <div className="absolute inset-0">
-        <img src={heroBg} alt="Car spare parts" className="w-full h-full object-cover opacity-30" />
+        <img src={heroBg} alt={t("home.heroTitle1")} className="w-full h-full object-cover opacity-30" />
         <div className="absolute inset-0 gradient-hero opacity-80" />
       </div>
 
@@ -20,7 +22,7 @@ const HeroSection = () => {
             className="inline-flex items-center gap-2 bg-green-500/20 backdrop-blur-sm border border-green-400/30 text-green-300 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-semibold mb-4 sm:mb-6"
           >
             <Truck className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
-            <span className="whitespace-nowrap">FREE DELIVERY — Nationwide!</span>
+            <span className="whitespace-nowrap">{t("home.freeDeliveryBadge")}</span>
           </motion.div>
 
           <motion.h1
@@ -29,8 +31,8 @@ const HeroSection = () => {
             transition={{ duration: 0.7 }}
             className="font-display font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-primary-foreground leading-tight"
           >
-            Quality Car Spare Parts for{" "}
-            <span className="text-gradient">Every Vehicle</span>
+            {t("home.heroTitle1")}{" "}
+            <span className="text-gradient">{t("home.heroTitle2")}</span>
           </motion.h1>
 
           <motion.p
@@ -39,7 +41,7 @@ const HeroSection = () => {
             transition={{ duration: 0.7, delay: 0.2 }}
             className="text-primary-foreground/70 text-base sm:text-lg md:text-xl mt-4 sm:mt-6 max-w-lg"
           >
-            From small clips to major engine components — MIKA GLOBAL delivers excellence worldwide.
+            {t("home.heroSubtitle")}
           </motion.p>
 
           <motion.div
@@ -51,10 +53,11 @@ const HeroSection = () => {
             <Search className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground/50 ml-2 sm:ml-3 shrink-0" />
             <input
               type="text"
-              placeholder="Search parts..."
+              placeholder={t("home.searchParts")}
+              aria-label={t("common.search")}
               className="flex-1 min-w-0 bg-transparent text-primary-foreground placeholder:text-primary-foreground/40 px-2 sm:px-3 py-2 sm:py-2.5 text-sm focus:outline-none"
             />
-            <button className="btn-primary rounded-lg px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm shrink-0">Search</button>
+            <button className="btn-primary rounded-lg px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm shrink-0">{t("common.search")}</button>
           </motion.div>
 
           <motion.div
@@ -63,8 +66,8 @@ const HeroSection = () => {
             transition={{ duration: 0.7, delay: 0.4 }}
             className="mt-6 sm:mt-8 flex flex-wrap gap-3 sm:gap-4"
           >
-            <Link to="/products" className="btn-primary text-sm sm:text-base">Shop Now</Link>
-            <Link to="/contact" className="btn-outline-hero text-sm sm:text-base">Request Quote</Link>
+            <Link to="/products" className="btn-primary text-sm sm:text-base">{t("home.shopNow")}</Link>
+            <Link to="/contact" className="btn-outline-hero text-sm sm:text-base">{t("home.requestQuote")}</Link>
           </motion.div>
 
           <motion.div
@@ -74,9 +77,9 @@ const HeroSection = () => {
             className="mt-8 sm:mt-12 grid grid-cols-3 gap-4 sm:flex sm:gap-8 max-w-md"
           >
             {[
-              { value: "50K+", label: "Parts" },
-              { value: "15K+", label: "Customers" },
-              { value: "120+", label: "Countries" },
+              { value: "50K+", label: t("home.statParts") },
+              { value: "15K+", label: t("home.statCustomers") },
+              { value: "120+", label: t("home.statCountries") },
             ].map((stat) => (
               <div key={stat.label}>
                 <div className="font-display font-bold text-xl sm:text-2xl text-secondary">{stat.value}</div>
