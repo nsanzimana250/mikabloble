@@ -256,10 +256,6 @@ const AdminProducts = () => {
       toast.error('Please select an image file');
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image must be smaller than 5MB');
-      return;
-    }
     try {
       setUploadingMainImage(true);
       const ext = file.name.split('.').pop() || 'jpg';
@@ -1091,7 +1087,7 @@ const AdminProducts = () => {
                                   }}
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                  {uploadingMainImage ? 'Uploading...' : 'PNG, JPG, WEBP up to 5MB'}
+                                  {uploadingMainImage ? 'Uploading...' : 'PNG, JPG, WEBP — any size'}
                                 </p>
                               </div>
                             </TabsContent>
