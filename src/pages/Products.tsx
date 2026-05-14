@@ -455,7 +455,7 @@ const Products = () => {
                 </div>
               </div>
             ) : filtered.length > 0 ? (
-              {viewMode === "grid" ? (
+              viewMode === "grid" ? (
                 <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-3">
                   {filtered.map((product, i) => (
                     <motion.div
@@ -501,7 +501,7 @@ const Products = () => {
                     </motion.div>
                   ))}
                 </div>
-              )}
+              )
             ) : (
               <div className="text-center py-20">
                 <p className="text-muted-foreground text-lg mb-4">{t("products.noResults")}</p>
