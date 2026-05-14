@@ -455,18 +455,53 @@ const Products = () => {
                 </div>
               </div>
             ) : filtered.length > 0 ? (
-              <div className={`grid gap-4 sm:gap-6 ${viewMode === "grid" ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}>
-                {filtered.map((product, i) => (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                  >
-                    <ProductCard product={product} />
-                  </motion.div>
-                ))}
-              </div>
+              {viewMode === "grid" ? (
+                <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-3">
+                  {filtered.map((product, i) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                    >
+                      <ProductCard product={product} />
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {filtered.map((product, i) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.03 }}
+                    >
+                      <Link
+                        to={`/products/${product.id}`}
+                        className="flex items-center gap-3 sm:gap-4 bg-card border border-border rounded-lg p-2 sm:p-3 hover:shadow-md transition-shadow"
+                      >
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 bg-white rounded-md overflow-hidden border">
+                          <img
+                            src={product.image || "/placeholder.svg"}
+                            alt={product.name}
+                            className="w-full h-full object-contain p-1"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm sm:text-base text-foreground line-clamp-1">{product.name}</h3>
+                          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{product.brand} · {product.category}</p>
+                          <span className="text-sm sm:text-base font-bold text-foreground mt-1 inline-block">
+                            RWF {product.price.toLocaleString()}
+                          </span>
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             ) : (
               <div className="text-center py-20">
                 <p className="text-muted-foreground text-lg mb-4">{t("products.noResults")}</p>

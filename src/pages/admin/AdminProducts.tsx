@@ -1044,22 +1044,31 @@ const AdminProducts = () => {
                       <Label>Main Product Image *</Label>
                       <div className="mt-2 space-y-3">
                         {productForm.image && (
-                          <div className="relative w-32 h-32 rounded-lg overflow-hidden border group">
-                            <img
-                              src={productForm.image}
-                              alt="Main product preview"
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
-                              }}
-                            />
+                          <div className="space-y-2">
+                            <div className="relative w-full max-w-md aspect-square rounded-lg overflow-hidden border bg-white group mx-auto sm:mx-0">
+                              <img
+                                src={productForm.image}
+                                alt="Main product preview"
+                                className="w-full h-full object-contain p-2"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
+                                }}
+                              />
+                              <button
+                                type="button"
+                                onClick={removeMainImage}
+                                className="absolute top-2 right-2 bg-destructive text-white rounded-full p-1.5 shadow-md hover:scale-110 transition-transform"
+                                title="Remove image"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
                             <button
                               type="button"
                               onClick={removeMainImage}
-                              className="absolute top-1 right-1 bg-destructive text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                              title="Remove image"
+                              className="text-xs text-destructive hover:underline"
                             >
-                              <X className="h-3 w-3" />
+                              Replace image
                             </button>
                           </div>
                         )}
