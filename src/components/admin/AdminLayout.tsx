@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Package, MessageSquare, LogOut, Menu, ChevronRight, ShoppingBag, Users } from "lucide-react";
+import { LayoutDashboard, Package, MessageSquare, LogOut, Menu, ChevronRight, ShoppingBag, Users, Mail, Shield } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const navItems = [
   { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
