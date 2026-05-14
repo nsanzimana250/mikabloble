@@ -18,7 +18,10 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user, profile } = useAuth();
+  const adminEmail = user?.email || profile?.email || localStorage.getItem("adminEmail") || "admin@mika.com";
+  const adminName = profile?.name || user?.user_metadata?.name || adminEmail.split("@")[0];
+  const initial = (adminName || "A").charAt(0).toUpperCase();
 
   const handleLogout = async () => {
     try {
