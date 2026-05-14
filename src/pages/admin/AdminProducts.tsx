@@ -251,25 +251,60 @@ const AdminProducts = () => {
     setProductForm(prev => ({ ...prev, image: '' }));
   };
 
+  // Resize/compress image client-side for fast uploads
+  const compressImage = async (file: File, maxDim = 1600, quality = 0.82): Promise<Blob> => {
+    // Skip compression for tiny files or non-raster (svg/gif)
+    if (file.size < 200 * 1024 || /svg|gif/i.test(file.type)) return file;
+    try {
+      const bitmap = await createImageBitmap(file);
+      const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+      const w = Math.round(bitmap.width * scale);
+      const h = Math.round(bitmap.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return file;
+      ctx.drawImage(bitmap, 0, 0, w, h);
+      const blob: Blob | null = await new Promise(res =>
+        canvas.toBlob(res, 'image/webp', quality)
+      );
+      if (!blob) return file;
+      // Only use compressed if actually smaller
+      return blob.size < file.size ? blob : file;
+    } catch {
+      return file;
+    }
+  };
+
   const uploadMainImageFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file');
       return;
     }
+    // Instant local preview while upload runs in background
+    const localPreview = URL.createObjectURL(file);
+    setProductForm(prev => ({ ...prev, image: localPreview }));
     try {
       setUploadingMainImage(true);
-      const ext = file.name.split('.').pop() || 'jpg';
+      const compressed = await compressImage(file);
+      const isWebp = compressed.type === 'image/webp';
+      const ext = isWebp ? 'webp' : (file.name.split('.').pop() || 'jpg');
+      const contentType = compressed.type || file.type;
       const path = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from('product-images')
-        .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+        .upload(path, compressed, { cacheControl: '3600', upsert: false, contentType });
       if (upErr) throw upErr;
       const { data } = supabase.storage.from('product-images').getPublicUrl(path);
       setProductForm(prev => ({ ...prev, image: data.publicUrl }));
+      URL.revokeObjectURL(localPreview);
       toast.success('Image uploaded');
     } catch (err: any) {
       console.error('Upload error:', err);
       toast.error(`Upload failed: ${err.message || 'Unknown error'}`);
+      setProductForm(prev => ({ ...prev, image: '' }));
+      URL.revokeObjectURL(localPreview);
     } finally {
       setUploadingMainImage(false);
     }
