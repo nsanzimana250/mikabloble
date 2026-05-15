@@ -214,6 +214,13 @@ const Checkout = () => {
                 <>
                   <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><CreditCard className="h-5 w-5 text-secondary" /> Payment Method</h2>
 
+                  <div className="mb-5 rounded-xl border-l-4 border-[#0c3b5e] bg-[#0c3b5e]/5 p-4 flex gap-3">
+                    <Shield className="h-5 w-5 text-[#0c3b5e] shrink-0 mt-0.5" />
+                    <p className="text-sm text-[#0c3b5e] leading-relaxed">
+                      <span className="font-semibold">Don't want to pay first?</span> You can place your order now and pay later after receiving a confirmation call from our office.
+                    </p>
+                  </div>
+
                   <div className="mb-6 relative overflow-hidden rounded-2xl border-2 border-[#ffcb05] bg-gradient-to-br from-[#0c3b5e] via-[#0c3b5e] to-[#08294a] p-5 shadow-md">
                     <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-[#ffcb05]/30 blur-2xl" />
                     <div className="relative flex items-center gap-4">
