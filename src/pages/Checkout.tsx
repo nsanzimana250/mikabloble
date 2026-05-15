@@ -278,7 +278,7 @@ const Checkout = () => {
                     <Button disabled={!paymentValid} onClick={() => {
                       if (!paymentValid) { toast.error("Please enter your Mobile Money number"); return; }
                       setStep(3);
-                    }}>Review Order</Button>
+                    }}>After Payment Send Us Your Order</Button>
                   </div>
                 </>
               )}
