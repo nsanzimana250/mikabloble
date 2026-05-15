@@ -11,6 +11,7 @@ import Layout from "@/components/Layout";
 import { motion } from "framer-motion";
 import { supabase } from "@/supabase";
 import momoLogo from "@/assets/momo-pay-logo.png";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { Copy } from "lucide-react";
 
 const Checkout = () => {
