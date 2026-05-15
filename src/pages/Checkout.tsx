@@ -238,10 +238,33 @@ const Checkout = () => {
                         <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">USSD Code</p>
                         <p className="font-mono font-bold text-lg text-foreground tracking-wider">*182*8*1*3529609#</p>
                       </div>
-                      <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => { navigator.clipboard.writeText("*182*8*1*3529609#"); toast.success("Code copied"); }}>
+                      <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => { navigator.clipboard.writeText(`*182*8*1*3529609*${Math.round(total)}#`); toast.success("Code copied"); }}>
                         <Copy className="h-4 w-4 mr-1" /> Copy
                       </Button>
                     </div>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+                              if (isMobile) {
+                                window.location.href = `tel:*182*8*1*3529609*${Math.round(total)}%23`;
+                              } else {
+                                toast.info("Open on your mobile phone");
+                              }
+                            }}
+                            className="mt-4 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
+                          >
+                            <span className="text-xl leading-none">📱</span>
+                            <span>Tap to Dial MoMo Pay</span>
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>Open on your mobile phone</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
 
                   <div>
