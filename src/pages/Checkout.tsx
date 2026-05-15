@@ -214,32 +214,32 @@ const Checkout = () => {
                 <>
                   <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><CreditCard className="h-5 w-5 text-secondary" /> Payment Method</h2>
 
-                  <div className="mb-6 relative overflow-hidden rounded-2xl border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 via-white to-yellow-100 dark:from-yellow-950/30 dark:via-background dark:to-yellow-900/20 p-5 shadow-md">
-                    <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-yellow-400/20 blur-2xl" />
+                  <div className="mb-6 relative overflow-hidden rounded-2xl border-2 border-[#ffcb05] bg-gradient-to-br from-[#0c3b5e] via-[#0c3b5e] to-[#08294a] p-5 shadow-md">
+                    <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-[#ffcb05]/30 blur-2xl" />
                     <div className="relative flex items-center gap-4">
                       <div className="h-16 w-16 shrink-0 rounded-xl bg-white shadow-sm flex items-center justify-center p-1">
                         <img src={momoLogo} alt="MoMo Pay" width={64} height={64} loading="lazy" className="h-full w-full object-contain" />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="font-bold text-foreground text-lg">MoMo Pay</p>
-                          <span className="text-[10px] font-bold uppercase tracking-wider bg-yellow-400 text-black px-2 py-0.5 rounded-full">Selected</span>
+                          <p className="font-bold text-white text-lg">MoMo Pay</p>
+                          <span className="text-[10px] font-bold uppercase tracking-wider bg-[#ffcb05] text-[#0c3b5e] px-2 py-0.5 rounded-full">Selected</span>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-0.5">Pay securely with Mobile Money</p>
+                        <p className="text-sm text-white/80 mt-0.5">Pay securely with Mobile Money</p>
                       </div>
-                      <Check className="h-6 w-6 text-yellow-500" />
+                      <Check className="h-6 w-6 text-[#ffcb05]" />
                     </div>
                   </div>
 
-                  <div className="rounded-2xl border border-border bg-gradient-to-br from-card to-muted/40 p-5 mb-5 shadow-sm">
+                  <div className="rounded-2xl border-2 border-[#0c3b5e]/20 bg-gradient-to-br from-card to-muted/40 p-5 mb-5 shadow-sm">
                     <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-2">Payment Instructions</p>
-                    <p className="font-bold text-foreground mb-4 leading-snug">ISHURA NA MOMO PAY K'UBUNTU – MIKA GLOBAL BUSINESS LTD</p>
-                    <div className="flex items-center justify-between gap-3 rounded-xl bg-background border-2 border-dashed border-yellow-400 px-4 py-3">
+                    <p className="font-bold text-[#0c3b5e] mb-4 leading-snug">ISHURA NA MOMO PAY K'UBUNTU – MIKA GLOBAL BUSINESS LTD</p>
+                    <div className="flex items-center justify-between gap-3 rounded-xl bg-background border-2 border-dashed border-[#ffcb05] px-4 py-3">
                       <div>
                         <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">USSD Code</p>
-                        <p className="font-mono font-bold text-lg text-foreground tracking-wider">*182*8*1*3529609#</p>
+                        <p className="font-mono font-bold text-lg text-[#0c3b5e] tracking-wider">*182*8*1*3529609#</p>
                       </div>
-                      <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => { navigator.clipboard.writeText(`*182*8*1*3529609*${Math.round(total)}#`); toast.success("Code copied"); }}>
+                      <Button type="button" variant="outline" size="sm" className="shrink-0 border-[#0c3b5e] text-[#0c3b5e] hover:bg-[#0c3b5e] hover:text-white" onClick={() => { navigator.clipboard.writeText(`*182*8*1*3529609*${Math.round(total)}#`); toast.success("Code copied"); }}>
                         <Copy className="h-4 w-4 mr-1" /> Copy
                       </Button>
                     </div>
@@ -257,7 +257,7 @@ const Checkout = () => {
                                 toast.info("Open on your mobile phone");
                               }
                             }}
-                            className="mt-4 w-full flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
+                            className="mt-4 w-full flex items-center justify-center gap-2 bg-[#ffcb05] hover:bg-[#e6b800] text-[#0c3b5e] font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-[0.98] border-2 border-[#0c3b5e]"
                           >
                             <span className="text-xl leading-none">📱</span>
                             <span>Tap to Dial MoMo Pay</span>
