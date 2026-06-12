@@ -12,7 +12,6 @@ import logo from "@/assets/logo.png";
 const Navbar = () => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const { user, profile, signOut } = useAuth();
   const { totalItems } = useCart();
   const location = useLocation();
@@ -24,12 +23,6 @@ const Navbar = () => {
     { name: t("nav.about"), path: "/about" },
     { name: t("nav.contact"), path: "/contact" },
   ];
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => setIsOpen(false), [location]);
 
@@ -43,13 +36,11 @@ const Navbar = () => {
     }
   };
 
-  const iconBtn = `p-2 rounded-lg transition-colors ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10"}`;
+  const iconBtn = "p-2 rounded-lg text-foreground transition-colors hover:bg-muted";
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-card/95 backdrop-blur-md shadow-lg" : "bg-primary"
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 bg-card/95 shadow-lg backdrop-blur-md"
     >
       <div className="section-container flex items-center justify-between h-16 md:h-20">
         {/* Logo */}
@@ -65,12 +56,8 @@ const Navbar = () => {
               to={link.path}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 location.pathname === link.path
-                  ? scrolled
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-primary-foreground/20 text-primary-foreground"
-                  : scrolled
-                  ? "text-foreground hover:bg-muted"
-                  : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-foreground hover:bg-muted"
               }`}
             >
               {link.name}
@@ -80,14 +67,14 @@ const Navbar = () => {
 
         {/* Icons */}
         <div className="flex items-center gap-1 sm:gap-2">
-          <LanguageSwitcher scrolled={scrolled} />
+          <LanguageSwitcher scrolled />
 
           {user ? (
             <>
               {/* Profile Icon — visible on ALL screens */}
               <Link
                 to="/profile"
-                className={`flex items-center gap-2 px-2 sm:px-3 py-2 rounded-lg transition-colors ${scrolled ? "text-foreground hover:bg-muted" : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10"}`}
+                className="flex items-center gap-2 rounded-lg px-2 py-2 text-foreground transition-colors hover:bg-muted sm:px-3"
                 title={t("nav.profile")}
               >
                 <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
@@ -134,7 +121,7 @@ const Navbar = () => {
           <button
             aria-label={isOpen ? t("common.close") : t("nav.menu")}
             aria-expanded={isOpen}
-            className={`lg:hidden p-2 rounded-lg transition-colors ${scrolled ? "text-foreground" : "text-primary-foreground"}`}
+            className="rounded-lg p-2 text-foreground transition-colors lg:hidden"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

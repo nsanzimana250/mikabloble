@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import HeroSection from "@/components/home/HeroSection";
-import CategoriesSection from "@/components/home/CategoriesSection";
+import ProductShowcaseSection from "@/components/home/ProductShowcaseSection";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 import SpecialOffers from "@/components/home/SpecialOffers";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
@@ -13,7 +13,7 @@ const Index = () => {
   return (
     <Layout>
       <HeroSection />
-      <CategoriesSection />
+      <ProductShowcaseSection />
       <FeaturedProducts />
       <SpecialOffers />
       <WhyChooseUs />

@@ -11,7 +11,7 @@ const partners = [
 const PartnersSection = () => {
   const { t } = useTranslation();
   return (
-    <section className="py-16 bg-background">
+    <section className="bg-white py-16">
       <div className="section-container">
         <div className="text-center mb-12">
           <h2 className="section-title">{t("home.trustedPartners")}</h2>

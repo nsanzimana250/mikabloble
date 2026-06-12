@@ -136,6 +136,9 @@
   .animate-pulse-orange {
     animation: pulseOrange 2s ease-in-out infinite;
   }
+  .animate-marquee-left-to-right {
+    animation: marqueeLeftToRight 26s linear infinite;
+  }
 }
 
 @keyframes float {
@@ -146,4 +149,9 @@
 @keyframes pulseOrange {
   0%, 100% { box-shadow: 0 0 0 0 hsl(25 95% 53% / 0.4); }
   50% { box-shadow: 0 0 0 12px hsl(25 95% 53% / 0); }
+}
+
+@keyframes marqueeLeftToRight {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
 }
