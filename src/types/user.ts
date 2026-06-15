@@ -7,7 +7,7 @@ export interface MikaUser {
   country?: string;
   city?: string;
   avatar?: string;
-  role: 'user' | 'admin' | 'moderator';
+  role: 'customer' | 'admin';
   created_at: string;
   updated_at: string;
   last_login?: string;
