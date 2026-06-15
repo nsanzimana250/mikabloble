@@ -203,7 +203,7 @@ const Profile = () => {
                 <Mail className="h-3 w-3" /> {user?.email}
               </p>
               <span className="inline-block mt-2 px-3 py-1 bg-primary/10 text-primary text-xs rounded-full capitalize">
-                {profile.role || 'customer'}
+                {profile.role || 'user'}
               </span>
             </div>
 
