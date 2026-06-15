@@ -10,6 +10,13 @@
 ALTER TABLE public.mika_users
   DROP CONSTRAINT IF EXISTS mika_users_role_check;
 
+-- 1a. Normalize any existing invalid role values so the new
+--     constraint can be applied. Keep admins, everything else
+--     becomes 'customer'.
+UPDATE public.mika_users
+  SET role = 'customer'
+  WHERE role IS NULL OR role NOT IN ('customer', 'admin');
+
 ALTER TABLE public.mika_users
   ALTER COLUMN role SET DEFAULT 'customer';
 
