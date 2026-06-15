@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           name: user.user_metadata?.name || user.email?.split("@")[0] || "User",
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          role: "customer",
+          role: "user",
           is_active: true,
           preferred_language: "en",
           currency: "RWF",
