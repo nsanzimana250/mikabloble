@@ -59,7 +59,7 @@ export const useAuth = () => {
                   name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
                   created_at: new Date().toISOString(),
                   updated_at: new Date().toISOString(),
-                  role: 'customer',
+                  role: 'user',
                   is_active: true,
                   preferred_language: 'en',
                   currency: 'RWF'

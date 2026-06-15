@@ -121,12 +121,13 @@ const AdminUsers = () => {
                     <td className="px-4 py-3 text-muted-foreground">{u.phone || "—"}</td>
                     <td className="px-4 py-3">
                       <select
-                        value={u.role || "customer"}
+                        value={u.role || "user"}
                         disabled={updateUser.isPending}
                         onChange={(e) => updateUser.mutate({ id: u.id, updates: { role: e.target.value } })}
                         className={`text-xs px-2 py-1 rounded-md font-medium capitalize border bg-background cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary ${u.role === "admin" ? "border-secondary text-secondary" : "border-border text-muted-foreground"}`}
                       >
-                        <option value="customer">Customer</option>
+                        <option value="user">User</option>
+                        <option value="moderator">Moderator</option>
                         <option value="admin">Admin</option>
                       </select>
                     </td>
