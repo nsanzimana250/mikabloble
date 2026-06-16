@@ -1,6 +1,8 @@
 import Layout from "@/components/Layout";
 import { motion } from "framer-motion";
 import { Target, Eye, Users, Package, Globe, Award } from "lucide-react";
+import { SEOHelmet } from "@/seo";
+import { pageSEO } from "@/seo";
 
 const stats = [
   { icon: Users, value: "15,000+", label: "Happy Customers" },
@@ -12,6 +14,7 @@ const stats = [
 const About = () => {
   return (
     <Layout>
+      <SEOHelmet seo={pageSEO.about} />
       <section className="gradient-hero py-20">
         <div className="section-container text-center">
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="font-display font-black text-4xl md:text-5xl text-primary-foreground">

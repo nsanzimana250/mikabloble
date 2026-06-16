@@ -8,10 +8,13 @@ import BrandsCarousel from "@/components/home/BrandsCarousel";
 import PartnersSection from "@/components/home/PartnersSection";
 import Testimonials from "@/components/home/Testimonials";
 import Newsletter from "@/components/home/Newsletter";
+import { SEOHelmet } from "@/seo";
+import { pageSEO } from "@/seo";
 
 const Index = () => {
   return (
     <Layout>
+      <SEOHelmet seo={pageSEO.home} />
       <HeroSection />
       <ProductShowcaseSection />
       <FeaturedProducts />

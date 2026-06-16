@@ -1,0 +1,39 @@
+{
+  "name": "MIKA GLOBAL BUSINESS LTD",
+  "short_name": "MIKA Global",
+  "description": "Premium automotive parts and accessories supplier in Kigali, Rwanda.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#1f3f94",
+  "lang": "en-RW",
+  "dir": "ltr",
+  "categories": ["automotive", "shopping", "business"],
+  "icons": [
+    {
+      "src": "/images/mika-logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "shortcuts": [
+    {
+      "name": "Products",
+      "short_name": "Shop",
+      "description": "Browse our auto parts catalog",
+      "url": "/products"
+    },
+    {
+      "name": "Contact",
+      "short_name": "Contact",
+      "description": "Get in touch with us",
+      "url": "/contact"
+    }
+  ]
+}

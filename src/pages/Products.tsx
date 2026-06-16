@@ -7,6 +7,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Search, SlidersHorizontal, Grid3X3, List, ChevronRight, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/supabase";
+import { SEOHelmet } from "@/seo";
+import { pageSEO } from "@/seo";
 
 interface Category {
   id: string;
@@ -338,8 +340,9 @@ const Products = () => {
 
   if (error) {
     return (
-      <Layout>
-        <div className="section-container py-8">
+    <Layout>
+      <SEOHelmet seo={pageSEO.products} />
+      <div className="section-container py-8">
           <div className="text-center py-20">
             <div className="text-red-500 text-lg mb-4">{error}</div>
             <button 

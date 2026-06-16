@@ -12,6 +12,8 @@ import { motion } from "framer-motion";
 import { supabase } from "@/supabase";
 import momoLogo from "@/assets/momo-pay-logo.png";
 import { Copy } from "lucide-react";
+import { SEOHelmet } from "@/seo";
+import { pageSEO } from "@/seo";
 
 const Checkout = () => {
   const { items, subtotal, clearCart } = useCart();
@@ -144,6 +146,7 @@ const Checkout = () => {
   if (items.length === 0 && !orderPlaced) {
     return (
       <Layout>
+        <SEOHelmet seo={pageSEO.checkout} />
         <div className="section-container py-20 text-center">
           <h1 className="section-title mb-4">Your cart is empty</h1>
           <Link to="/products"><Button>Browse Products</Button></Link>
@@ -155,6 +158,7 @@ const Checkout = () => {
   if (orderPlaced) {
     return (
       <Layout>
+        <SEOHelmet seo={pageSEO.checkout} />
         <div className="section-container py-20 flex flex-col items-center text-center">
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="h-20 w-20 rounded-full bg-green-500 flex items-center justify-center mb-6">
             <Check className="h-10 w-10 text-white" />
@@ -173,6 +177,7 @@ const Checkout = () => {
 
   return (
     <Layout>
+      <SEOHelmet seo={pageSEO.checkout} />
       <div className="section-container py-8 md:py-12">
         <div className="flex items-center justify-center gap-2 mb-10">
           {["Shipping", "Payment", "Review"].map((s, i) => (

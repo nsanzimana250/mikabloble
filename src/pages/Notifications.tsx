@@ -3,6 +3,8 @@ import Layout from "@/components/Layout";
 import { Bell, CheckCircle, Clock, Package, Truck, XCircle } from "lucide-react";
 import { supabase } from "@/supabase";
 import { useAuth } from "@/contexts/AuthContext";
+import { SEOHelmet } from "@/seo";
+import { pageSEO } from "@/seo";
 
 interface Notification {
   id: string;
@@ -125,6 +127,7 @@ const Notifications = () => {
 
   return (
     <Layout>
+      <SEOHelmet seo={pageSEO.notifications} />
       <section className="py-16 min-h-[80vh]">
         <div className="section-container max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-6">

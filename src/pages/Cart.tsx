@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { SEOHelmet } from "@/seo";
+import { pageSEO } from "@/seo";
 
 const Cart = () => {
   const { t } = useTranslation();
@@ -16,6 +18,7 @@ const Cart = () => {
   if (items.length === 0) {
     return (
       <Layout>
+        <SEOHelmet seo={pageSEO.cart} />
         <div className="section-container py-20 text-center">
           <ShoppingCart className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
           <h1 className="section-title">{t("cart.empty")}</h1>
@@ -28,6 +31,7 @@ const Cart = () => {
 
   return (
     <Layout>
+      <SEOHelmet seo={pageSEO.cart} />
       <div className="section-container py-8">
         <h1 className="section-title mb-8">{t("cart.title")} ({totalItems} {t("cart.items")})</h1>
 

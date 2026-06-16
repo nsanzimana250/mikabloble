@@ -1,16 +1,67 @@
+# robots.txt for MIKA GLOBAL BUSINESS LTD
+# https://www.mikaglobalbusiness.com
+
+# Crawl Settings
 User-agent: Googlebot
 Allow: /
+Allow: /products
+Allow: /about
+Allow: /contact
+Disallow: /admin/
+Disallow: /checkout
+Disallow: /profile
+Disallow: /notifications
+Disallow: /login
+Disallow: /signup
+Disallow: /api/
+Disallow: /*?
+Disallow: /*?search=
+Disallow: /*?category=
+Crawl-Delay: 10
+
+User-agent: Googlebot-Image
+Allow: /images/
+Allow: /correction_images/
+Allow: /pateners/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin/
+Disallow: /checkout
+Disallow: /profile
+Disallow: /notifications
+Disallow: /login
+Disallow: /signup
+Disallow: /api/
+Crawl-Delay: 10
 
 User-agent: Twitterbot
 Allow: /
+Allow: /images/
+Allow: /products
+Disallow: /admin/
+Disallow: /api/
 
 User-agent: facebookexternalhit
 Allow: /
+Allow: /products
+Allow: /images/
+Allow: /about
+Allow: /contact
 
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /checkout
+Disallow: /profile
+Disallow: /notifications
+Disallow: /login
+Disallow: /signup
+Crawl-Delay: 10
 
+# Sitemaps
 Sitemap: https://www.mikaglobalbusiness.com/sitemap.xml
+
+# Host
+Host: https://www.mikaglobalbusiness.com

@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/supabase";
+import { SEOHelmet } from "@/seo";
+import { pageSEO } from "@/seo";
 
 const Profile = () => {
   const [editing, setEditing] = useState(false);
@@ -154,6 +156,7 @@ const Profile = () => {
 
   return (
     <Layout>
+      <SEOHelmet seo={pageSEO.profile} />
       <section className="gradient-hero py-16 text-center">
         <h1 className="font-display font-black text-4xl text-primary-foreground">
           My Profile

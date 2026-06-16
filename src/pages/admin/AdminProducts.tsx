@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { 
   Plus, Search, Edit2, Trash2, X, Package, 
@@ -48,6 +48,9 @@ interface SpecItem {
   key: string;
   value: string;
 }
+
+const PRODUCT_IMAGE_PLACEHOLDER = "/placeholder.svg";
+const SUPPORTED_PRODUCT_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
 
 const AdminProducts = () => {
   const [productList, setProductList] = useState<ProductWithRelations[]>([]);
@@ -108,6 +111,30 @@ const AdminProducts = () => {
   const [imageUrlInput, setImageUrlInput] = useState("");
   const [additionalImageUrl, setAdditionalImageUrl] = useState("");
   const [uploadingMainImage, setUploadingMainImage] = useState(false);
+  const [mainImagePreviewUrl, setMainImagePreviewUrl] = useState("");
+  const mainImageObjectUrlRef = useRef<string | null>(null);
+
+  const setMainImagePreview = useCallback((url: string) => {
+    if (mainImageObjectUrlRef.current && mainImageObjectUrlRef.current !== url) {
+      URL.revokeObjectURL(mainImageObjectUrlRef.current);
+      mainImageObjectUrlRef.current = null;
+    }
+    setMainImagePreviewUrl(url);
+  }, []);
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.src.endsWith(PRODUCT_IMAGE_PLACEHOLDER)) return;
+    img.src = PRODUCT_IMAGE_PLACEHOLDER;
+  };
+
+  useEffect(() => {
+    return () => {
+      if (mainImageObjectUrlRef.current) {
+        URL.revokeObjectURL(mainImageObjectUrlRef.current);
+      }
+    };
+  }, []);
 
   // Fetch all data
   const fetchAllData = useCallback(async () => {
@@ -215,6 +242,7 @@ const AdminProducts = () => {
     try {
       new URL(imageUrlInput);
       setProductForm(prev => ({ ...prev, image: imageUrlInput }));
+      setMainImagePreview(imageUrlInput);
       setImageUrlInput('');
       toast.success('Main image URL added');
     } catch {
@@ -249,6 +277,7 @@ const AdminProducts = () => {
 
   const removeMainImage = () => {
     setProductForm(prev => ({ ...prev, image: '' }));
+    setMainImagePreview('');
   };
 
   const uploadMainImageFile = async (file: File) => {
@@ -256,6 +285,18 @@ const AdminProducts = () => {
       toast.error('Please select an image file');
       return;
     }
+    if (!SUPPORTED_PRODUCT_IMAGE_TYPES.includes(file.type)) {
+      toast.error('Please upload JPG, PNG, WEBP, GIF, or AVIF. HEIC photos need to be converted first.');
+      return;
+    }
+
+    const localPreviewUrl = URL.createObjectURL(file);
+    if (mainImageObjectUrlRef.current) {
+      URL.revokeObjectURL(mainImageObjectUrlRef.current);
+    }
+    mainImageObjectUrlRef.current = localPreviewUrl;
+    setMainImagePreviewUrl(localPreviewUrl);
+
     try {
       setUploadingMainImage(true);
       const ext = file.name.split('.').pop() || 'jpg';
@@ -269,6 +310,7 @@ const AdminProducts = () => {
       toast.success('Image uploaded');
     } catch (err: any) {
       console.error('Upload error:', err);
+      setProductForm(prev => ({ ...prev, image: '' }));
       toast.error(`Upload failed: ${err.message || 'Unknown error'}`);
     } finally {
       setUploadingMainImage(false);
@@ -346,6 +388,7 @@ const AdminProducts = () => {
       specs: [],
       images: []
     });
+    setMainImagePreview('');
     setImageUrlInput('');
     setAdditionalImageUrl('');
     setNewCompatibility('');
@@ -380,6 +423,7 @@ const AdminProducts = () => {
       specs: specsArray,
       images: p.images || []
     });
+    setMainImagePreview(p.image || '');
     setImageUrlInput('');
     setAdditionalImageUrl('');
     setShowProductForm(true);
@@ -798,12 +842,10 @@ const AdminProducts = () => {
                               onClick={() => openImageGallery(p, 0)}
                             >
                               <img 
-                                src={p.image || '/placeholder-image.jpg'} 
+                                src={p.image || PRODUCT_IMAGE_PLACEHOLDER} 
                                 alt={p.name} 
                                 className="h-10 w-10 rounded-lg object-cover shrink-0 border"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
-                                }}
+                                onError={handleImageError}
                               />
                               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                                 <Eye className="h-4 w-4 text-white" />
@@ -1043,15 +1085,13 @@ const AdminProducts = () => {
                     <div>
                       <Label>Main Product Image *</Label>
                       <div className="mt-2 space-y-3">
-                        {productForm.image && (
+                        {(mainImagePreviewUrl || productForm.image) && (
                           <div className="relative w-32 h-32 rounded-lg overflow-hidden border group">
                             <img
-                              src={productForm.image}
+                              src={mainImagePreviewUrl || productForm.image}
                               alt="Main product preview"
                               className="w-full h-full object-cover"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
-                              }}
+                              onError={handleImageError}
                             />
                             <button
                               type="button"
@@ -1064,7 +1104,7 @@ const AdminProducts = () => {
                           </div>
                         )}
 
-                        {!productForm.image && (
+                        {!(mainImagePreviewUrl || productForm.image) && (
                           <Tabs defaultValue="upload" className="w-full">
                             <TabsList className="grid w-full grid-cols-2">
                               <TabsTrigger value="upload">
@@ -1078,7 +1118,7 @@ const AdminProducts = () => {
                               <div className="flex flex-col gap-2">
                                 <Input
                                   type="file"
-                                  accept="image/*"
+                                  accept={SUPPORTED_PRODUCT_IMAGE_TYPES.join(',')}
                                   disabled={uploadingMainImage}
                                   onChange={(e) => {
                                     const f = e.target.files?.[0];
@@ -1087,7 +1127,7 @@ const AdminProducts = () => {
                                   }}
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                  {uploadingMainImage ? 'Uploading...' : 'PNG, JPG, WEBP — any size'}
+                                  {uploadingMainImage ? 'Uploading...' : 'JPG, PNG, WEBP, GIF, or AVIF'}
                                 </p>
                               </div>
                             </TabsContent>
@@ -1123,9 +1163,7 @@ const AdminProducts = () => {
                                 src={img} 
                                 alt={`Additional ${index + 1}`} 
                                 className="w-full h-full rounded-lg object-cover border"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
-                                }}
+                                onError={handleImageError}
                               />
                               <button
                                 type="button"
@@ -1452,12 +1490,10 @@ const AdminProducts = () => {
                         onClick={() => openImageGallery(viewProduct, 0)}
                       >
                         <img 
-                          src={viewProduct.image || '/placeholder-image.jpg'} 
+                          src={viewProduct.image || PRODUCT_IMAGE_PLACEHOLDER} 
                           alt={viewProduct.name} 
                           className="w-full h-64 object-cover rounded-lg border"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
-                          }}
+                          onError={handleImageError}
                         />
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                           <span className="text-white text-sm">Click to view gallery</span>
@@ -1472,12 +1508,10 @@ const AdminProducts = () => {
                               onClick={() => openImageGallery(viewProduct, index + 1)}
                             >
                               <img 
-                                src={img || '/placeholder-image.jpg'} 
+                                src={img || PRODUCT_IMAGE_PLACEHOLDER} 
                                 alt={`Additional ${index + 1}`} 
                                 className="w-full h-24 object-cover rounded-lg border"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
-                                }}
+                                onError={handleImageError}
                               />
                               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                                 <Eye className="h-4 w-4 text-white" />
@@ -1610,12 +1644,10 @@ const AdminProducts = () => {
                   {/* Main Image */}
                   <div className="flex items-center justify-center">
                     <img 
-                      src={getAllImages(viewProduct)[selectedImageIndex] || '/placeholder-image.jpg'} 
+                      src={getAllImages(viewProduct)[selectedImageIndex] || PRODUCT_IMAGE_PLACEHOLDER} 
                       alt={`${viewProduct.name} - Image ${selectedImageIndex + 1}`} 
                       className="max-h-[80vh] max-w-full object-contain rounded-lg"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
-                      }}
+                      onError={handleImageError}
                     />
                   </div>
 
@@ -1655,12 +1687,10 @@ const AdminProducts = () => {
                         }`}
                       >
                         <img 
-                          src={img || '/placeholder-image.jpg'} 
+                          src={img || PRODUCT_IMAGE_PLACEHOLDER} 
                           alt={`Thumbnail ${index + 1}`} 
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
-                          }}
+                          onError={handleImageError}
                         />
                       </button>
                     ))}

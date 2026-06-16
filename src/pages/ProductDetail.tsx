@@ -8,6 +8,7 @@ import { ChevronRight, Minus, Plus, Heart, ShoppingCart, Truck, ShieldCheck, Rot
 import { motion } from "framer-motion";
 import { supabase } from "@/supabase";
 import ImageLightbox from "@/components/ImageLightbox";
+import { SEOHelmet, pageSEO, siteConfig } from "@/seo";
 
 interface Product {
   id: string;
@@ -225,6 +226,7 @@ const ProductDetail = () => {
   if (error || !product) {
     return (
       <Layout>
+        <SEOHelmet seo={pageSEO.notFound} />
         <div className="section-container py-20 text-center">
           <h1 className="section-title text-2xl mb-4">Product Not Found</h1>
           <p className="text-muted-foreground mb-6">{error || "The product you're looking for doesn't exist."}</p>
@@ -234,8 +236,32 @@ const ProductDetail = () => {
     );
   }
 
+  const productImage = product.image || (product.images?.[0]) || siteConfig.logo;
+  const productAvailability = product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock";
+
   return (
     <Layout>
+      <SEOHelmet
+        seo={{
+          ...pageSEO.productDetail,
+          title: pageSEO.productDetail.title.replace("{productName}", product.name),
+          description: pageSEO.productDetail.description.replace("{productName}", product.name),
+          canonical: `${siteConfig.url}/products/${product.id}`,
+        }}
+        productName={product.name}
+        productId={product.id}
+        productPrice={product.price.toString()}
+        productImage={productImage}
+        productAvailability={productAvailability}
+        productBrand={product.brand}
+        imageAlt={product.name}
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Products", url: "/products" },
+          { name: product.category, url: `/products?category=${encodeURIComponent(product.category)}` },
+          { name: product.name, url: `/products/${product.id}` },
+        ]}
+      />
       <div className="section-container py-8 overflow-x-hidden">
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6 flex-wrap">

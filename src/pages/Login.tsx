@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import logo from "@/assets/logo.png";
 import { supabase } from "@/supabase";
+import { SEOHelmet } from "@/seo";
+import { pageSEO } from "@/seo";
 
 const Login = () => {
   const { t } = useTranslation();
@@ -58,6 +60,7 @@ const Login = () => {
 
   return (
     <Layout>
+      <SEOHelmet seo={pageSEO.login} />
       <section className="py-16 min-h-[80vh] flex items-center">
         <div className="section-container w-full max-w-md mx-auto">
           <motion.div

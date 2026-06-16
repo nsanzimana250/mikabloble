@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/supabase";
+import { SEOHelmet } from "@/seo";
+import { pageSEO } from "@/seo";
 
 const Contact = () => {
   const { t } = useTranslation();
@@ -55,6 +57,7 @@ const Contact = () => {
 
   return (
     <Layout>
+      <SEOHelmet seo={pageSEO.contact} />
       {/* Hero */}
       <section className="gradient-hero py-16">
         <div className="section-container text-center">
