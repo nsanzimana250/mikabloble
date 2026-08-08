@@ -13,13 +13,6 @@ const staticPages: SitemapUrl[] = [
   { loc: "/products", priority: 0.9, changefreq: "daily" },
   { loc: "/about", priority: 0.7, changefreq: "monthly" },
   { loc: "/contact", priority: 0.7, changefreq: "monthly" },
-  { loc: "/cart", priority: 0.4, changefreq: "weekly" },
-  { loc: "/login", priority: 0.3, changefreq: "monthly" },
-  { loc: "/signup", priority: 0.3, changefreq: "monthly" },
-];
-
-const adminPages: SitemapUrl[] = [
-  { loc: "/admin/login", priority: 0.1, changefreq: "monthly" },
 ];
 
 /**
@@ -29,7 +22,7 @@ const adminPages: SitemapUrl[] = [
  */
 export function generateSitemap(dynamicUrls: SitemapUrl[] = []): string {
   const today = new Date().toISOString().split("T")[0];
-  const allUrls = [...staticPages, ...adminPages, ...dynamicUrls];
+  const allUrls = [...staticPages, ...dynamicUrls];
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
   xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"`;

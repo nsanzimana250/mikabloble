@@ -9,7 +9,7 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-[520px] sm:min-h-[600px] md:min-h-[680px] flex items-center gradient-hero overflow-hidden">
       <div className="absolute inset-0">
-        <img src={heroBg} alt={t("home.heroTitle1")} className="w-full h-full object-cover opacity-30" />
+        <img src={heroBg} alt={t("home.heroTitle1")} width={1920} height={1080} decoding="async" className="w-full h-full object-cover opacity-30" />
         <div className="absolute inset-0 gradient-hero opacity-80" />
       </div>
 

@@ -26,7 +26,7 @@ const SpecialOffers = () => {
     <section className="py-20 bg-card">
       <div className="section-container">
         <div className="relative rounded-2xl overflow-hidden">
-          <img src={saleBanner} alt="Special offer" className="w-full h-[400px] md:h-[350px] object-cover" />
+          <img src={saleBanner} alt="Special offer" width={1600} height={600} loading="lazy" decoding="async" className="w-full h-[400px] md:h-[350px] object-cover" />
           <div className="absolute inset-0 gradient-hero opacity-85" />
           <div className="absolute inset-0 flex items-center">
             <div className="section-container">

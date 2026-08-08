@@ -1,266 +1,56 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams, Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
-import { useAuth } from "@/contexts/AuthContext";
 import { Search, SlidersHorizontal, Grid3X3, List, ChevronRight, X } from "lucide-react";
 import { motion } from "framer-motion";
-import { supabase } from "@/supabase";
 import { SEOHelmet } from "@/seo";
 import { pageSEO } from "@/seo";
-
-interface Category {
-  id: string;
-  name: string;
-  count?: number;
-}
-
-interface Brand {
-  id: string;
-  name: string;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  reviewCount: number;
-  category: string;
-  category_id?: string;
-  brand: string;
-  brand_id?: string;
-  inStock: boolean;
-  lowStock: boolean;
-  image: string;
-  images: string[];
-  specs: Record<string, any>;
-  compatibility: string[];
-}
+import { useBrands, useCategories, useProductPage } from "@/hooks/use-product-data";
+import { PRODUCT_PAGE_SIZE } from "@/lib/product-data";
 
 const Products = () => {
   const { t } = useTranslation();
-  const { authReady, session } = useAuth();
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "";
+  const initialBrand = searchParams.get("brand") || "";
 
   const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategory ? [initialCategory] : []);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState("popularity");
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(initialBrand ? [initialBrand] : []);
+  const [sortBy, setSortBy] = useState<"popularity" | "price-asc" | "price-desc">("popularity");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
-  
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const categoriesQuery = useCategories();
+  const brandsQuery = useBrands();
+  const categories = useMemo(() => categoriesQuery.data || [], [categoriesQuery.data]);
+  const brands = useMemo(() => brandsQuery.data || [], [brandsQuery.data]);
+  const categoryIds = useMemo(() => categories.filter((item) => selectedCategories.includes(item.name)).map((item) => item.id), [categories, selectedCategories]);
+  const brandIds = useMemo(() => brands.filter((item) => selectedBrands.includes(item.name)).map((item) => item.id), [brands, selectedBrands]);
 
-  const transformProduct = (product: any): Product => ({
-    id: product.id,
-    name: product.name,
-    description: product.description || '',
-    price: parseFloat(product.price),
-    originalPrice: product.original_price ? parseFloat(product.original_price) : undefined,
-    reviewCount: product.review_count || 0,
-    category: product.mika_categories?.name || 'Uncategorized',
-    category_id: product.category_id,
-    brand: product.mika_brands?.name || 'Unbranded',
-    brand_id: product.brand_id,
-    inStock: product.in_stock ?? true,
-    lowStock: product.low_stock ?? false,
-    image: product.image || '',
-    images: product.images || [],
-    specs: product.specs || {},
-    compatibility: product.compatibility || []
-  });
-
-  // Helper: Debug log Supabase session state
-  const logSessionState = async (context: string) => {
-    try {
-      const { data: { session: localSession }, error: sessionError } = await supabase.auth.getSession();
-      
-      const authState = !localSession 
-        ? 'unauthenticated' 
-        : localSession.expires_at && localSession.expires_at * 1000 < Date.now() 
-          ? 'expired' 
-          : 'authenticated';
-      
-      console.log(`[Products] ${context} - Session State:`, {
-        hasSession: !!localSession,
-        userId: localSession?.user?.id,
-        userEmail: localSession?.user?.email,
-        authState,
-        expiresAt: localSession?.expires_at ? new Date(localSession.expires_at * 1000).toISOString() : null,
-        error: sessionError?.message
-      });
-      
-      return { session: localSession, authState };
-    } catch (err) {
-      console.error('[Products] Session check error:', err);
-      return { session: null, authState: 'error' };
-    }
-  };
-
-  // Check auth state and wait for it to be ready (from context)
   useEffect(() => {
-    if (!authReady) {
-      console.log('[Products] Waiting for auth to be ready...');
-      return;
-    }
-    
-    console.log('[Products] Auth ready, current session:', session?.user?.id || 'none');
-  }, [authReady, session]);
+    const timeout = window.setTimeout(() => setDebouncedSearch(search), 300);
+    return () => window.clearTimeout(timeout);
+  }, [search]);
 
-  // Listen for auth state changes and refetch when user logs in/out
-  // Note: Auth state is now managed by AuthContext, this is just for data refetching
-  useEffect(() => {
-    if (!authReady) return;
+  useEffect(() => setPage(1), [debouncedSearch, selectedCategories, selectedBrands, sortBy]);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log('[Products] Auth state changed:', {
-        event: _event,
-        hasSession: !!session,
-        userId: session?.user?.id
-      });
-
-      // Reload data when auth state changes
-      loadData();
-    });
-
-    return () => subscription.unsubscribe();
-  }, [authReady]);
-
-  // Data loading function
-  const loadData = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const { session } = await logSessionState('Before fetch');
-      console.log('[Products] Current user:', session?.user || 'none');
-
-      const { data: productsData, error: productsError } = await supabase
-        .from('mika_products')
-        .select(`
-          *,
-          mika_categories!left (id, name),
-          mika_brands!left (id, name)
-        `)
-        ;
-
-      if (productsError) {
-        console.error('[Products] Products fetch error:', {
-          code: productsError.code,
-          message: productsError.message,
-          details: productsError.details,
-          hint: productsError.hint
-        });
-        setError(`Failed to load products: ${productsError.message}`);
-        return;
-      }
-
-      console.log('[Products] Raw products data:', productsData?.length || 0, 'products');
-
-      const { data: categoriesData, error: categoriesError } = await supabase
-        .from('mika_categories')
-        .select('*')
-        .order('name');
-
-      if (categoriesError) {
-        console.error('Categories error:', categoriesError);
-      }
-
-      const { data: brandsData, error: brandsError } = await supabase
-        .from('mika_brands')
-        .select('*')
-        .order('name');
-
-      if (brandsError) {
-        console.error('Brands error:', brandsError);
-      }
-
-      if (productsData && productsData.length > 0) {
-        const shuffled = [...productsData].sort(() => Math.random() - 0.5);
-        const transformedProducts = shuffled.map(transformProduct);
-        console.log('[Products] Transformed products:', transformedProducts.length);
-        setProducts(transformedProducts);
-      } else {
-        console.warn('[Products] No products returned - possible RLS issue');
-        setProducts([]);
-      }
-
-      if (categoriesData && categoriesData.length > 0) {
-        const productCounts: Record<string, number> = {};
-        (productsData || []).forEach(product => {
-          if (product.category_id) {
-            productCounts[product.category_id] = (productCounts[product.category_id] || 0) + 1;
-          }
-        });
-
-        const categoriesWithCount = categoriesData.map(cat => ({
-          id: cat.id,
-          name: cat.name,
-          description: cat.description,
-          image: cat.image,
-          count: productCounts[cat.id] || 0
-        }));
-        setCategories(categoriesWithCount);
-      } else {
-        setCategories([]);
-      }
-
-      setBrands(brandsData || []);
-
-    } catch (err) {
-      console.error('Error loading data:', err);
-      setError(t('products.failed'));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Fetch when auth is ready
-  useEffect(() => {
-    if (!authReady) return;
-    loadData();
-  }, [authReady, loadData]);
+  const filtersReady = (!selectedCategories.length || categoriesQuery.isSuccess) && (!selectedBrands.length || brandsQuery.isSuccess);
+  const productsQuery = useProductPage({ page, search: debouncedSearch, categoryIds, brandIds, sort: sortBy }, filtersReady);
+  const products = productsQuery.data?.products || [];
+  const totalProducts = productsQuery.data?.count || 0;
+  const totalPages = Math.max(1, Math.ceil(totalProducts / PRODUCT_PAGE_SIZE));
+  const loading = productsQuery.isPending;
+  const error = productsQuery.error;
 
   const toggleCategory = (cat: string) =>
     setSelectedCategories((prev) => prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]);
   
   const toggleBrand = (brand: string) =>
     setSelectedBrands((prev) => prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]);
-
-  const filtered = useMemo(() => {
-    let result = [...products];
-    
-    if (search) {
-      result = result.filter((p) => 
-        p.name.toLowerCase().includes(search.toLowerCase()) || 
-        p.description.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-    
-    if (selectedCategories.length) {
-      result = result.filter((p) => selectedCategories.includes(p.category));
-    }
-    
-    if (selectedBrands.length) {
-      result = result.filter((p) => selectedBrands.includes(p.brand));
-    }
-    
-    if (sortBy === "price-asc") {
-      result.sort((a, b) => a.price - b.price);
-    } else if (sortBy === "price-desc") {
-      result.sort((a, b) => b.price - a.price);
-    }
-    
-    return result;
-  }, [search, selectedCategories, selectedBrands, sortBy, products]);
 
   const resetFilters = () => {
     setSearch("");
@@ -299,9 +89,8 @@ const Products = () => {
                   checked={selectedCategories.includes(cat.name)}
                   onChange={() => toggleCategory(cat.name)}
                   className="rounded border-border accent-secondary"
-                  disabled={cat.count === 0}
                 />
-                {cat.name} <span className="text-muted-foreground ml-auto">({cat.count || 0})</span>
+                {cat.name}
               </label>
             ))
           )}
@@ -344,7 +133,7 @@ const Products = () => {
       <SEOHelmet seo={pageSEO.products} />
       <div className="section-container py-8">
           <div className="text-center py-20">
-            <div className="text-red-500 text-lg mb-4">{error}</div>
+            <div className="text-red-500 text-lg mb-4">{error instanceof Error ? error.message : t('products.failed')}</div>
             <button 
               onClick={() => window.location.reload()} 
               className="btn-primary"
@@ -395,13 +184,13 @@ const Products = () => {
                     </span>
                   )}
                 </button>
-                <span className="text-sm text-muted-foreground">{filtered.length} {t("common.viewAll").length > 0 ? "" : ""}{t("products.productsCount", { count: filtered.length }).replace(/\d+ /, "")}</span>
+                <span className="text-sm text-muted-foreground">{totalProducts} {t("common.viewAll").length > 0 ? "" : ""}{t("products.productsCount", { count: totalProducts }).replace(/\d+ /, "")}</span>
               </div>
 
               <div className="flex items-center gap-3">
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                   className="px-3 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-secondary"
                 >
                   <option value="popularity">{t("products.sortPopularity")}</option>
@@ -448,18 +237,15 @@ const Products = () => {
               </div>
             )}
 
-            {(!authReady || loading) ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                  <p className="text-muted-foreground">
-                    {!authReady ? t('products.checkingAuth') : t('products.loading')}
-                  </p>
-                </div>
-              </div>
-            ) : filtered.length > 0 ? (
+            {loading ? (
               <div className={`grid gap-4 sm:gap-6 ${viewMode === "grid" ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}>
-                {filtered.map((product, i) => (
+                {Array.from({ length: 12 }).map((_, index) => (
+                  <div key={index} className="aspect-[3/4] animate-pulse rounded-lg bg-muted" />
+                ))}
+              </div>
+            ) : products.length > 0 ? (
+              <div className={`grid gap-4 sm:gap-6 ${viewMode === "grid" ? "grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}>
+                {products.map((product, i) => (
                   <motion.div
                     key={product.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -475,6 +261,13 @@ const Products = () => {
                 <p className="text-muted-foreground text-lg mb-4">{t("products.noResults")}</p>
                 <button onClick={resetFilters} className="btn-primary">{t("products.resetFilters")}</button>
               </div>
+            )}
+            {totalPages > 1 && (
+              <nav className="mt-8 flex items-center justify-center gap-3" aria-label="Product pages">
+                <button className="rounded-lg border px-4 py-2 disabled:opacity-50" disabled={page === 1 || productsQuery.isFetching} onClick={() => setPage((value) => value - 1)}>Previous</button>
+                <span className="text-sm text-muted-foreground">Page {page} of {totalPages}</span>
+                <button className="rounded-lg border px-4 py-2 disabled:opacity-50" disabled={page === totalPages || productsQuery.isFetching} onClick={() => setPage((value) => value + 1)}>Next</button>
+              </nav>
             )}
           </div>
         </div>

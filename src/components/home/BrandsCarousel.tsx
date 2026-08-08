@@ -1,14 +1,6 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { supabase } from "@/supabase"; // FIXED: Correct import path
-
-interface Brand {
-  id: string;
-  name: string;
-  description?: string;
-  logo?: string;
-}
+import { useBrands } from "@/hooks/use-product-data";
 
 const renderHeader = (title: string) => (
   <div className="mb-10 text-center">
@@ -19,47 +11,8 @@ const renderHeader = (title: string) => (
 
 const BrandsCarousel = () => {
   const { t } = useTranslation();
-  const [brands, setBrands] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // Fetch all brands from database
-        const { data, error: brandsError } = await supabase
-          .from('mika_brands')
-          .select('name')
-          .order('name', { ascending: true });
-        
-        if (brandsError) {
-          console.error('Error fetching brands:', brandsError);
-          setError(t('home.failedBrands'));
-          setBrands([]);
-          return;
-        }
-        
-        if (data && data.length > 0) {
-          // Extract just the brand names
-          const brandNames = data.map(brand => brand.name);
-          setBrands(brandNames);
-        } else {
-          setBrands([]);
-        }
-      } catch (err) {
-        console.error('Error fetching brands:', err);
-        setError(t('home.failedBrands'));
-        setBrands([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBrands();
-  }, []);
+  const { data = [], isPending: loading, error } = useBrands();
+  const brands = data.map((brand) => brand.name);
 
   if (loading) {
     return (
@@ -87,7 +40,7 @@ const BrandsCarousel = () => {
         <div className="section-container">
           {renderHeader(t("home.popularBrands"))}
           <div className="py-8 text-center">
-            <p className="mb-4 text-red-500">{error}</p>
+            <p className="mb-4 text-red-500">{t('home.failedBrands')}</p>
             <button 
               onClick={() => window.location.reload()} 
               className="btn-primary inline-block"

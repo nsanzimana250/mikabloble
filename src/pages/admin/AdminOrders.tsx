@@ -102,7 +102,11 @@ const AdminOrders = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("mika_orders")
-        .select("*, items:mika_order_items(*, product:mika_products(id, name, image, images))")
+        .select(`
+          id,order_number,user_id,first_name,last_name,email,phone,address,city,zip,country,
+          subtotal,shipping_cost,tax,total,payment_method,payment_status,order_status,created_at,updated_at,
+          items:mika_order_items(id,product_id,product_name,product_price,quantity,total,product:mika_products(id,name,image))
+        `)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data || [];

@@ -11,8 +11,8 @@ export interface SEOData {
 export const siteConfig = {
   name: "MIKA GLOBAL BUSINESS LTD",
   shortName: "MIKA Global",
-  url: "https://www.mikaglobalbusiness.com",
-  logo: "https://www.mikaglobalbusiness.com/images/mika-logo.png",
+  url: "https://mikaglobalbusiness.com",
+  logo: "https://mikaglobalbusiness.com/images/mika-logo.png",
   defaultDescription:
     "MIKA GLOBAL BUSINESS LTD supplies high-quality automotive parts, engine oils, lubricants, and car accessories from Kigali, Rwanda with free delivery and expert support.",
   defaultKeywords:
@@ -65,6 +65,7 @@ export const pageSEO: Record<string, SEOData> = {
     keywords: "shopping cart, auto parts cart, car accessories order, MIKA GLOBAL cart",
     canonical: `${siteConfig.url}/cart`,
     ogType: "website",
+    noIndex: true,
   },
   checkout: {
     title: "Checkout | MIKA GLOBAL BUSINESS LTD",

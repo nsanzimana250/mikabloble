@@ -57,14 +57,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const { data, error } = await supabase
         .from('mika_cart')
-        .select('*, product:mika_products(*)')
+        .select(`quantity,product:mika_products(
+          id,name,description,price,original_price,review_count,category,category_id,
+          brand,brand_id,in_stock,low_stock,image,images,specs,compatibility
+        )`)
         .eq('user_id', user.id);
 
       if (error) throw error;
 
       if (data) {
-        const cartItems: CartItem[] = data.map((item: { product: Record<string, unknown>; quantity: number }) => ({
-          product: mapProduct(item.product),
+        const cartItems: CartItem[] = data.map((item) => ({
+          product: mapProduct((Array.isArray(item.product) ? item.product[0] : item.product) as Record<string, unknown>),
           quantity: item.quantity
         }));
         setItems(cartItems);

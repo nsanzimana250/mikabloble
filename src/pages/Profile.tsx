@@ -34,7 +34,10 @@ const Profile = () => {
     try {
       const { data, error } = await supabase
         .from("mika_orders")
-        .select(`*, items:mika_order_items(*, product:mika_products(id, name, image, images, brand, category))`)
+        .select(`
+          id,order_number,created_at,order_status,total,
+          items:mika_order_items(id,quantity,total,product:mika_products(id,name,image,brand,category))
+        `)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 

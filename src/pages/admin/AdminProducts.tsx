@@ -49,6 +49,9 @@ interface SpecItem {
   value: string;
 }
 
+const relationName = (relation: { name?: string } | { name?: string }[] | null, fallback: string) =>
+  (Array.isArray(relation) ? relation[0]?.name : relation?.name) || fallback;
+
 const PRODUCT_IMAGE_PLACEHOLDER = "/placeholder.svg";
 const SUPPORTED_PRODUCT_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
 
@@ -141,11 +144,16 @@ const AdminProducts = () => {
     try {
       setLoading(true);
       
-      // Fetch categories
-      const { data: categoriesData, error: categoriesError } = await supabase
-        .from('mika_categories')
-        .select('*')
-        .order('name');
+      const [categoriesResult, brandsResult, productsResult] = await Promise.all([
+        supabase.from('mika_categories').select('id,name,created_at,updated_at').order('name'),
+        supabase.from('mika_brands').select('id,name,created_at,updated_at').order('name'),
+        supabase.from('mika_products').select(`
+          id,name,description,price,original_price,review_count,category_id,brand_id,
+          in_stock,low_stock,image,images,specs,compatibility,created_at,
+          mika_categories!left (id, name),mika_brands!left (id, name)
+        `).order('created_at', { ascending: false }).limit(200),
+      ]);
+      const { data: categoriesData, error: categoriesError } = categoriesResult;
       
       if (categoriesError) {
         console.error('Error fetching categories:', categoriesError);
@@ -155,11 +163,7 @@ const AdminProducts = () => {
         setCategories(categoriesData || []);
       }
 
-      // Fetch brands
-      const { data: brandsData, error: brandsError } = await supabase
-        .from('mika_brands')
-        .select('*')
-        .order('name');
+      const { data: brandsData, error: brandsError } = brandsResult;
       
       if (brandsError) {
         console.error('Error fetching brands:', brandsError);
@@ -169,15 +173,7 @@ const AdminProducts = () => {
         setBrands(brandsData || []);
       }
 
-      // Fetch products with category and brand relations
-      const { data: productsData, error: productsError } = await supabase
-        .from('mika_products')
-        .select(`
-          *,
-          mika_categories!left (id, name),
-          mika_brands!left (id, name)
-        `)
-        .order('created_at', { ascending: false });
+      const { data: productsData, error: productsError } = productsResult;
       
       if (productsError) {
         console.error('Error fetching products:', productsError);
@@ -202,9 +198,9 @@ const AdminProducts = () => {
             price: parseFloat(product.price),
             originalPrice: product.original_price ? parseFloat(product.original_price) : undefined,
             reviewCount: product.review_count || 0,
-            category: product.mika_categories?.name || 'Uncategorized',
+            category: relationName(product.mika_categories, 'Uncategorized'),
             category_id: product.category_id,
-            brand: product.mika_brands?.name || 'Unbranded',
+            brand: relationName(product.mika_brands, 'Unbranded'),
             brand_id: product.brand_id,
             inStock: product.in_stock,
             lowStock: product.low_stock || false,

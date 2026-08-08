@@ -66,7 +66,7 @@ const useDashboardData = () =>
           .from("mika_orders")
           .select("id,total,order_status,payment_status,created_at,first_name,last_name,order_number,email")
           .order("created_at", { ascending: false }),
-        supabase.from("mika_products").select("*"),
+        supabase.from("mika_products").select("id,name,category_id,in_stock,low_stock"),
         supabase.from("mika_users").select("*").order("created_at", { ascending: false }),
         supabase.from("mika_order_items").select("product_name,quantity,total"),
         supabase.from("contact_messages").select("*").order("created_at", { ascending: false }),

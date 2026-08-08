@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { supabase } from "@/supabase";
+import { useCategories } from "@/hooks/use-product-data";
 
 const showcaseImages = [
   { src: "/correction_images/auto-products-assortment.jpg", alt: "Auto parts assortment" },
@@ -46,7 +46,8 @@ const fallbackCategories = [
 const ProductShowcaseSection = () => {
   const { t } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [categories, setCategories] = useState(fallbackCategories);
+  const { data: categoryData } = useCategories();
+  const categories = categoryData?.map((category) => category.name) || fallbackCategories;
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -54,21 +55,6 @@ const ProductShowcaseSection = () => {
     }, 4500);
 
     return () => window.clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const { data, error } = await supabase
-        .from("mika_categories")
-        .select("name")
-        .order("name", { ascending: true });
-
-      if (!error && data?.length) {
-        setCategories(data.map((category) => category.name));
-      }
-    };
-
-    fetchCategories();
   }, []);
 
   const activeImage = showcaseImages[activeIndex];
@@ -128,6 +114,10 @@ const ProductShowcaseSection = () => {
                   key={activeImage.src}
                   src={activeImage.src}
                   alt={activeImage.alt}
+                  width={900}
+                  height={700}
+                  loading="lazy"
+                  decoding="async"
                   className="max-h-[280px] w-full object-contain sm:max-h-[410px] md:max-h-[480px]"
                 />
               </div>

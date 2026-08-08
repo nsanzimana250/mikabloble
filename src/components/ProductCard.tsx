@@ -1,31 +1,16 @@
 import { ShoppingCart, Eye, Truck } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { Link } from "react-router-dom";
-import { useState } from "react";
-
-// Define Product interface locally instead of importing from static data
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  reviewCount: number;
-  category: string;
-  category_id?: string;
-  brand: string;
-  brand_id?: string;
-  inStock: boolean;
-  lowStock: boolean;
-  image: string;
-  images: string[];
-  specs: Record<string, any>;
-  compatibility: string[];
-}
+import { memo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { fetchProduct } from "@/lib/product-data";
+import { productKeys } from "@/hooks/use-product-data";
+import { getOptimizedImageUrl } from "@/lib/images";
+import type { Product } from "@/types/product";
 
 const ProductCard = ({ product }: { product: Product }) => {
   const { addToCart } = useCart();
-  const [hovered, setHovered] = useState(false);
+  const queryClient = useQueryClient();
   const [imageError, setImageError] = useState(false);
 
   const discount = product.originalPrice && product.originalPrice > product.price
@@ -33,10 +18,20 @@ const ProductCard = ({ product }: { product: Product }) => {
     : 0;
 
   // Fallback image in case the product image fails to load
-  const fallbackImage = "/images/placeholder.jpg"; // Update this path to your actual placeholder image
+  const fallbackImage = "/placeholder.svg";
 
   // Use a default placeholder if no image is provided
   const productImage = product.image || fallbackImage;
+  const image320 = getOptimizedImageUrl(productImage, 320);
+  const image640 = getOptimizedImageUrl(productImage, 640);
+
+  const prefetchProduct = () => {
+    void queryClient.prefetchQuery({
+      queryKey: productKeys.detail(product.id),
+      queryFn: () => fetchProduct(product.id),
+      staleTime: 10 * 60_000,
+    });
+  };
 
   const handleAddToCart = () => {
     if (product.inStock) {
@@ -47,16 +42,20 @@ const ProductCard = ({ product }: { product: Product }) => {
   return (
     <div
       className="product-card group relative flex flex-col h-full bg-card rounded-lg overflow-hidden border border-border hover:shadow-lg transition-shadow"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={prefetchProduct}
     >
       {/* Image Container - 80% of card, fully visible product */}
       <Link to={`/products/${product.id}`} className="relative block w-full bg-white overflow-hidden" style={{ aspectRatio: '1/1' }} aria-label={`View ${product.name}`}>
         <img
-          src={imageError ? fallbackImage : productImage}
+          src={imageError ? fallbackImage : image320}
+          srcSet={imageError ? undefined : `${image320} 320w, ${image640} 640w`}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 280px"
           alt={product.name}
+          width={640}
+          height={640}
           className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
+          decoding="async"
           onError={() => setImageError(true)}
         />
         
@@ -84,9 +83,9 @@ const ProductCard = ({ product }: { product: Product }) => {
         )}
         
         {/* Quick View Button on Hover */}
-        {hovered && product.inStock && (
+        {product.inStock && (
           <span
-            className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-lg z-10"
+            className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-lg z-10 opacity-0 group-hover:opacity-100 transition-opacity"
             aria-label="Quick view"
           >
             <Eye className="h-4 w-4 text-gray-700" />
@@ -120,4 +119,4 @@ const ProductCard = ({ product }: { product: Product }) => {
   );
 };
 
-export default ProductCard;
+export default memo(ProductCard);
