@@ -149,7 +149,7 @@ const Profile = () => {
       case 'shipped':
         return <Truck className="h-5 w-5 text-blue-500" />;
       case 'processing':
-        return <Clock className="h-5 w-5 text-yellow-500" />;
+        return <Clock className="h-5 w-5 text-orange-500" />;
       default:
         return <Package className="h-5 w-5 text-gray-500" />;
     }
@@ -435,7 +435,7 @@ const Profile = () => {
                                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                                   order.status === 'delivered' ? 'bg-green-100 text-green-700' :
                                   order.status === 'shipped' ? 'bg-blue-100 text-blue-700' :
-                                  'bg-yellow-100 text-yellow-700'
+                                  'bg-orange-100 text-orange-700'
                                 }`}>
                                   {order.status}
                                 </span>

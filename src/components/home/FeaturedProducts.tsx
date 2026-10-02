@@ -10,12 +10,11 @@ const FeaturedProducts = () => {
 
   if (loading) {
     return (
-      <section className="py-20">
+      <section className="py-9">
         <div className="section-container">
-          <div className="text-center mb-12">
+          <div className="mb-7 flex items-end justify-between border-b border-slate-200 pb-3 text-left">
             <h2 className="section-title">{t("home.bestSelling")}</h2>
-            <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
-            <p className="section-subtitle mt-3">{t("home.bestSellingDesc")}</p>
+            <p className="hidden text-sm text-muted-foreground sm:block">{t("home.bestSellingDesc")}</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[...Array(8)].map((_, i) => ( // CHANGED: from 4 to 8 skeleton loaders
@@ -34,11 +33,10 @@ const FeaturedProducts = () => {
 
   if (error) {
     return (
-      <section className="py-20">
+      <section className="py-9">
         <div className="section-container">
-          <div className="text-center mb-12">
+          <div className="mb-7 border-b border-slate-200 pb-3 text-left">
             <h2 className="section-title">{t("home.bestSelling")}</h2>
-            <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
             <p className="section-subtitle mt-3">{t("home.bestSellingDesc")}</p>
           </div>
           <div className="text-center py-12">
@@ -56,16 +54,15 @@ const FeaturedProducts = () => {
   }
 
   return (
-    <section className="py-20">
+    <section className="py-9">
       <div className="section-container">
-        <div className="text-center mb-12">
+        <div className="mb-7 flex items-end justify-between border-b border-slate-200 pb-3 text-left">
           <h2 className="section-title">{t("home.bestSelling")}</h2>
-          <div className="w-16 h-1 bg-secondary mx-auto mt-3 rounded-full" />
-          <p className="section-subtitle mt-3">{t("home.bestSellingDesc")}</p>
+          <p className="hidden text-sm text-muted-foreground sm:block">{t("home.bestSellingDesc")}</p>
         </div>
 
         {featured.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-6">
             {featured.map((product, i) => (
               <motion.div
                 key={product.id}
@@ -84,7 +81,7 @@ const FeaturedProducts = () => {
           </div>
         )}
 
-        <div className="text-center mt-10">
+        <div className="mt-7 text-center">
           <Link to="/products" className="btn-primary inline-block">
             {t("home.viewAllProducts")}
           </Link>

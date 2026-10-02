@@ -882,7 +882,7 @@ const AdminProducts = () => {
                         <td className="p-4">
                           <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                             !p.inStock ? "bg-red-500/10 text-red-500" : 
-                            p.lowStock ? "bg-yellow-500/10 text-yellow-600" : "bg-green-500/10 text-green-600"
+                            p.lowStock ? "bg-orange-500/10 text-orange-600" : "bg-green-500/10 text-green-600"
                           }`}>
                             {!p.inStock ? "Out of Stock" : p.lowStock ? "Low Stock" : "In Stock"}
                           </span>
@@ -1551,7 +1551,7 @@ const AdminProducts = () => {
                           <Label className="text-sm text-muted-foreground">Stock Status</Label>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                             !viewProduct.inStock ? "bg-red-500/10 text-red-500" : 
-                            viewProduct.lowStock ? "bg-yellow-500/10 text-yellow-600" : "bg-green-500/10 text-green-600"
+                            viewProduct.lowStock ? "bg-orange-500/10 text-orange-600" : "bg-green-500/10 text-green-600"
                           }`}>
                             {!viewProduct.inStock ? "Out of Stock" : viewProduct.lowStock ? "Low Stock" : "In Stock"}
                           </span>

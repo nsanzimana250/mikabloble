@@ -1,65 +1,25 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
-import saleBanner from "@/assets/sale-banner.jpg";
+import { useFeaturedProducts } from "@/hooks/use-product-data";
+import { getOptimizedImageUrl } from "@/lib/images";
 
 const SpecialOffers = () => {
   const { t } = useTranslation();
-  const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 12, minutes: 45, seconds: 30 });
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeLeft((prev) => {
-        let { days, hours, minutes, seconds } = prev;
-        seconds--;
-        if (seconds < 0) { seconds = 59; minutes--; }
-        if (minutes < 0) { minutes = 59; hours--; }
-        if (hours < 0) { hours = 23; days--; }
-        if (days < 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-        return { days, hours, minutes, seconds };
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const { data: products = [] } = useFeaturedProducts();
+  const product = products.find((item) => item.image) || products[0];
 
   return (
-    <section className="py-20 bg-card">
+    <section className="py-7">
       <div className="section-container">
-        <div className="relative rounded-2xl overflow-hidden">
-          <img src={saleBanner} alt="Special offer" width={1600} height={600} loading="lazy" decoding="async" className="w-full h-[400px] md:h-[350px] object-cover" />
-          <div className="absolute inset-0 gradient-hero opacity-85" />
-          <div className="absolute inset-0 flex items-center">
-            <div className="section-container">
-              <div className="max-w-lg">
-                <span className="inline-block bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1 rounded-full mb-4">
-                  {t("home.limitedTime")}
-                </span>
-                <h2 className="font-display font-bold text-3xl md:text-4xl text-primary-foreground mb-3">
-                  {t("home.specialDiscount")}
-                </h2>
-                <p className="text-primary-foreground/70 mb-6">{t("home.specialDiscountDesc")}</p>
-
-                {/* Countdown */}
-                <div className="flex gap-3 mb-6">
-                  {[
-                    { value: timeLeft.days, label: t("home.days") },
-                    { value: timeLeft.hours, label: t("home.hours") },
-                    { value: timeLeft.minutes, label: t("home.min") },
-                    { value: timeLeft.seconds, label: t("home.sec") },
-                  ].map((unit) => (
-                    <div key={unit.label} className="bg-primary-foreground/10 backdrop-blur-sm rounded-lg px-4 py-3 text-center min-w-[60px]">
-                      <div className="font-display font-bold text-2xl text-primary-foreground">{String(unit.value).padStart(2, "0")}</div>
-                      <div className="text-primary-foreground/60 text-xs">{unit.label}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <Link to="/products?category=Brake+Systems" className="btn-primary inline-block">
-                  {t("home.shopSale")}
-                </Link>
-              </div>
-            </div>
+        <div className="relative min-h-[220px] overflow-hidden border border-slate-200 bg-white px-7 py-8 sm:px-12">
+          <div className="relative z-10 max-w-lg">
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-[#e98400]">MIKA GLOBAL BUSINESS LTD</span>
+            <h2 className="mt-3 font-display text-3xl font-black uppercase leading-none text-[#15223a] sm:text-4xl">{product?.name || t("home.viewAllProducts")}</h2>
+            {product && <p className="mt-3 text-lg font-extrabold text-[#084995]">RWF {product.price.toLocaleString()}</p>}
+            <Link to={product ? `/products/${product.id}` : "/products"} className="mt-6 inline-block bg-[#ff9d1a] px-5 py-3 text-xs font-black uppercase text-[#15223a]">{t("home.shopNow")}</Link>
           </div>
+          {product?.image && <img src={getOptimizedImageUrl(product.image, 760)} alt={product.name} width={760} height={480} loading="lazy" decoding="async" className="absolute inset-y-0 right-0 h-full w-[52%] object-contain object-right p-4" />}
+          <div className="absolute inset-y-0 right-[34%] hidden w-24 -skew-x-12 bg-[#ff9d1a]/15 lg:block" />
         </div>
       </div>
     </section>

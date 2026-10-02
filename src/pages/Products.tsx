@@ -16,7 +16,7 @@ const Products = () => {
   const initialCategory = searchParams.get("category") || "";
   const initialBrand = searchParams.get("brand") || "";
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("search") || "");
   const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategory ? [initialCategory] : []);
   const [selectedBrands, setSelectedBrands] = useState<string[]>(initialBrand ? [initialBrand] : []);
   const [sortBy, setSortBy] = useState<"popularity" | "price-asc" | "price-desc">("popularity");
@@ -30,6 +30,15 @@ const Products = () => {
   const brands = useMemo(() => brandsQuery.data || [], [brandsQuery.data]);
   const categoryIds = useMemo(() => categories.filter((item) => selectedCategories.includes(item.name)).map((item) => item.id), [categories, selectedCategories]);
   const brandIds = useMemo(() => brands.filter((item) => selectedBrands.includes(item.name)).map((item) => item.id), [brands, selectedBrands]);
+
+  useEffect(() => {
+    const querySearch = searchParams.get("search") || "";
+    const queryCategory = searchParams.get("category") || "";
+    const queryBrand = searchParams.get("brand") || "";
+    setSearch(querySearch);
+    setSelectedCategories(queryCategory ? [queryCategory] : []);
+    setSelectedBrands(queryBrand ? [queryBrand] : []);
+  }, [searchParams]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => setDebouncedSearch(search), 300);

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Target, Eye, Users, Package, Globe, Award } from "lucide-react";
 import { SEOHelmet } from "@/seo";
 import { pageSEO } from "@/seo";
+import StoreBenefits from "@/components/StoreBenefits";
 
 const stats = [
   { icon: Users, value: "15,000+", label: "Happy Customers" },
@@ -25,6 +26,8 @@ const About = () => {
           </motion.p>
         </div>
       </section>
+
+      <StoreBenefits />
 
       <section className="py-20">
         <div className="section-container grid grid-cols-1 md:grid-cols-2 gap-12 items-center">

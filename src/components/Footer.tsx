@@ -1,44 +1,31 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Linkedin, Twitter, ArrowUp, Mail, Phone, MapPin } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
+import { Facebook, Instagram, Twitter, ArrowUp, Mail, Phone, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import logo from "@/assets/logo.png";
 
 const Footer = () => {
   const { t } = useTranslation();
-  const [email, setEmail] = useState("");
-
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      toast.success("Subscribed successfully!");
-      setEmail("");
-    }
-  };
-
   return (
-    <footer className="bg-primary text-primary-foreground">
+    <footer className="border-t-4 border-[#ff9d1a] bg-[#061d43] text-white">
       <div className="section-container py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Company Info */}
           <div>
             <div className="mb-4">
-              <img src={logo} alt="MIKA GLOBAL BUSINESS LTD" width="240" height="56" className="h-14 w-auto brightness-0 invert" />
+              <span className="inline-flex bg-white px-2 py-1"><img src={logo} alt="MIKA GLOBAL BUSINESS LTD" width="240" height="56" className="h-14 w-auto object-contain" /></span>
             </div>
             <p className="text-primary-foreground/90 text-sm leading-relaxed mb-4">
               {t("footer.tagline")}
             </p>
             <div className="flex gap-3">
               {[
-                { Icon: Facebook, label: "Facebook" },
-                { Icon: Instagram, label: "Instagram" },
-                { Icon: Linkedin, label: "LinkedIn" },
-                { Icon: Twitter, label: "Twitter" },
-              ].map(({ Icon, label }) => (
-                <a key={label} href="#" aria-label={`Follow us on ${label}`} className="p-2 rounded-lg bg-primary-foreground/10 hover:bg-secondary hover:text-secondary-foreground transition-colors">
+                { Icon: Facebook, label: "Facebook", href: "https://facebook.com/mikaglobalbusiness" },
+                { Icon: Instagram, label: "Instagram", href: "https://instagram.com/mikaglobalbusiness" },
+                { Icon: Twitter, label: "Twitter", href: "https://twitter.com/mikaglobalbiz" },
+              ].map(({ Icon, label, href }) => (
+                <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={`Follow us on ${label}`} className="p-2 rounded-sm bg-white/10 hover:bg-secondary hover:text-secondary-foreground transition-colors">
                   <Icon className="h-4 w-4" />
                 </a>
               ))}
@@ -81,26 +68,11 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Newsletter */}
+          {/* Customer support */}
           <div>
-            <h3 className="font-display font-semibold text-lg mb-4">{t("footer.newsletter")}</h3>
-            <p className="text-primary-foreground/90 text-sm mb-4">{t("footer.newsletterDesc")}</p>
-            <form onSubmit={handleSubscribe} className="flex gap-2">
-              <label htmlFor="newsletter-email" className="sr-only">{t("footer.yourEmail")}</label>
-              <input
-                id="newsletter-email"
-                type="email"
-                placeholder={t("footer.yourEmail")}
-                aria-label={t("footer.yourEmail")}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 min-w-0 px-2 py-1.5 h-8 rounded-md bg-primary-foreground/10 border border-primary-foreground/30 text-xs text-primary-foreground placeholder:text-primary-foreground/60 focus:outline-none focus:border-secondary"
-                required
-              />
-              <button type="submit" className="px-3 h-8 text-xs font-semibold rounded-md bg-secondary text-secondary-foreground hover:brightness-110 transition-all">
-                {t("footer.join")}
-              </button>
-            </form>
+            <h3 className="font-display font-semibold text-lg mb-4">Customer Support</h3>
+            <p className="text-white/70 text-sm mb-5">Need help finding a product or completing an order? Contact the Mika Global Business team.</p>
+            <Link to="/contact" className="inline-block bg-[#ff9d1a] px-4 py-2.5 text-xs font-extrabold uppercase text-[#16223a]">{t("nav.contact")}</Link>
           </div>
         </div>
       </div>

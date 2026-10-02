@@ -21,7 +21,7 @@ import {
 const statusOptions = ["pending", "processing", "shipped", "delivered", "cancelled"];
 const paymentStatusOptions = ["pending", "paid", "cancelled"];
 const statusColors: Record<string, string> = {
-  pending: "bg-yellow-500/10 text-yellow-600",
+  pending: "bg-orange-500/10 text-orange-600",
   processing: "bg-secondary/10 text-secondary",
   shipped: "bg-blue-500/10 text-blue-600",
   delivered: "bg-green-500/10 text-green-600",

@@ -40,7 +40,7 @@ const statusColors: Record<string, string> = {
   delivered: "bg-green-500/10 text-green-600",
   processing: "bg-secondary/10 text-secondary",
   shipped: "bg-primary/10 text-primary",
-  pending: "bg-yellow-500/10 text-yellow-600",
+  pending: "bg-orange-500/10 text-orange-600",
   cancelled: "bg-red-500/10 text-red-500",
   paid: "bg-green-500/10 text-green-600",
   failed: "bg-red-500/10 text-red-500",
@@ -289,7 +289,7 @@ const Dashboard = () => {
 
         {/* Alerts row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard title="Pending Orders" value={s.pendingOrders} icon={Clock} color="bg-yellow-500/10 text-yellow-600" delay={0.2} link="/admin/orders" />
+          <StatCard title="Pending Orders" value={s.pendingOrders} icon={Clock} color="bg-orange-500/10 text-orange-600" delay={0.2} link="/admin/orders" />
           <StatCard title="Unread Messages" value={s.unreadContacts} icon={Mail} color="bg-blue-500/10 text-blue-600" delay={0.25} link="/admin/contacts" />
           <StatCard title="Low Stock" value={s.lowStockCount} icon={AlertTriangle} color="bg-orange-500/10 text-orange-600" delay={0.3} link="/admin/products" />
           <StatCard title="Out of Stock" value={s.outOfStockCount} icon={XCircle} color="bg-red-500/10 text-red-600" delay={0.35} link="/admin/products" />

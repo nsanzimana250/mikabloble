@@ -6,10 +6,10 @@ import { JsonLdSchema } from "@/seo";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="store-shell min-h-screen flex flex-col overflow-x-hidden">
       <JsonLdSchema />
       <Navbar />
-      <main className="flex-1 pt-16 md:pt-20">{children}</main>
+      <main className="flex-1">{children}</main>
       <Footer />
       <WhatsAppWidget />
       <Analytics />
