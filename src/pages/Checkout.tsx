@@ -299,7 +299,7 @@ const Checkout = () => {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-card rounded-xl p-6 shadow-sm border border-border sticky top-24">
+            <div className="bg-card rounded-xl p-6 shadow-sm border border-border sticky top-[calc(var(--store-header-height,150px)+1rem)]">
               <h3 className="font-bold text-lg mb-4">Order Summary</h3>
               <div className="space-y-3 text-sm">
                 {items.map((item) => (

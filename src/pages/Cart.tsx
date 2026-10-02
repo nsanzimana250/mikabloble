@@ -72,7 +72,7 @@ const Cart = () => {
             ))}
           </div>
 
-          <div className="bg-card rounded-xl p-6 shadow-[var(--card-shadow)] h-fit sticky top-24">
+          <div className="bg-card rounded-xl p-6 shadow-[var(--card-shadow)] h-fit sticky top-[calc(var(--store-header-height,150px)+1rem)]">
             <h2 className="font-display font-semibold text-lg text-card-foreground mb-4">{t("cart.orderSummary")}</h2>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Bell, ChevronDown, Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -14,6 +14,8 @@ const Navbar = () => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [headerHeight, setHeaderHeight] = useState(150);
+  const headerRef = useRef<HTMLElement>(null);
   const { user, profile, signOut } = useAuth();
   const { totalItems, subtotal } = useCart();
   const { data: categories = [] } = useCategories();
@@ -22,6 +24,28 @@ const Navbar = () => {
   const navLinks = [{ name: t("nav.home"), path: "/" }, { name: t("nav.products"), path: "/products" }, { name: t("nav.about"), path: "/about" }, { name: t("nav.contact"), path: "/contact" }];
 
   useEffect(() => setIsOpen(false), [location]);
+
+  useLayoutEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+
+    const updateHeaderHeight = () => {
+      const height = Math.ceil(header.getBoundingClientRect().height);
+      setHeaderHeight(height);
+      document.documentElement.style.setProperty("--store-header-height", `${height}px`);
+    };
+
+    updateHeaderHeight();
+    const observer = new ResizeObserver(updateHeaderHeight);
+    observer.observe(header);
+    window.addEventListener("resize", updateHeaderHeight);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateHeaderHeight);
+      document.documentElement.style.removeProperty("--store-header-height");
+    };
+  }, []);
 
   const submitSearch = (event: React.FormEvent) => {
     event.preventDefault();
@@ -35,7 +59,8 @@ const Navbar = () => {
   };
 
   return (
-    <header className="store-header sticky top-0 z-50">
+    <Fragment>
+    <header ref={headerRef} className="store-header fixed inset-x-0 top-0 z-50">
       <div className="bg-[#061d43] text-white/70">
         <div className="section-container flex h-8 items-center justify-between text-[11px]">
           <LanguageSwitcher scrolled />
@@ -65,6 +90,8 @@ const Navbar = () => {
       <div className="hidden border-b bg-white text-xs text-slate-500 md:block"><div className="section-container flex h-9 items-center gap-2 overflow-hidden whitespace-nowrap"><span className="font-semibold text-slate-700">Categories:</span>{categories.slice(0, 8).map((category, index) => <span key={category.id} className="flex items-center gap-2"><Link to={`/products?category=${encodeURIComponent(category.name)}`} className="hover:text-[#084995]">{category.name}</Link>{index < Math.min(categories.length, 8) - 1 && <span>•</span>}</span>)}</div></div>
       <AnimatePresence>{isOpen && <motion.nav initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden border-t border-white/10 bg-[#082b61] text-white lg:hidden"><div className="section-container grid gap-1 py-3">{navLinks.map((link) => <Link key={link.path} to={link.path} className="rounded px-4 py-3 text-sm font-semibold hover:bg-white/10">{link.name}</Link>)}<details className="group"><summary className="flex cursor-pointer list-none items-center justify-between rounded px-4 py-3 text-sm font-semibold hover:bg-white/10">Categories <ChevronDown className="h-4 w-4 group-open:rotate-180" /></summary><div className="grid grid-cols-2 gap-1 px-3 pb-3">{categories.map((category) => <Link key={category.id} to={`/products?category=${encodeURIComponent(category.name)}`} className="rounded px-3 py-2 text-xs text-white/80 hover:bg-white/10">{category.name}</Link>)}</div></details></div></motion.nav>}</AnimatePresence>
     </header>
+    <div aria-hidden="true" style={{ height: headerHeight }} />
+    </Fragment>
   );
 };
 

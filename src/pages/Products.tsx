@@ -172,7 +172,7 @@ const Products = () => {
 
         <div className="flex gap-8">
           <aside className="hidden lg:block w-64 shrink-0">
-            <div className="bg-card rounded-xl p-5 shadow-[var(--card-shadow)] sticky top-24">
+            <div className="bg-card rounded-xl p-5 shadow-[var(--card-shadow)] sticky top-[calc(var(--store-header-height,150px)+1rem)]">
               <h3 className="font-display font-semibold text-lg mb-4">{t("products.filters")}</h3>
               <FilterSidebar />
             </div>
