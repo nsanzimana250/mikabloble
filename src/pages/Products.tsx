@@ -8,7 +8,6 @@ import { motion } from "framer-motion";
 import { SEOHelmet } from "@/seo";
 import { pageSEO } from "@/seo";
 import { useBrands, useCategories, useProductPage } from "@/hooks/use-product-data";
-import { PRODUCT_PAGE_SIZE } from "@/lib/product-data";
 
 const Products = () => {
   const { t } = useTranslation();
@@ -22,7 +21,6 @@ const Products = () => {
   const [sortBy, setSortBy] = useState<"popularity" | "price-asc" | "price-desc">("popularity");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
-  const [page, setPage] = useState(1);
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const categoriesQuery = useCategories();
   const brandsQuery = useBrands();
@@ -45,13 +43,10 @@ const Products = () => {
     return () => window.clearTimeout(timeout);
   }, [search]);
 
-  useEffect(() => setPage(1), [debouncedSearch, selectedCategories, selectedBrands, sortBy]);
-
   const filtersReady = (!selectedCategories.length || categoriesQuery.isSuccess) && (!selectedBrands.length || brandsQuery.isSuccess);
-  const productsQuery = useProductPage({ page, search: debouncedSearch, categoryIds, brandIds, sort: sortBy }, filtersReady);
+  const productsQuery = useProductPage({ search: debouncedSearch, categoryIds, brandIds, sort: sortBy }, filtersReady);
   const products = productsQuery.data?.products || [];
   const totalProducts = productsQuery.data?.count || 0;
-  const totalPages = Math.max(1, Math.ceil(totalProducts / PRODUCT_PAGE_SIZE));
   const loading = productsQuery.isPending;
   const error = productsQuery.error;
 
@@ -170,9 +165,9 @@ const Products = () => {
           )}
         </div>
 
-        <div className="flex gap-8">
-          <aside className="hidden lg:block w-64 shrink-0">
-            <div className="bg-card rounded-xl p-5 shadow-[var(--card-shadow)] sticky top-[calc(var(--store-header-height,150px)+1rem)]">
+        <div className="flex items-start gap-8">
+          <aside className="hidden w-64 shrink-0 self-start lg:sticky lg:top-[calc(var(--store-header-height,150px)+1rem)] lg:block">
+            <div className="max-h-[calc(100vh-var(--store-header-height,150px)-2rem)] overflow-y-auto rounded-xl bg-card p-5 shadow-[var(--card-shadow)]">
               <h3 className="font-display font-semibold text-lg mb-4">{t("products.filters")}</h3>
               <FilterSidebar />
             </div>
@@ -259,7 +254,7 @@ const Products = () => {
                     key={product.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
+                    transition={{ delay: Math.min(i * 0.05, 0.3) }}
                   >
                     <ProductCard product={product} />
                   </motion.div>
@@ -270,13 +265,6 @@ const Products = () => {
                 <p className="text-muted-foreground text-lg mb-4">{t("products.noResults")}</p>
                 <button onClick={resetFilters} className="btn-primary">{t("products.resetFilters")}</button>
               </div>
-            )}
-            {totalPages > 1 && (
-              <nav className="mt-8 flex items-center justify-center gap-3" aria-label="Product pages">
-                <button className="rounded-lg border px-4 py-2 disabled:opacity-50" disabled={page === 1 || productsQuery.isFetching} onClick={() => setPage((value) => value - 1)}>Previous</button>
-                <span className="text-sm text-muted-foreground">Page {page} of {totalPages}</span>
-                <button className="rounded-lg border px-4 py-2 disabled:opacity-50" disabled={page === totalPages || productsQuery.isFetching} onClick={() => setPage((value) => value + 1)}>Next</button>
-              </nav>
             )}
           </div>
         </div>

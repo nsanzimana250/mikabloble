@@ -6,7 +6,7 @@ import { JsonLdSchema } from "@/seo";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="store-shell min-h-screen flex flex-col overflow-x-hidden">
+    <div className="store-shell min-h-screen flex flex-col overflow-x-clip">
       <JsonLdSchema />
       <Navbar />
       <main className="flex-1">{children}</main>

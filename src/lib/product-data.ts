@@ -67,7 +67,7 @@ export const mapProduct = (row: Record<string, any>): Product => ({
 });
 
 export interface ProductFilters {
-  page: number;
+  page?: number;
   pageSize?: number;
   search?: string;
   categoryIds?: string[];
@@ -82,8 +82,6 @@ export interface ProductPage {
 
 export async function fetchProductPage(filters: ProductFilters): Promise<ProductPage> {
   const pageSize = filters.pageSize || PRODUCT_PAGE_SIZE;
-  const from = (filters.page - 1) * pageSize;
-  const to = from + pageSize - 1;
   let query = supabase
     .from("mika_products")
     .select(PRODUCT_CARD_COLUMNS, { count: "exact" });
@@ -97,7 +95,12 @@ export async function fetchProductPage(filters: ProductFilters): Promise<Product
   else if (filters.sort === "price-desc") query = query.order("price", { ascending: false });
   else query = query.order("created_at", { ascending: false });
 
-  const { data, error, count } = await query.range(from, to);
+  if (filters.page !== undefined) {
+    const from = (filters.page - 1) * pageSize;
+    query = query.range(from, from + pageSize - 1);
+  }
+
+  const { data, error, count } = await query;
   if (error) throw error;
   return { products: (data || []).map(mapProduct), count: count || 0 };
 }
